@@ -5,7 +5,7 @@ export default function Footer() {
         <div>
           <strong>koaus</strong> —
           <span data-i18n="footerText"
-            >한국 브랜드의 미국 시장 검증과 론칭 실행.</span
+            >한국 소비재의 미국시장 실증 검증 서비스.</span
           >
         </div>
         <div className="footer-links">

@@ -3,7 +3,7 @@ export default function Header() {
     <header className="site-header">
       <div className="shell header-inner">
         <a className="wordmark" href="/" aria-label="Koaus home"
-          >koaus <span>/ launch studio</span></a
+          >koaus <span>/ us validation</span></a
         >
         <nav className="desktop-nav" aria-label="Primary navigation">
           <a href="#services" data-i18n="navServices">서비스</a>
@@ -28,7 +28,7 @@ export default function Header() {
             className="button button--dark"
             href="#contact"
             data-i18n="requestPilot"
-            >미국 런칭 문의</a
+            >제품 검증 시작하기</a
           >
           <button
             className="menu-toggle"

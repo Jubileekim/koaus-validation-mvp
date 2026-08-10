@@ -185,18 +185,21 @@ export default function HeroSection() {
       <div className="shell hero-ugc-inner">
         <div className="hero-ugc-copy" data-reveal>
           <p className="eyebrow" data-i18n="heroEyebrow">
-            미국 진출 전, 먼저 검증하세요
+            US MARKET VALIDATION
           </p>
           <h1 id="hero-title" data-i18n="heroTitle">
-            <span className="hero-title-line">끝없이 커지는 미국 시장,</span>
-            <span className="hero-title-line"><em>우리 브랜드도</em> 통할까요?</span>
+            <span className="hero-title-line">미국에 대량으로 보내기 전에,</span>
+            <span className="hero-title-line"><em>실제로 팔리고 남는지</em> 먼저 확인하세요.</span>
           </h1>
           <div className="hero-ugc-body hero-validation" data-i18n="heroBody">
-            <p className="hero-validation__lead">큰 비용과 재고를 먼저 투입하기 전에</p>
+            <p className="hero-validation__lead">
+              KoaUS는 한국 소비재 제품을 미국 소비자에게 실제로 노출하고
+              시장 반응, 고객 피드백, 배송비, 판매원가와 예상 마진까지 검증합니다.
+            </p>
             <div className="hero-validation__rows">
-              <div><strong>CREATOR</strong><span>제품 적합도 확인</span></div>
-              <div><strong>UGC</strong><span>고객 반응 측정</span></div>
-              <div><strong>COMMERCE</strong><span>실제 구매 가능성 검증</span></div>
+              <div><strong>MARKET FIT</strong><span>제품·시장 적합도</span></div>
+              <div><strong>CREATIVE</strong><span>수요·메시지 반응 테스트</span></div>
+              <div><strong>ECONOMICS</strong><span>배송·VOC·마진 검증</span></div>
             </div>
           </div>
 
@@ -205,29 +208,29 @@ export default function HeroSection() {
               className="button button--lime"
               href="#contact"
               data-i18n="heroPrimary"
-              >미국 런칭 문의 →</a
+              >제품 검증 시작하기 →</a
             >
             <a
               className="button button--glass"
-              href="#services"
+              href="#process"
               data-i18n="heroSecondary"
-              >서비스 보기</a
+              >샘플 리포트 보기</a
             >
           </div>
         </div>
 
         <div className="hero-ugc-proof" data-reveal>
           <div>
-            <strong>5–12</strong>
-            <span data-i18n="proofCreators">패키지별 미국 크리에이터</span>
+            <strong>Product Scan</strong>
+            <span data-i18n="proofCreators">시장·경쟁·가격 사전 분석</span>
           </div>
           <div>
             <strong>4–8 weeks</strong>
-            <span data-i18n="proofDays">진단부터 결과 리포트까지</span>
+            <span data-i18n="proofDays">검증부터 GO/IMPROVE/STOP까지</span>
           </div>
           <div>
-            <strong>UGC → Commerce</strong>
-            <span data-i18n="proofSystem">콘텐츠·리스팅·런치 연결</span>
+            <strong>Fit → Margin</strong>
+            <span data-i18n="proofSystem">반응·배송·원가·마진 연결</span>
           </div>
         </div>
       </div>

@@ -247,14 +247,14 @@ export default function LandingPage() {
         </a>
         <a href="#services" data-rail-target="services">
           <span className="section-rail__label" data-final-i18n="railSolution">
-            문제 → 솔루션
+            문제 → 검증
           </span>
           <span className="section-rail__number">02</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#process" data-rail-target="process">
           <span className="section-rail__label" data-final-i18n="railProcess">
-            파일럿 → 결정
+            검증 → 결정
           </span>
           <span className="section-rail__number">03</span>
           <span className="section-rail__line" aria-hidden="true"></span>
@@ -268,14 +268,14 @@ export default function LandingPage() {
         </a>
         <a href="#launch-event" data-rail-target="launch-event">
           <span className="section-rail__label" data-final-i18n="railBenefit">
-            첫 파트너 혜택
+            첫 검증 혜택
           </span>
           <span className="section-rail__number">05</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#contact" data-rail-target="contact">
           <span className="section-rail__label" data-final-i18n="railContact">
-            런칭 문의
+            검증 문의
           </span>
           <span className="section-rail__number">06</span>
           <span className="section-rail__line" aria-hidden="true"></span>

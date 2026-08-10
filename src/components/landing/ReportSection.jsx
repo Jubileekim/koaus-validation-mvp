@@ -4,87 +4,89 @@ export default function ReportSection() {
     <div className="pilot-report-bridge" aria-hidden="true">
       <span>01–04</span>
       <i></i>
-      <strong>U.S. MARKET DECISION REPORT</strong>
+      <strong>US MARKET VALIDATION REPORT</strong>
     </div>
 
     <div className="pilot-report-grid">
       <div className="pilot-report-copy">
         <p className="section-kicker" data-final-i18n="resultsKicker">
-          YOUR PILOT REPORT
+          YOUR VALIDATION REPORT
         </p>
         <h3 data-final-i18n="resultsTitle">
-          콘텐츠 개수가 아니라,<br /><em>다음 결정을 위한 지표</em>를 남깁니다.
+          광고 숫자만이 아니라,<br /><em>투자 결정을 위한 검증 지표</em>를 남깁니다.
         </h3>
         <p data-final-i18n="resultsBody">
-          캠페인이 끝난 뒤 단순 조회수만 남기지 않습니다. 콘텐츠 반응, 고객 참여, 구매 신호를 구분해 무엇을 계속하고 무엇을 바꿔야 하는지 정리합니다.
+          시장 신호, Creative 적합도, 고객 목소리, 공헌이익을 한 리포트로
+          정리해 대량 선적 전에 GO / IMPROVE / STOP을 판단할 수 있게 합니다.
         </p>
         <dl className="pilot-report-list">
           <div>
-            <dt>Content</dt>
-            <dd data-final-i18n="metricContent">포맷·훅·메시지별 성과</dd>
+            <dt>Market Fit</dt>
+            <dd data-final-i18n="metricContent">경쟁·타깃·가격·메시지 적합도</dd>
           </div>
           <div>
-            <dt>Audience</dt>
-            <dd data-final-i18n="metricAudience">조회·저장·댓글·참여율</dd>
+            <dt>Creative</dt>
+            <dd data-final-i18n="metricAudience">UGC·광고 반응과 수요 신호</dd>
           </div>
           <div>
-            <dt>Commerce</dt>
-            <dd data-final-i18n="metricCommerce">클릭·쿠폰·문의·구매 신호</dd>
+            <dt>Fulfillment</dt>
+            <dd data-final-i18n="metricCommerce">소량 배송·VOC·물류비</dd>
           </div>
           <div>
             <dt>Decision</dt>
-            <dd data-final-i18n="metricDecision">계속할 것·바꿀 것·다음 테스트</dd>
+            <dd data-final-i18n="metricDecision">GO / IMPROVE / STOP 제안</dd>
           </div>
         </dl>
       </div>
 
       <div
         className="koaus-dashboard pilot-report-dashboard"
-        aria-label="미국 시장 파일럿 결과 리포트 예시"
+        aria-label="미국 시장 검증 리포트 예시"
       >
         <div className="koaus-dashboard__top">
           <div>
             <span>SAMPLE REPORT</span>
-            <strong>U.S. Market Decision Report</strong>
+            <strong>US Market Validation Report</strong>
           </div>
-          <span className="koaus-dashboard__status"><i></i> PILOT COMPLETE</span>
+          <span className="koaus-dashboard__status"><i></i> IMPROVE</span>
         </div>
 
         <div className="koaus-dashboard__metrics">
           <article>
-            <span>Creators</span><strong>8</strong><small>matched</small>
+            <span>Market Signal</span><strong>72</strong><small>/ 100</small>
           </article>
           <article>
-            <span>Contents</span><strong>8</strong><small>published</small>
+            <span>Creative Fit</span><strong>81</strong><small>/ 100</small>
           </article>
           <article>
-            <span>Views</span><strong>12,430</strong><small>total</small>
+            <span>Customer Voice</span><strong>76</strong><small>/ 100</small>
           </article>
           <article>
-            <span>Signals</span><strong>23</strong><small>purchase intent</small>
+            <span>Contribution Margin</span><strong>22.8%</strong><small>estimated</small>
           </article>
         </div>
 
         <div className="koaus-dashboard__lower">
-          <div className="koaus-dashboard__chart" aria-label="Creator response Top 4">
+          <div className="koaus-dashboard__chart" aria-label="Validation score breakdown">
             <div className="koaus-dashboard__chart-head">
-              <span>Creator response</span><strong>Top 4</strong>
+              <span>Score breakdown</span><strong>Top signals</strong>
             </div>
             <div className="koaus-dashboard__bars" aria-hidden="true">
-              <div><i style={{ '--bar': '88%' }}></i><span>A</span></div>
-              <div><i style={{ '--bar': '72%' }}></i><span>B</span></div>
-              <div><i style={{ '--bar': '58%' }}></i><span>C</span></div>
-              <div><i style={{ '--bar': '42%' }}></i><span>D</span></div>
+              <div><i style={{ '--bar': '81%' }}></i><span>C</span></div>
+              <div><i style={{ '--bar': '76%' }}></i><span>V</span></div>
+              <div><i style={{ '--bar': '72%' }}></i><span>M</span></div>
+              <div><i style={{ '--bar': '46%' }}></i><span>E</span></div>
             </div>
           </div>
 
           <div className="koaus-dashboard__insight">
-            <span>TOP INSIGHT</span>
+            <span>RECOMMENDATION</span>
             <strong data-final-i18n="dashboardInsight">
-              일상 루틴형 콘텐츠의 저장과 제품 질문이 가장 높았습니다.
+              고객 반응은 긍정적이나 현재 단품 배송 구조에서는 물류비 비중이 높습니다.
+              2-Pack Bundle 또는 패키지 경량화 후 재검증을 권장합니다.
             </strong>
             <small data-final-i18n="dashboardNext">
-              NEXT · 광고용 훅 2종 추가 테스트
+              NEXT · IMPROVE → Bundle / Packaging retest
             </small>
           </div>
         </div>
