@@ -1,0 +1,151 @@
+.collab-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  background: rgba(8, 6, 13, 0.42);
+}
+
+.collab-modal {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: min(88vh, 760px);
+  overflow: auto;
+  padding: 32px 28px 28px;
+  background: #fff;
+  color: var(--ink, #111);
+  border: 1px solid var(--line, #e6e4df);
+  border-radius: var(--radius, 22px);
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.collab-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink, #111);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.collab-modal h2 {
+  margin: 0 0 10px;
+  max-width: none;
+  font-size: 1.7rem;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.collab-lead {
+  margin: 0 0 18px;
+  color: var(--muted, #6b6375);
+}
+
+.collab-product {
+  display: grid;
+  gap: 4px;
+  margin: 0 0 22px;
+  padding: 14px 16px;
+  border: 1px solid var(--line, #e6e4df);
+  border-radius: 16px;
+}
+
+.collab-product span {
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.collab-product strong {
+  font-size: 1.02rem;
+}
+
+.collab-form {
+  display: grid;
+  gap: 16px;
+}
+
+.collab-field {
+  display: grid;
+  gap: 8px;
+}
+
+.collab-field span {
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.collab-field input,
+.collab-field select,
+.collab-field textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--line, #e6e4df);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink, #111);
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.collab-field input,
+.collab-field select {
+  min-height: 48px;
+}
+
+.collab-field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.collab-field input:focus,
+.collab-field select:focus,
+.collab-field textarea:focus {
+  outline: 2px solid var(--ink, #111);
+  outline-offset: 2px;
+}
+
+.collab-field em {
+  font-style: normal;
+  color: var(--brand-red-500, #f04a32);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.collab-form .button,
+.collab-success .button {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.collab-success p {
+  margin: 0 0 12px;
+  color: var(--muted, #6b6375);
+}
+
+.collab-success p:last-of-type {
+  margin-bottom: 22px;
+}
+
+@media (max-width: 640px) {
+  .collab-backdrop {
+    padding: 16px 12px;
+    align-items: end;
+  }
+
+  .collab-modal {
+    width: 100%;
+    padding: 28px 20px 22px;
+    border-radius: 20px;
+  }
+}

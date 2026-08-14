@@ -1,6 +1,12 @@
+import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router'
+import CollaborationRequestModal from '../components/collaboration/CollaborationRequestModal.jsx'
 import { PRODUCTS } from '../data/products.js'
-import { hasCreatorAccess } from '../services/creatorStorage.js'
+import { getRequestsByCreator } from '../services/collaborationStorage.js'
+import {
+  getCreatorProfile,
+  hasCreatorAccess,
+} from '../services/creatorStorage.js'
 import '../styles/marketplace.css'
 import '../styles/product-detail.css'
 
@@ -17,6 +23,19 @@ function initials(name) {
 export default function ProductDetailPage() {
   const { productId } = useParams()
   const product = PRODUCTS.find((item) => item.id === productId)
+  const [isCollaborationModalOpen, setIsCollaborationModalOpen] = useState(false)
+  const [requestVersion, setRequestVersion] = useState(0)
+
+  const creator = getCreatorProfile()
+  const unlocked = hasCreatorAccess()
+  const existingRequest = useMemo(() => {
+    if (!unlocked || !creator?.email || !product) return null
+    return (
+      getRequestsByCreator(creator.email).find(
+        (item) => item.productId === product.id,
+      ) || null
+    )
+  }, [unlocked, creator?.email, product, requestVersion])
 
   if (!product) {
     return (
@@ -45,7 +64,6 @@ export default function ProductDetailPage() {
   }
 
   const accessTo = `/creator-access?redirect=/products/${product.id}`
-  const unlocked = hasCreatorAccess()
 
   return (
     <div className="mp-page">
@@ -155,13 +173,26 @@ export default function ProductDetailPage() {
               </dl>
               {unlocked ? (
                 <>
+                  {existingRequest ? (
+                    <p className="pd-access__requested">
+                      ✓ Collaboration Requested
+                    </p>
+                  ) : null}
                   <p className="pd-access__note">
                     Creator-only pricing is available for this product.
                   </p>
-                  <button className="button button--dark" type="button" disabled>
-                    Request Collaboration
+                  <button
+                    className="button button--dark"
+                    type="button"
+                    onClick={() => {
+                      if (!hasCreatorAccess() || !creator?.email) return
+                      setIsCollaborationModalOpen(true)
+                    }}
+                  >
+                    {existingRequest
+                      ? 'Request another collaboration'
+                      : 'Request Collaboration'}
                   </button>
-                  <p className="pd-access__coming">Coming next</p>
                 </>
               ) : (
                 <>
@@ -178,6 +209,16 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </main>
+
+      {unlocked && creator ? (
+        <CollaborationRequestModal
+          product={product}
+          creator={creator}
+          isOpen={isCollaborationModalOpen}
+          onClose={() => setIsCollaborationModalOpen(false)}
+          onSuccess={() => setRequestVersion((current) => current + 1)}
+        />
+      ) : null}
     </div>
   )
 }
