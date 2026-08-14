@@ -1,6 +1,9 @@
 import { Link } from 'react-router'
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
 
 export default function LaunchEventSection() {
+  const { t } = useTranslation()
+
   return (
     <section
       className="section koaus-launch-event"
@@ -11,59 +14,53 @@ export default function LaunchEventSection() {
     >
       <div className="shell koaus-launch-event__grid">
         <div className="koaus-launch-event__copy">
-          <span className="koaus-event-badge">✦ CREATOR PRODUCT DROP</span>
-          <p>Be early to new Korean products.</p>
+          <span className="koaus-event-badge">{t('drop.badge')}</span>
+          <p>{t('drop.lead')}</p>
           <h2 id="event-title">
-            Be first to discover
+            {t('drop.title1')}
             <br />
             <em>
-              new Korean
+              {t('drop.titleEm1')}
               <br />
-              products.
+              {t('drop.titleEm2')}
             </em>
           </h2>
-          <p className="koaus-event-description">
-            Join Creator Access to receive updates when new collaboration-ready
-            products are added.
-          </p>
+          <p className="koaus-event-description">{t('drop.body')}</p>
           <Link className="button button--dark" to="/creator-access">
-            Get Creator Access
+            {t('nav.creatorAccess')}
           </Link>
         </div>
         <article className="koaus-event-card">
           <div className="koaus-event-card__top">
             <div>
-              <span>CREATOR ACCESS</span>
-              <h3>Get product-drop updates</h3>
+              <span>{t('drop.cardEyebrow')}</span>
+              <h3>{t('drop.cardTitle')}</h3>
             </div>
             <span className="koaus-event-roundel">
-              NEW
+              {t('drop.roundel1')}
               <br />
-              DROPS
+              {t('drop.roundel2')}
             </span>
           </div>
           <div className="koaus-event-price">
-            <strong>Creator-only terms</strong>
-            <small>Unlock pricing, MOQ and samples</small>
+            <strong>{t('drop.price')}</strong>
+            <small>{t('drop.priceSmall')}</small>
           </div>
           <div className="koaus-event-benefits">
             <ul>
-              <li>New collaboration-ready products</li>
-              <li>Creator-only pricing unlock</li>
-              <li>Group Buy, Affiliate, UGC</li>
-              <li>Sample availability on product pages</li>
+              <li>{t('drop.b1')}</li>
+              <li>{t('drop.b2')}</li>
+              <li>{t('drop.b3')}</li>
+              <li>{t('drop.b4')}</li>
             </ul>
             <ul>
-              <li>Product-drop updates</li>
-              <li>Request Collaboration from product pages</li>
-              <li>Save your creator profile on this device</li>
-              <li>Browse the curated marketplace anytime</li>
+              <li>{t('drop.b5')}</li>
+              <li>{t('drop.b6')}</li>
+              <li>{t('drop.b7')}</li>
+              <li>{t('drop.b8')}</li>
             </ul>
           </div>
-          <p>
-            Updates are a preference saved with Creator Access. This MVP does
-            not send emails yet.
-          </p>
+          <p>{t('drop.note')}</p>
         </article>
       </div>
     </section>

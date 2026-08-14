@@ -5,7 +5,10 @@ export const PRODUCTS = [
     name: 'Barrier Recovery Cream',
     category: 'Beauty',
     country: 'Korea',
-    tagline: 'Daily barrier care for sensitive skin',
+    tagline: {
+      en: 'Daily barrier care for sensitive skin',
+      ko: '민감 피부를 위한 데일리 장벽 케어',
+    },
     retailPrice: 32,
     creatorPrice: 14.5,
     creatorMargin: 55,
@@ -14,13 +17,14 @@ export const PRODUCTS = [
     sampleAvailable: true,
     isNew: true,
     collaborationTypes: ['Group Buy', 'Affiliate', 'UGC'],
-    highlights: [
-      'Sensitive skin friendly',
-      'Lightweight daily texture',
-      'Made in Korea',
-    ],
-    description:
-      'A ceramide-rich recovery cream designed for dry and reactive skin. ONDO focuses on quiet, everyday Korean skincare that photographs well in close-up routines.',
+    highlights: {
+      en: ['Sensitive skin friendly', 'Lightweight daily texture', 'Made in Korea'],
+      ko: ['민감 피부용', '가벼운 데일리 제형', '한국 생산'],
+    },
+    description: {
+      en: 'A ceramide-rich recovery cream designed for dry and reactive skin. ONDO focuses on quiet, everyday Korean skincare that photographs well in close-up routines.',
+      ko: '건조하고 예민한 피부를 위한 세라마이드 크림입니다. 클로즈업 루틴 영상에 잘 맞는 담백한 한국 스킨케어예요.',
+    },
   },
   {
     id: 'nuri-silk-scarf',
@@ -28,7 +32,10 @@ export const PRODUCTS = [
     name: 'Hanji Silk Scarf',
     category: 'Fashion',
     country: 'Korea',
-    tagline: 'Lightweight silk with a paper-grain print',
+    tagline: {
+      en: 'Lightweight silk with a paper-grain print',
+      ko: '한지 결이 살아있는 가벼운 실크 스카프',
+    },
     retailPrice: 68,
     creatorPrice: 31,
     creatorMargin: 54,
@@ -37,13 +44,14 @@ export const PRODUCTS = [
     sampleAvailable: true,
     isNew: true,
     collaborationTypes: ['Affiliate', 'UGC', 'Product Seeding'],
-    highlights: [
-      '90cm silk square',
-      'Muted hanji print',
-      'Small-batch from Seoul',
-    ],
-    description:
-      'A 90cm silk scarf printed with a muted hanji texture. NURI ATELIER makes small-batch accessories for creators who style quiet luxury looks.',
+    highlights: {
+      en: ['90cm silk square', 'Muted hanji print', 'Small-batch from Seoul'],
+      ko: ['90cm 실크 스퀘어', '은은한 한지 프린트', '서울 소량 제작'],
+    },
+    description: {
+      en: 'A 90cm silk scarf printed with a muted hanji texture. NURI ATELIER makes small-batch accessories for creators who style quiet luxury looks.',
+      ko: '은은한 한지 텍스처를 올린 90cm 실크 스카프입니다. 조용한 럭셔리 스타일링에 잘 어울리는 소량 제작 액세서리예요.',
+    },
   },
   {
     id: 'hae-sleep-gummies',
@@ -51,7 +59,10 @@ export const PRODUCTS = [
     name: 'Moonlight Sleep Gummies',
     category: 'Wellness',
     country: 'Korea',
-    tagline: 'Magnesium night gummies without melatonin crash',
+    tagline: {
+      en: 'Magnesium night gummies without melatonin crash',
+      ko: '멜라토닌 없이 가볍게 챙기는 마그네슘 나이트 구미',
+    },
     retailPrice: 28,
     creatorPrice: 12.6,
     creatorMargin: 55,
@@ -60,13 +71,14 @@ export const PRODUCTS = [
     sampleAvailable: true,
     isNew: false,
     collaborationTypes: ['Group Buy', 'Affiliate'],
-    highlights: [
-      'Clean-label magnesium',
-      'Berry flavor for night routines',
-      'Easy to explain on camera',
-    ],
-    description:
-      'Berry-flavored magnesium gummies for wind-down routines. HAE WELL keeps formulas clean-label and easy to explain on camera.',
+    highlights: {
+      en: ['Clean-label magnesium', 'Berry flavor for night routines', 'Easy to explain on camera'],
+      ko: ['클린 라벨 마그네슘', '나이트 루틴용 베리 맛', '영상에서 설명하기 쉬운 제품'],
+    },
+    description: {
+      en: 'Berry-flavored magnesium gummies for wind-down routines. HAE WELL keeps formulas clean-label and easy to explain on camera.',
+      ko: '잠들기 전 루틴에 넣는 베리맛 마그네슘 구미입니다. 성분이 단순해서 카메라 앞에서 소개하기 좋아요.',
+    },
   },
   {
     id: 'sori-sesame-crunch',
@@ -74,7 +86,10 @@ export const PRODUCTS = [
     name: 'Toasted Sesame Crunch',
     category: 'Food',
     country: 'Korea',
-    tagline: 'Small-batch Korean sesame snack for grazing tables',
+    tagline: {
+      en: 'Small-batch Korean sesame snack for grazing tables',
+      ko: '테이블에 올리기 좋은 소량 생산 참깨 스낵',
+    },
     retailPrice: 18,
     creatorPrice: 8.1,
     creatorMargin: 55,
@@ -83,13 +98,14 @@ export const PRODUCTS = [
     sampleAvailable: true,
     isNew: false,
     collaborationTypes: ['Group Buy', 'UGC'],
-    highlights: [
-      'Roasted in Jeonju',
-      'Crisp sesame clusters',
-      'Built for unboxing and tasting',
-    ],
-    description:
-      'Crisp sesame clusters roasted in small pans in Jeonju. SORI PANTRY is built for unboxing, pantry tours, and tasting videos.',
+    highlights: {
+      en: ['Roasted in Jeonju', 'Crisp sesame clusters', 'Built for unboxing and tasting'],
+      ko: ['전주에서 볶은 참깨', '바삭한 클러스터', '언박싱·시식 영상에 잘 맞음'],
+    },
+    description: {
+      en: 'Crisp sesame clusters roasted in small pans in Jeonju. SORI PANTRY is built for unboxing, pantry tours, and tasting videos.',
+      ko: '전주에서 소량으로 볶아 만든 바삭한 참깨 스낵입니다. 언박싱과 시식 영상에 잘 맞아요.',
+    },
   },
   {
     id: 'dal-ceramic-mug',
@@ -97,7 +113,10 @@ export const PRODUCTS = [
     name: 'Mist Ceramic Mug',
     category: 'Lifestyle',
     country: 'Korea',
-    tagline: 'Hand-glazed mug for slow morning content',
+    tagline: {
+      en: 'Hand-glazed mug for slow morning content',
+      ko: '슬로 모닝 콘텐츠에 잘 어울리는 핸드 글레이즈 머그',
+    },
     retailPrice: 42,
     creatorPrice: 19.5,
     creatorMargin: 54,
@@ -106,13 +125,14 @@ export const PRODUCTS = [
     sampleAvailable: false,
     isNew: true,
     collaborationTypes: ['Affiliate', 'UGC'],
-    highlights: [
-      '320ml stoneware',
-      'Soft mist glaze',
-      'Kitchen and desk ready',
-    ],
-    description:
-      'A 320ml stoneware mug with a soft mist glaze. DAL HOUSE makes home objects that sit naturally in kitchen and desk setups.',
+    highlights: {
+      en: ['320ml stoneware', 'Soft mist glaze', 'Kitchen and desk ready'],
+      ko: ['320ml 스톤웨어', '부드러운 미스트 유약', '주방·데스크 연출용'],
+    },
+    description: {
+      en: 'A 320ml stoneware mug with a soft mist glaze. DAL HOUSE makes home objects that sit naturally in kitchen and desk setups.',
+      ko: '부드러운 미스트 유약을 올린 320ml 머그입니다. 주방과 데스크 장면에 자연스럽게 들어가요.',
+    },
   },
   {
     id: 'mul-linen-notebook',
@@ -120,7 +140,10 @@ export const PRODUCTS = [
     name: 'Coastal Linen Notebook',
     category: 'Stationery',
     country: 'Korea',
-    tagline: 'Lay-flat journal with Korean linen cover',
+    tagline: {
+      en: 'Lay-flat journal with Korean linen cover',
+      ko: '한국 리넨 커버의 펼침 노트',
+    },
     retailPrice: 24,
     creatorPrice: 11,
     creatorMargin: 54,
@@ -129,13 +152,14 @@ export const PRODUCTS = [
     sampleAvailable: true,
     isNew: false,
     collaborationTypes: ['Affiliate', 'UGC'],
-    highlights: [
-      '160 lay-flat pages',
-      'Undyed linen cover',
-      'Warm ivory stock',
-    ],
-    description:
-      'A 160-page lay-flat notebook for planners and analog desk content. MUL PAPER uses undyed linen and warm ivory stock.',
+    highlights: {
+      en: ['160 lay-flat pages', 'Undyed linen cover', 'Warm ivory stock'],
+      ko: ['160페이지 펼침 제본', '무염색 리넨 커버', '따뜻한 아이보리 용지'],
+    },
+    description: {
+      en: 'A 160-page lay-flat notebook for planners and analog desk content. MUL PAPER uses undyed linen and warm ivory stock.',
+      ko: '플래너와 데스크 콘텐츠에 쓰기 좋은 160페이지 펼침 노트입니다. 무염색 리넨과 아이보리 용지를 사용했어요.',
+    },
   },
   {
     id: 'bora-lip-oil',
@@ -143,7 +167,10 @@ export const PRODUCTS = [
     name: 'Plum Glow Lip Oil',
     category: 'Beauty',
     country: 'Korea',
-    tagline: 'Sheer plum tint with a glass-skin finish',
+    tagline: {
+      en: 'Sheer plum tint with a glass-skin finish',
+      ko: '글래스 스킨 느낌의 플럼 립오일',
+    },
     retailPrice: 22,
     creatorPrice: 9.9,
     creatorMargin: 55,
@@ -152,13 +179,14 @@ export const PRODUCTS = [
     sampleAvailable: true,
     isNew: true,
     collaborationTypes: ['Group Buy', 'Affiliate', 'UGC'],
-    highlights: [
-      'Non-sticky glass finish',
-      'Cool plum sheen',
-      'GRWM lighting friendly',
-    ],
-    description:
-      'A non-sticky lip oil with a cool plum sheen. BORA LAB designs beauty SKUs that work in GRWM and close-up lighting.',
+    highlights: {
+      en: ['Non-sticky glass finish', 'Cool plum sheen', 'GRWM lighting friendly'],
+      ko: ['끈적임 적은 글로시 피니시', '쿨한 플럼 컬러', 'GRWM 조명에 잘 맞음'],
+    },
+    description: {
+      en: 'A non-sticky lip oil with a cool plum sheen. BORA LAB designs beauty SKUs that work in GRWM and close-up lighting.',
+      ko: '끈적임이 적은 쿨 플럼 립오일입니다. GRWM과 클로즈업 조명에서 잘 보이는 컬러예요.',
+    },
   },
   {
     id: 'kieum-wool-beanie',
@@ -166,7 +194,10 @@ export const PRODUCTS = [
     name: 'Charcoal Wool Beanie',
     category: 'Fashion',
     country: 'Korea',
-    tagline: 'Fine merino beanie for street and studio looks',
+    tagline: {
+      en: 'Fine merino beanie for street and studio looks',
+      ko: '스트리트와 스튜디오 룩에 맞는 메리노 비니',
+    },
     retailPrice: 48,
     creatorPrice: 21.6,
     creatorMargin: 55,
@@ -175,13 +206,14 @@ export const PRODUCTS = [
     sampleAvailable: false,
     isNew: false,
     collaborationTypes: ['Affiliate', 'UGC', 'Sponsored Content'],
-    highlights: [
-      'Fine merino wool',
-      'Clean rib, no logo hardware',
-      'Street and studio styling',
-    ],
-    description:
-      'A merino beanie with a clean rib and no logo hardware. KIEUM is a Seoul knit label for everyday fashion content.',
+    highlights: {
+      en: ['Fine merino wool', 'Clean rib, no logo hardware', 'Street and studio styling'],
+      ko: ['파인 메리노 울', '로고 장식 없는 깔끔한 골지', '스트리트·스튜디오 연출'],
+    },
+    description: {
+      en: 'A merino beanie with a clean rib and no logo hardware. KIEUM is a Seoul knit label for everyday fashion content.',
+      ko: '로고 장식 없이 골지만 살린 메리노 비니입니다. 데일리 패션 콘텐츠에 잘 맞는 서울 니트 브랜드예요.',
+    },
   },
   {
     id: 'sol-matcha-sachets',
@@ -189,7 +221,10 @@ export const PRODUCTS = [
     name: 'Jeju Matcha Sachets',
     category: 'Food',
     country: 'Korea',
-    tagline: 'Single-serve Jeju matcha for cafe-at-home videos',
+    tagline: {
+      en: 'Single-serve Jeju matcha for cafe-at-home videos',
+      ko: '홈카페 영상에 쓰기 좋은 제주 말차 스틱',
+    },
     retailPrice: 26,
     creatorPrice: 11.7,
     creatorMargin: 55,
@@ -198,13 +233,14 @@ export const PRODUCTS = [
     sampleAvailable: true,
     isNew: true,
     collaborationTypes: ['Group Buy', 'Affiliate', 'UGC'],
-    highlights: [
-      'Ceremonial-grade Jeju matcha',
-      'Ten 2g sachets',
-      'Made for pour shots',
-    ],
-    description:
-      'Ten 2g sachets of ceremonial-grade Jeju matcha. SOL TEA is made for pour shots, morning rituals, and affiliate replenishment.',
+    highlights: {
+      en: ['Ceremonial-grade Jeju matcha', 'Ten 2g sachets', 'Made for pour shots'],
+      ko: ['제주 세레모니얼 말차', '2g 스틱 10개', '푸어샷 연출용'],
+    },
+    description: {
+      en: 'Ten 2g sachets of ceremonial-grade Jeju matcha. SOL TEA is made for pour shots, morning rituals, and affiliate replenishment.',
+      ko: '제주 세레모니얼 말차 2g 스틱 10개입입니다. 모닝 루틴과 홈카페 영상에 잘 맞아요.',
+    },
   },
   {
     id: 'podo-body-oil',
@@ -212,7 +248,10 @@ export const PRODUCTS = [
     name: 'Grape Seed Body Oil',
     category: 'Wellness',
     country: 'Korea',
-    tagline: 'Fast-absorbing oil for after-shower routines',
+    tagline: {
+      en: 'Fast-absorbing oil for after-shower routines',
+      ko: '샤워 후 루틴에 올리는 산뜻한 바디 오일',
+    },
     retailPrice: 36,
     creatorPrice: 16.2,
     creatorMargin: 55,
@@ -221,13 +260,14 @@ export const PRODUCTS = [
     sampleAvailable: true,
     isNew: false,
     collaborationTypes: ['Group Buy', 'Affiliate', 'Product Seeding'],
-    highlights: [
-      'Fast-absorbing texture',
-      'Faint green-grape scent',
-      'Editorial wellness ritual',
-    ],
-    description:
-      'A lightweight grape-seed body oil with a faint green-grape scent. PODO focuses on wellness rituals that feel editorial, not clinical.',
+    highlights: {
+      en: ['Fast-absorbing texture', 'Faint green-grape scent', 'Editorial wellness ritual'],
+      ko: ['빠르게 흡수되는 제형', '은은한 청포도 향', '웰니스 루틴 연출용'],
+    },
+    description: {
+      en: 'A lightweight grape-seed body oil with a faint green-grape scent. PODO focuses on wellness rituals that feel editorial, not clinical.',
+      ko: '은은한 청포도 향의 가벼운 포도씨 바디 오일입니다. 병원처럼 보이지 않는 웰니스 루틴에 잘 맞아요.',
+    },
   },
   {
     id: 'yul-desk-tray',
@@ -235,7 +275,10 @@ export const PRODUCTS = [
     name: 'Oak Catchall Tray',
     category: 'Lifestyle',
     country: 'Korea',
-    tagline: 'Compact oak tray for keys, jewelry, and desk shots',
+    tagline: {
+      en: 'Compact oak tray for keys, jewelry, and desk shots',
+      ko: '키, 주얼리, 데스크 컷에 쓰는 오크 트레이',
+    },
     retailPrice: 38,
     creatorPrice: 17.5,
     creatorMargin: 54,
@@ -244,13 +287,14 @@ export const PRODUCTS = [
     sampleAvailable: false,
     isNew: false,
     collaborationTypes: ['Affiliate', 'UGC'],
-    highlights: [
-      'Solid oak catchall',
-      'Softened corners',
-      'Fits jewelry and desk flat-lays',
-    ],
-    description:
-      'A solid oak catchall with softened corners. YUL OBJECT designs small home pieces that fill lifestyle flat-lays without crowding the frame.',
+    highlights: {
+      en: ['Solid oak catchall', 'Softened corners', 'Fits jewelry and desk flat-lays'],
+      ko: ['오크 원목 트레이', '부드러운 모서리', '주얼리·데스크 플랫레이용'],
+    },
+    description: {
+      en: 'A solid oak catchall with softened corners. YUL OBJECT designs small home pieces that fill lifestyle flat-lays without crowding the frame.',
+      ko: '모서리를 부드럽게 다듬은 오크 트레이입니다. 화면을 채우되 과하지 않은 라이프스타일 소품이에요.',
+    },
   },
   {
     id: 'dot-gel-pen-set',
@@ -258,7 +302,10 @@ export const PRODUCTS = [
     name: 'Soft Black Gel Pen Set',
     category: 'Stationery',
     country: 'Korea',
-    tagline: 'Low-smear gel pens for planner and study content',
+    tagline: {
+      en: 'Low-smear gel pens for planner and study content',
+      ko: '플래너와 스터디 콘텐츠용 번짐 적은 젤펜',
+    },
     retailPrice: 16,
     creatorPrice: 7.2,
     creatorMargin: 55,
@@ -267,12 +314,13 @@ export const PRODUCTS = [
     sampleAvailable: true,
     isNew: true,
     collaborationTypes: ['Group Buy', 'Affiliate', 'UGC'],
-    highlights: [
-      '0.38mm black gel ink',
-      'Low-smear for planners',
-      'Three-pen set',
-    ],
-    description:
-      'A three-pen set with 0.38mm black gel ink. DOT PRESS is a stationery studio for study-with-me and analog planning creators.',
+    highlights: {
+      en: ['0.38mm black gel ink', 'Low-smear for planners', 'Three-pen set'],
+      ko: ['0.38mm 블랙 젤잉크', '플래너에 번짐이 적음', '3본 세트'],
+    },
+    description: {
+      en: 'A three-pen set with 0.38mm black gel ink. DOT PRESS is a stationery studio for study-with-me and analog planning creators.',
+      ko: '0.38mm 블랙 젤펜 3본 세트입니다. 스터디위드미와 아날로그 플래너 콘텐츠에 잘 맞아요.',
+    },
   },
 ]

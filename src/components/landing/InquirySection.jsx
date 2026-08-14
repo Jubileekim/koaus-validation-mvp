@@ -1,6 +1,9 @@
 import { Link } from 'react-router'
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
 
 export default function InquirySection() {
+  const { t } = useTranslation()
+
   return (
     <section
       className="launch-contact"
@@ -10,39 +13,33 @@ export default function InquirySection() {
     >
       <div className="shell launch-contact__grid">
         <div className="launch-contact__intro" data-reveal>
-          <p className="launch-contact__kicker">FOR KOREAN BRANDS</p>
+          <p className="launch-contact__kicker">{t('inquiry.kicker')}</p>
           <h2 id="launch-contact-title">
-            Have a Korean product
+            {t('inquiry.title1')}
             <br />
-            creators should
+            {t('inquiry.title2')}
             <br />
-            know about?
+            {t('inquiry.title3')}
           </h2>
-          <p>
-            Introduce your product to KoaUS and explore collaboration
-            opportunities with U.S. creators.
-          </p>
+          <p>{t('inquiry.body')}</p>
           <div className="launch-contact__promise">
             <span>01</span>
-            <p>Share brand and product basics</p>
+            <p>{t('inquiry.p1')}</p>
             <span>02</span>
-            <p>Present Group Buy, Affiliate, UGC and other options</p>
+            <p>{t('inquiry.p2')}</p>
             <span>03</span>
-            <p>Get your product in front of collaboration-ready creators</p>
+            <p>{t('inquiry.p3')}</p>
           </div>
         </div>
 
         <div className="launch-inquiry-form" data-reveal>
           <div className="launch-field launch-field--full">
-            <p className="launch-contact__kicker">BRAND INQUIRY</p>
-            <h3 className="landing-brand-cta__title">List Your Product</h3>
-            <p className="landing-brand-cta__body">
-              Tell us about your brand on the For Brands page. Product inquiries
-              are saved for KoaUS review.
-            </p>
+            <p className="launch-contact__kicker">{t('inquiry.formKicker')}</p>
+            <h3 className="landing-brand-cta__title">{t('inquiry.formTitle')}</h3>
+            <p className="landing-brand-cta__body">{t('inquiry.formBody')}</p>
           </div>
           <Link className="launch-submit" to="/brands">
-            List Your Product →
+            {t('inquiry.cta')}
           </Link>
         </div>
       </div>

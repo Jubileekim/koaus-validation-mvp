@@ -1,5 +1,6 @@
 .mp-page {
   min-height: 100vh;
+  overflow-x: hidden;
   background: var(--paper);
   color: var(--ink);
 }
@@ -19,6 +20,19 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  min-width: 0;
+}
+
+.mp-topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.mp-topbar__actions .language-toggle {
+  flex-shrink: 0;
 }
 
 .mp-main {
@@ -293,5 +307,15 @@
 
   .mp-sort {
     width: 100%;
+  }
+
+  .mp-topbar__inner {
+    gap: 10px;
+  }
+
+  .mp-topbar .button {
+    min-height: 42px;
+    padding: 0 14px;
+    font-size: 0.86rem;
   }
 }

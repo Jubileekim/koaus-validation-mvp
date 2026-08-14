@@ -1,0 +1,56 @@
+.nf-main {
+  padding: 48px 0 88px;
+}
+
+.nf-card {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  max-width: 520px;
+  padding: 48px 36px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.nf-kicker {
+  margin: 0;
+  color: var(--brand-red-500, #f04a32);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.nf-card h1 {
+  margin: 0;
+  max-width: none;
+  font-size: clamp(2rem, 4vw, 2.6rem);
+  letter-spacing: -0.045em;
+}
+
+.nf-card p {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+.nf-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .nf-card {
+    padding: 28px 20px;
+  }
+
+  .nf-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .nf-actions .button {
+    width: 100%;
+  }
+}

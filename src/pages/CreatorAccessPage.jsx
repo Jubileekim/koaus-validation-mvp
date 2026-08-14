@@ -1,11 +1,13 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
+import LanguageToggle from '../components/layout/LanguageToggle.jsx'
 import {
   getCreatorProfile,
   hasCreatorAccess,
   removeCreatorProfile,
   saveCreatorProfile,
 } from '../services/creatorStorage.js'
+import { useTranslation } from '../contexts/LocaleContext.jsx'
 import '../styles/marketplace.css'
 import '../styles/creator-access.css'
 
@@ -19,8 +21,27 @@ const EMPTY_FORM = {
   newsletterOptIn: false,
 }
 
+const FOLLOWER_RANGES = [
+  ['Under 10K', 'creator.rangeUnder10'],
+  ['10K–50K', 'creator.range10'],
+  ['50K–100K', 'creator.range50'],
+  ['100K–500K', 'creator.range100'],
+  ['500K+', 'creator.range500'],
+]
+
+const CONTENT_CATEGORIES = ['Beauty', 'Fashion', 'Lifestyle', 'Food', 'Wellness', 'Other']
+
 function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+function isValidHttpUrl(value) {
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
 }
 
 function getSafeRedirect(redirect) {
@@ -29,32 +50,35 @@ function getSafeRedirect(redirect) {
   return '/marketplace'
 }
 
-function validateForm(form) {
+function validateForm(form, t) {
   const errors = {}
   if (!form.email.trim()) {
-    errors.email = 'Please enter your email.'
+    errors.email = t('errors.emailRequired')
   } else if (!isValidEmail(form.email.trim())) {
-    errors.email = 'Please enter a valid email address.'
+    errors.email = t('errors.emailInvalid')
   }
   if (!form.creatorName.trim()) {
-    errors.creatorName = 'Please enter your creator name.'
+    errors.creatorName = t('errors.creatorName')
   }
   if (!form.platform) {
-    errors.platform = 'Please select your primary platform.'
+    errors.platform = t('errors.platform')
   }
   if (!form.profileUrl.trim()) {
-    errors.profileUrl = 'Please enter your creator profile URL.'
+    errors.profileUrl = t('errors.profileUrl')
+  } else if (!isValidHttpUrl(form.profileUrl.trim())) {
+    errors.profileUrl = t('errors.profileUrlInvalid')
   }
   if (!form.followerRange) {
-    errors.followerRange = 'Please select your follower range.'
+    errors.followerRange = t('errors.followerRange')
   }
   if (!form.category) {
-    errors.category = 'Please select your content category.'
+    errors.category = t('errors.contentCategory')
   }
   return errors
 }
 
 export default function CreatorAccessPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const redirectTo = getSafeRedirect(searchParams.get('redirect'))
@@ -64,7 +88,15 @@ export default function CreatorAccessPage() {
   const [errors, setErrors] = useState({})
   const [isActive, setIsActive] = useState(() => hasCreatorAccess())
   const [success, setSuccess] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [activeProfile, setActiveProfile] = useState(existingProfile)
+
+  useEffect(() => {
+    setErrors((current) => {
+      if (Object.keys(current).length === 0) return current
+      return validateForm(form, t)
+    })
+  }, [t, form])
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }))
@@ -77,14 +109,18 @@ export default function CreatorAccessPage() {
     setForm(EMPTY_FORM)
     setErrors({})
     setSuccess(false)
+    setSubmitting(false)
   }
 
   const handleSubmit = (event) => {
     event.preventDefault()
-    const nextErrors = validateForm(form)
+    if (submitting) return
+
+    const nextErrors = validateForm(form, t)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
+    setSubmitting(true)
     const profile = {
       email: form.email.trim(),
       creatorName: form.creatorName.trim(),
@@ -97,67 +133,76 @@ export default function CreatorAccessPage() {
       createdAt: new Date().toISOString(),
     }
 
-    saveCreatorProfile(profile)
+    const saved = saveCreatorProfile(profile)
+    if (!saved) {
+      setSubmitting(false)
+      return
+    }
+
     setActiveProfile(profile)
     setIsActive(true)
     setSuccess(true)
+    setErrors({})
 
     window.setTimeout(() => {
       navigate(redirectTo)
     }, 900)
   }
 
+  const followerLabel =
+    FOLLOWER_RANGES.find(([value]) => value === activeProfile?.followerRange)?.[1]
+
   return (
     <div className="mp-page">
       <div className="mp-topbar">
         <div className="shell mp-topbar__inner">
-          <Link className="wordmark" to="/" aria-label="Koaus home">
+          <Link className="wordmark" to="/" aria-label={t('nav.homeAria')}>
             koaus <span>/ creator access</span>
           </Link>
-          <Link className="button button--ghost" to="/marketplace">
-            Browse Marketplace
-          </Link>
+          <div className="mp-topbar__actions">
+            <LanguageToggle />
+            <Link className="button button--ghost" to="/marketplace">
+              {t('nav.browseMarketplace')}
+            </Link>
+          </div>
         </div>
       </div>
 
       <main className="shell ca-main">
         {success ? (
           <div className="ca-card ca-success">
-            <p className="ca-eyebrow">CREATOR ACCESS</p>
-            <h1>✓ Creator Access unlocked</h1>
-            <p>Creator-only pricing is now available.</p>
+            <p className="ca-eyebrow">{t('creator.eyebrow')}</p>
+            <h1>{t('creator.successTitle')}</h1>
+            <p>{t('creator.successBody')}</p>
           </div>
         ) : isActive && activeProfile ? (
           <div className="ca-card">
-            <p className="ca-eyebrow">CREATOR ACCESS</p>
-            <h1>Creator Access Active</h1>
+            <p className="ca-eyebrow">{t('creator.eyebrow')}</p>
+            <h1>{t('creator.activeTitle')}</h1>
             <ul className="ca-profile">
               <li>{activeProfile.creatorName}</li>
               <li>{activeProfile.platform}</li>
-              <li>{activeProfile.followerRange}</li>
+              <li>{followerLabel ? t(followerLabel) : activeProfile.followerRange}</li>
             </ul>
-            <p className="ca-note">Your creator access is active.</p>
+            <p className="ca-note">{t('creator.activeNote')}</p>
             <div className="ca-actions">
               <Link className="button button--dark" to="/marketplace">
-                Browse Marketplace
+                {t('nav.browseMarketplace')}
               </Link>
               <button className="button button--ghost" type="button" onClick={handleReset}>
-                Reset Creator Access
+                {t('creator.reset')}
               </button>
             </div>
           </div>
         ) : (
           <div className="ca-card">
-            <p className="ca-eyebrow">CREATOR ACCESS</p>
-            <h1>Unlock creator-only pricing and collaborations.</h1>
-            <p className="ca-lead">
-              Get access to creator pricing, samples, and collaboration
-              opportunities from curated Korean brands.
-            </p>
+            <p className="ca-eyebrow">{t('creator.eyebrow')}</p>
+            <h1>{t('creator.title')}</h1>
+            <p className="ca-lead">{t('creator.lead')}</p>
 
             <form className="ca-form" onSubmit={handleSubmit} noValidate>
               <label className="ca-field">
-                <span>Email *</span>
+                <span>{t('creator.email')}</span>
                 <input
                   type="email"
                   value={form.email}
@@ -168,7 +213,7 @@ export default function CreatorAccessPage() {
               </label>
 
               <label className="ca-field">
-                <span>Creator Name *</span>
+                <span>{t('creator.name')}</span>
                 <input
                   type="text"
                   value={form.creatorName}
@@ -179,12 +224,12 @@ export default function CreatorAccessPage() {
               </label>
 
               <label className="ca-field">
-                <span>Primary Platform *</span>
+                <span>{t('creator.platform')}</span>
                 <select
                   value={form.platform}
                   onChange={(event) => updateField('platform', event.target.value)}
                 >
-                  <option value="">Select a platform</option>
+                  <option value="">{t('creator.selectPlatform')}</option>
                   <option value="TikTok">TikTok</option>
                   <option value="Instagram">Instagram</option>
                   <option value="YouTube">YouTube</option>
@@ -193,7 +238,7 @@ export default function CreatorAccessPage() {
               </label>
 
               <label className="ca-field">
-                <span>Creator Profile URL *</span>
+                <span>{t('creator.url')}</span>
                 <input
                   type="url"
                   value={form.profileUrl}
@@ -205,34 +250,33 @@ export default function CreatorAccessPage() {
               </label>
 
               <label className="ca-field">
-                <span>Follower Range *</span>
+                <span>{t('creator.followers')}</span>
                 <select
                   value={form.followerRange}
                   onChange={(event) => updateField('followerRange', event.target.value)}
                 >
-                  <option value="">Select a range</option>
-                  <option value="Under 10K">Under 10K</option>
-                  <option value="10K–50K">10K–50K</option>
-                  <option value="50K–100K">50K–100K</option>
-                  <option value="100K–500K">100K–500K</option>
-                  <option value="500K+">500K+</option>
+                  <option value="">{t('creator.selectRange')}</option>
+                  {FOLLOWER_RANGES.map(([value, key]) => (
+                    <option key={value} value={value}>
+                      {t(key)}
+                    </option>
+                  ))}
                 </select>
                 {errors.followerRange ? <em>{errors.followerRange}</em> : null}
               </label>
 
               <label className="ca-field">
-                <span>Content Category *</span>
+                <span>{t('creator.category')}</span>
                 <select
                   value={form.category}
                   onChange={(event) => updateField('category', event.target.value)}
                 >
-                  <option value="">Select a category</option>
-                  <option value="Beauty">Beauty</option>
-                  <option value="Fashion">Fashion</option>
-                  <option value="Lifestyle">Lifestyle</option>
-                  <option value="Food">Food</option>
-                  <option value="Wellness">Wellness</option>
-                  <option value="Other">Other</option>
+                  <option value="">{t('creator.selectCategory')}</option>
+                  {CONTENT_CATEGORIES.map((category) => (
+                    <option key={category} value={category}>
+                      {t(`category.${category}`)}
+                    </option>
+                  ))}
                 </select>
                 {errors.category ? <em>{errors.category}</em> : null}
               </label>
@@ -245,18 +289,16 @@ export default function CreatorAccessPage() {
                     updateField('newsletterOptIn', event.target.checked)
                   }
                 />
-                <span>
-                  Send me new Korean product drops and collaboration
-                  opportunities.
-                </span>
+                <span>{t('creator.newsletter')}</span>
               </label>
-              <p className="ca-pref">
-                This only saves your preference on this device. No emails are
-                sent in this MVP.
-              </p>
+              <p className="ca-pref">{t('creator.pref')}</p>
 
-              <button className="button button--dark" type="submit">
-                Get Creator Access
+              <button
+                className="button button--dark"
+                type="submit"
+                disabled={submitting}
+              >
+                {submitting ? t('common.saving') : t('creator.submit')}
               </button>
             </form>
           </div>

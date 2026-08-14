@@ -1,12 +1,16 @@
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
+
 export default function ProductSort({ value, onChange }) {
+  const { t } = useTranslation()
+
   return (
     <label className="mp-sort">
-      <span>Sort</span>
+      <span>{t('marketplace.sort')}</span>
       <select value={value} onChange={(event) => onChange(event.target.value)}>
-        <option value="newest">Newest</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="margin">Creator Margin</option>
+        <option value="newest">{t('marketplace.newest')}</option>
+        <option value="price-asc">{t('marketplace.priceAsc')}</option>
+        <option value="price-desc">{t('marketplace.priceDesc')}</option>
+        <option value="margin">{t('marketplace.margin')}</option>
       </select>
     </label>
   )

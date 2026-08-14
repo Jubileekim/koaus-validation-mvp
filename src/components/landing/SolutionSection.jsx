@@ -1,29 +1,30 @@
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
+
 export default function SolutionSection() {
+  const { t } = useTranslation()
+
   return (
-    <div className="decision-lanes" aria-label="How KoaUS connects creators and brands">
+    <div className="decision-lanes" aria-label={t('solution.aria')}>
       <article className="decision-lane decision-lane--creator">
         <div className="decision-problem">
           <div className="decision-problem__meta">
             <span>01</span>
-            <small>Creator Discovery</small>
+            <small>{t('solution.p1Meta')}</small>
           </div>
-          <h3>Finding collaboration-ready Korean brands is difficult.</h3>
-          <p>
-            Opportunities are hard to compare, and most catalogs are not built
-            for creator collaboration.
-          </p>
+          <h3>{t('solution.p1Title')}</h3>
+          <p>{t('solution.p1Body')}</p>
         </div>
         <div className="decision-connector" aria-hidden="true">
           <span>→</span>
         </div>
         <div className="decision-solution">
-          <span className="decision-solution__type">01 DISCOVER</span>
-          <h3>Curated Korean Products</h3>
+          <span className="decision-solution__type">{t('solution.s1Type')}</span>
+          <h3>{t('solution.s1Title')}</h3>
           <ul>
-            <li>Explore beauty, fashion, lifestyle, food and wellness</li>
-            <li>See brands open to creator collaboration</li>
-            <li>Browse by category, brand and opportunity</li>
-            <li>Start from a curated marketplace, not cold DMs</li>
+            <li>{t('solution.s1a')}</li>
+            <li>{t('solution.s1b')}</li>
+            <li>{t('solution.s1c')}</li>
+            <li>{t('solution.s1d')}</li>
           </ul>
         </div>
       </article>
@@ -32,25 +33,22 @@ export default function SolutionSection() {
         <div className="decision-problem">
           <div className="decision-problem__meta">
             <span>02</span>
-            <small>Creator Terms</small>
+            <small>{t('solution.p2Meta')}</small>
           </div>
-          <h3>Wholesale / creator pricing is rarely transparent.</h3>
-          <p>
-            MOQ, samples and collaboration conditions are usually hidden until
-            after a long back-and-forth.
-          </p>
+          <h3>{t('solution.p2Title')}</h3>
+          <p>{t('solution.p2Body')}</p>
         </div>
         <div className="decision-connector" aria-hidden="true">
           <span>→</span>
         </div>
         <div className="decision-solution">
-          <span className="decision-solution__type">02 ACCESS</span>
-          <h3>Creator-only Terms</h3>
+          <span className="decision-solution__type">{t('solution.s2Type')}</span>
+          <h3>{t('solution.s2Title')}</h3>
           <ul>
-            <li>Unlock creator-only pricing</li>
-            <li>See MOQ and sample availability</li>
-            <li>Review collaboration conditions</li>
-            <li>Get access with a creator profile</li>
+            <li>{t('solution.s2a')}</li>
+            <li>{t('solution.s2b')}</li>
+            <li>{t('solution.s2c')}</li>
+            <li>{t('solution.s2d')}</li>
           </ul>
         </div>
       </article>
@@ -59,25 +57,22 @@ export default function SolutionSection() {
         <div className="decision-problem">
           <div className="decision-problem__meta">
             <span>03</span>
-            <small>Collaboration</small>
+            <small>{t('solution.p3Meta')}</small>
           </div>
-          <h3>Opportunities are scattered across DMs and emails.</h3>
-          <p>
-            Brands also struggle to find relevant U.S. creators and to tell who
-            is genuinely interested.
-          </p>
+          <h3>{t('solution.p3Title')}</h3>
+          <p>{t('solution.p3Body')}</p>
         </div>
         <div className="decision-connector" aria-hidden="true">
           <span>→</span>
         </div>
         <div className="decision-solution">
-          <span className="decision-solution__type">03 COLLABORATE</span>
-          <h3>Request Collaboration</h3>
+          <span className="decision-solution__type">{t('solution.s3Type')}</span>
+          <h3>{t('solution.s3Title')}</h3>
           <ul>
-            <li>Submit Group Buy interest</li>
-            <li>Request Affiliate partnerships</li>
-            <li>Propose UGC collaborations</li>
-            <li>Share other formats the brand already offers</li>
+            <li>{t('solution.s3a')}</li>
+            <li>{t('solution.s3b')}</li>
+            <li>{t('solution.s3c')}</li>
+            <li>{t('solution.s3d')}</li>
           </ul>
         </div>
       </article>

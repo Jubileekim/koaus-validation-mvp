@@ -1,3 +1,5 @@
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
+
 const CATEGORIES = [
   'All',
   'Beauty',
@@ -9,8 +11,10 @@ const CATEGORIES = [
 ]
 
 export default function ProductFilters({ value, onChange }) {
+  const { t } = useTranslation()
+
   return (
-    <div className="mp-filters" role="group" aria-label="Product categories">
+    <div className="mp-filters" role="group" aria-label={t('marketplace.filterAria')}>
       {CATEGORIES.map((category) => {
         const active = value === category
         return (
@@ -21,7 +25,7 @@ export default function ProductFilters({ value, onChange }) {
             aria-pressed={active}
             onClick={() => onChange(category)}
           >
-            {category}
+            {t(`category.${category}`)}
           </button>
         )
       })}

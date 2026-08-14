@@ -1,12 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router'
 import CollaborationRequestModal from '../components/collaboration/CollaborationRequestModal.jsx'
+import LanguageToggle from '../components/layout/LanguageToggle.jsx'
 import { PRODUCTS } from '../data/products.js'
 import { getRequestsByCreator } from '../services/collaborationStorage.js'
 import {
   getCreatorProfile,
   hasCreatorAccess,
 } from '../services/creatorStorage.js'
+import { useTranslation } from '../contexts/LocaleContext.jsx'
 import '../styles/marketplace.css'
 import '../styles/product-detail.css'
 
@@ -21,6 +23,7 @@ function initials(name) {
 }
 
 export default function ProductDetailPage() {
+  const { t, pick } = useTranslation()
   const { productId } = useParams()
   const product = PRODUCTS.find((item) => item.id === productId)
   const [isCollaborationModalOpen, setIsCollaborationModalOpen] = useState(false)
@@ -28,34 +31,39 @@ export default function ProductDetailPage() {
 
   const creator = getCreatorProfile()
   const unlocked = hasCreatorAccess()
-  const existingRequest = useMemo(() => {
-    if (!unlocked || !creator?.email || !product) return null
-    return (
-      getRequestsByCreator(creator.email).find(
-        (item) => item.productId === product.id,
-      ) || null
-    )
-  }, [unlocked, creator?.email, product, requestVersion])
+  const existingRequest =
+    requestVersion >= 0 && unlocked && creator?.email && product
+      ? getRequestsByCreator(creator.email).find(
+          (item) => item.productId === product.id,
+        ) || null
+      : null
+
+  const topbar = (
+    <div className="mp-topbar">
+      <div className="shell mp-topbar__inner">
+        <Link className="wordmark" to="/" aria-label={t('nav.homeAria')}>
+          koaus <span>/ marketplace</span>
+        </Link>
+        <div className="mp-topbar__actions">
+          <LanguageToggle />
+          <Link className="button button--ghost" to="/marketplace">
+            {t('nav.backToMarketplace')}
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
 
   if (!product) {
     return (
       <div className="mp-page">
-        <div className="mp-topbar">
-          <div className="shell mp-topbar__inner">
-            <Link className="wordmark" to="/" aria-label="Koaus home">
-              koaus <span>/ marketplace</span>
-            </Link>
-            <Link className="button button--ghost" to="/marketplace">
-              Back to Marketplace
-            </Link>
-          </div>
-        </div>
+        {topbar}
         <main className="shell pd-main">
           <div className="pd-missing">
-            <h1>Product not found</h1>
-            <p>This product may no longer be available.</p>
+            <h1>{t('product.notFoundTitle')}</h1>
+            <p>{t('product.notFoundBody')}</p>
             <Link className="button button--dark" to="/marketplace">
-              Back to Marketplace
+              {t('nav.backToMarketplace')}
             </Link>
           </div>
         </main>
@@ -64,52 +72,45 @@ export default function ProductDetailPage() {
   }
 
   const accessTo = `/creator-access?redirect=/products/${product.id}`
+  const highlights = pick(product.highlights) || []
 
   return (
     <div className="mp-page">
-      <div className="mp-topbar">
-        <div className="shell mp-topbar__inner">
-          <Link className="wordmark" to="/" aria-label="Koaus home">
-            koaus <span>/ marketplace</span>
-          </Link>
-          <Link className="button button--ghost" to="/marketplace">
-            Back to Marketplace
-          </Link>
-        </div>
-      </div>
+      {topbar}
 
       <main className="shell pd-main">
         <Link className="pd-back" to="/marketplace">
-          ← Back to Marketplace
+          ← {t('nav.backToMarketplace')}
         </Link>
 
         <div className="pd-layout">
           <div className="pd-visual" aria-hidden="true">
             <span className="pd-visual__brand">{product.brand}</span>
             <span className="pd-visual__initials">{initials(product.name)}</span>
-            <span className="pd-visual__category">{product.category}</span>
+            <span className="pd-visual__category">{t(`category.${product.category}`)}</span>
           </div>
 
           <div className="pd-info">
             <p className="pd-kicker">
-              {product.category} · Made in {product.country}
+              {t(`category.${product.category}`)} ·{' '}
+              {t('common.madeIn', { country: t('common.countryKorea') })}
             </p>
             <p className="pd-brand">{product.brand}</p>
             <h1>{product.name}</h1>
-            <p className="pd-tagline">{product.tagline}</p>
-            <p className="pd-description">{product.description}</p>
+            <p className="pd-tagline">{pick(product.tagline)}</p>
+            <p className="pd-description">{pick(product.description)}</p>
 
             <dl className="pd-facts">
               <div>
-                <dt>MSRP</dt>
+                <dt>{t('card.msrp')}</dt>
                 <dd>${product.retailPrice}</dd>
               </div>
               <div>
-                <dt>Ships to</dt>
-                <dd>{product.shipsTo}</dd>
+                <dt>{t('product.shipsTo')}</dt>
+                <dd>{t('common.shipsToUS')}</dd>
               </div>
               <div>
-                <dt>Sample</dt>
+                <dt>{t('product.sample')}</dt>
                 <dd>
                   <span
                     className={
@@ -119,75 +120,75 @@ export default function ProductDetailPage() {
                     }
                   >
                     {product.sampleAvailable
-                      ? 'Sample Available'
-                      : 'Sample Currently Unavailable'}
+                      ? t('product.sampleOn')
+                      : t('product.sampleOff')}
                   </span>
                 </dd>
               </div>
             </dl>
 
             <section className="pd-block">
-              <h2>Product Highlights</h2>
+              <h2>{t('product.highlights')}</h2>
               <ul className="pd-highlights">
-                {product.highlights.map((highlight) => (
+                {highlights.map((highlight) => (
                   <li key={highlight}>✓ {highlight}</li>
                 ))}
               </ul>
             </section>
 
             <section className="pd-block">
-              <h2>Collaboration types</h2>
+              <h2>{t('product.collabTypes')}</h2>
               <div className="pd-chips">
                 {product.collaborationTypes.map((type) => (
                   <span className="pd-chip" key={type}>
-                    {type}
+                    {t(`collabType.${type}`)}
                   </span>
                 ))}
               </div>
             </section>
 
             <aside className={unlocked ? 'pd-access is-unlocked' : 'pd-access'}>
-              <p className="pd-access__eyebrow">CREATOR ACCESS</p>
+              <p className="pd-access__eyebrow">{t('product.access')}</p>
               {unlocked ? (
-                <p className="pd-access__status">✓ Access Active</p>
+                <p className="pd-access__status">{t('product.accessActive')}</p>
               ) : null}
               <dl>
                 <div>
-                  <dt>Creator Price</dt>
+                  <dt>{t('product.creatorPrice')}</dt>
                   <dd>
                     {unlocked
                       ? `$${Number(product.creatorPrice).toFixed(2)}`
-                      : '🔒 Locked'}
+                      : t('common.locked')}
                   </dd>
                 </div>
                 <div>
-                  <dt>Creator Margin</dt>
+                  <dt>{t('product.creatorMargin')}</dt>
                   <dd>
-                    {unlocked ? `${product.creatorMargin}%` : '🔒 Locked'}
+                    {unlocked ? `${product.creatorMargin}%` : t('common.locked')}
                   </dd>
                 </div>
                 <div>
-                  <dt>MOQ</dt>
-                  <dd>{unlocked ? `${product.moq} units` : '🔒 Locked'}</dd>
+                  <dt>{t('product.moq')}</dt>
+                  <dd>
+                    {unlocked
+                      ? t('common.units', { n: product.moq })
+                      : t('common.locked')}
+                  </dd>
                 </div>
               </dl>
               {unlocked ? (
                 existingRequest ? (
                   <>
                     <p className="pd-access__requested">
-                      ✓ Collaboration Request Submitted
+                      {t('product.submittedTitle')}
                     </p>
                     <p className="pd-access__note">
-                      Your request has been saved.
+                      {t('product.submittedBody1')}
                       <br />
-                      KoaUS will review the collaboration details.
+                      {t('product.submittedBody2')}
                     </p>
-                    <button
-                      className="pd-access__done"
-                      type="button"
-                      disabled
-                    >
-                      ✓ Request Submitted
+                    <button className="pd-access__done" type="button" disabled>
+                      {t('product.submittedCta')}
                     </button>
                     <button
                       className="pd-access__another"
@@ -197,14 +198,12 @@ export default function ProductDetailPage() {
                         setIsCollaborationModalOpen(true)
                       }}
                     >
-                      Submit another request
+                      {t('product.another')}
                     </button>
                   </>
                 ) : (
                   <>
-                    <p className="pd-access__note">
-                      Creator-only pricing is available for this product.
-                    </p>
+                    <p className="pd-access__note">{t('product.pricingReady')}</p>
                     <button
                       className="button button--dark"
                       type="button"
@@ -213,18 +212,15 @@ export default function ProductDetailPage() {
                         setIsCollaborationModalOpen(true)
                       }}
                     >
-                      Request Collaboration
+                      {t('product.request')}
                     </button>
                   </>
                 )
               ) : (
                 <>
-                  <p className="pd-access__note">
-                    Creator pricing and collaboration terms are available to
-                    approved creators.
-                  </p>
+                  <p className="pd-access__note">{t('product.pricingLocked')}</p>
                   <Link className="button button--dark" to={accessTo}>
-                    Unlock Creator Access
+                    {t('product.unlock')}
                   </Link>
                 </>
               )}

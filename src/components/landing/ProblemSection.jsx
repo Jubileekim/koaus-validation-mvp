@@ -1,18 +1,18 @@
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
+
 export default function ProblemSection() {
+  const { t } = useTranslation()
+
   return (
     <div className="decision-head">
       <div className="decision-head__problem">
-        <p className="section-kicker">THE DISCOVERY GAP</p>
+        <p className="section-kicker">{t('problem.kicker')}</p>
         <h2 id="decision-title">
-          Great products and great creators
+          {t('problem.title1')}
           <br />
-          should be easier to discover.
+          {t('problem.title2')}
         </h2>
-        <p>
-          Creators struggle to find collaboration-ready Korean brands and
-          transparent pricing. Brands spend too much time on cold outreach
-          without knowing who is genuinely interested.
-        </p>
+        <p>{t('problem.body')}</p>
       </div>
 
       <div className="decision-head__arrow" aria-hidden="true">
@@ -20,16 +20,13 @@ export default function ProblemSection() {
       </div>
 
       <div className="decision-head__solution">
-        <p className="section-kicker">KOAUS CREATOR MARKETPLACE</p>
+        <p className="section-kicker">{t('problem.solutionKicker')}</p>
         <h2>
-          A curated marketplace for
+          {t('problem.solutionTitle1')}
           <br />
-          <em>Korean products × U.S. creators</em>.
+          <em>{t('problem.solutionTitleEm')}</em>.
         </h2>
-        <p>
-          Discover products, unlock creator-only terms, and request Group Buy,
-          Affiliate, and UGC collaborations in one place.
-        </p>
+        <p>{t('problem.solutionBody')}</p>
       </div>
     </div>
   )

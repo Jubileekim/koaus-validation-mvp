@@ -59,7 +59,15 @@ img, video { display: block; max-width: 100%; }
 .wordmark span { font-weight: 500; color: var(--muted); }
 .desktop-nav { display: flex; align-items: center; gap: 28px; }
 .desktop-nav a { text-decoration: none; font-size: 0.92rem; font-weight: 700; }
-.header-actions { display: flex; gap: 10px; align-items: center; }
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.header-actions .language-toggle {
+  flex-shrink: 0;
+}
 .button {
   border: 1px solid var(--ink);
   border-radius: 999px;

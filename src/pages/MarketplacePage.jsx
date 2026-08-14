@@ -7,6 +7,8 @@ import ProductFilters from '../components/marketplace/ProductFilters.jsx'
 import ProductSort from '../components/marketplace/ProductSort.jsx'
 import ProductCard from '../components/marketplace/ProductCard.jsx'
 import EmptyState from '../components/marketplace/EmptyState.jsx'
+import LanguageToggle from '../components/layout/LanguageToggle.jsx'
+import { useTranslation } from '../contexts/LocaleContext.jsx'
 import '../styles/marketplace.css'
 
 function getVisibleProducts(products, search, category, sort) {
@@ -34,6 +36,7 @@ function getVisibleProducts(products, search, category, sort) {
 }
 
 export default function MarketplacePage() {
+  const { t } = useTranslation()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
   const [sort, setSort] = useState('newest')
@@ -50,19 +53,22 @@ export default function MarketplacePage() {
 
   const countLabel =
     visibleProducts.length === 1
-      ? '1 product found'
-      : `${visibleProducts.length} products found`
+      ? t('marketplace.countOne')
+      : t('marketplace.countMany', { n: visibleProducts.length })
 
   return (
     <div className="mp-page">
       <div className="mp-topbar">
         <div className="shell mp-topbar__inner">
-          <Link className="wordmark" to="/" aria-label="Koaus home">
+          <Link className="wordmark" to="/" aria-label={t('nav.homeAria')}>
             koaus <span>/ marketplace</span>
           </Link>
-          <Link className="button button--ghost" to="/">
-            Back to KoaUS
-          </Link>
+          <div className="mp-topbar__actions">
+            <LanguageToggle />
+            <Link className="button button--ghost" to="/">
+              {t('nav.backToKoaus')}
+            </Link>
+          </div>
         </div>
       </div>
 

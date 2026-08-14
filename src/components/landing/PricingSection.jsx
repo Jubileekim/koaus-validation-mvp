@@ -1,6 +1,9 @@
 import { Link } from 'react-router'
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
 
 export default function PricingSection() {
+  const { t } = useTranslation()
+
   return (
     <section
       className="section koaus-pricing"
@@ -12,50 +15,47 @@ export default function PricingSection() {
       <div className="shell">
         <div className="koaus-pricing__heading">
           <div>
-            <p className="section-kicker">TWO PATHWAYS</p>
-            <h2 id="pricing-title">Start as a creator or a Korean brand.</h2>
+            <p className="section-kicker">{t('pathways.kicker')}</p>
+            <h2 id="pricing-title">{t('pathways.title')}</h2>
           </div>
-          <p>
-            Choose how you want to use KoaUS. Creator Access unlocks product
-            terms. Brands can introduce products for creator collaboration.
-          </p>
+          <p>{t('pathways.body')}</p>
         </div>
 
         <div className="koaus-pricing__cards koaus-pricing__cards--pathways">
           <article className="koaus-plan-card koaus-plan-card--featured">
-            <div className="koaus-popular-badge">FOR CREATORS</div>
+            <div className="koaus-popular-badge">{t('pathways.creatorBadge')}</div>
             <div className="koaus-plan-card__head">
-              <span>FOR CREATORS</span>
-              <h3>Discover Korean Products</h3>
-              <p>Unlock creator-only terms and request collaborations.</p>
+              <span>{t('pathways.creatorEyebrow')}</span>
+              <h3>{t('pathways.creatorTitle')}</h3>
+              <p>{t('pathways.creatorDesc')}</p>
             </div>
-            <p className="koaus-per-person">Creator Access pathway</p>
+            <p className="koaus-per-person">{t('pathways.creatorPath')}</p>
             <ul>
-              <li>Browse curated products</li>
-              <li>Unlock creator-only terms</li>
-              <li>Request collaborations</li>
-              <li>Get product-drop updates</li>
+              <li>{t('pathways.creator1')}</li>
+              <li>{t('pathways.creator2')}</li>
+              <li>{t('pathways.creator3')}</li>
+              <li>{t('pathways.creator4')}</li>
             </ul>
             <Link className="button button--dark" to="/creator-access">
-              Get Creator Access
+              {t('nav.creatorAccess')}
             </Link>
           </article>
 
           <article className="koaus-plan-card">
             <div className="koaus-plan-card__head">
-              <span>FOR KOREAN BRANDS</span>
-              <h3>Meet U.S. Creators</h3>
-              <p>Introduce your product and collaboration options.</p>
+              <span>{t('pathways.brandEyebrow')}</span>
+              <h3>{t('pathways.brandTitle')}</h3>
+              <p>{t('pathways.brandDesc')}</p>
             </div>
-            <p className="koaus-per-person">Brand inquiry pathway</p>
+            <p className="koaus-per-person">{t('pathways.brandPath')}</p>
             <ul>
-              <li>Showcase your product</li>
-              <li>Present creator collaboration options</li>
-              <li>Receive qualified interest</li>
-              <li>Explore U.S. creator opportunities</li>
+              <li>{t('pathways.brand1')}</li>
+              <li>{t('pathways.brand2')}</li>
+              <li>{t('pathways.brand3')}</li>
+              <li>{t('pathways.brand4')}</li>
             </ul>
             <Link className="button button--ghost" to="/brands">
-              List Your Product
+              {t('pathways.listProduct')}
             </Link>
           </article>
         </div>

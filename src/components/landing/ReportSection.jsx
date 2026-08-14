@@ -1,94 +1,91 @@
 import { Link } from 'react-router'
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
 
 export default function ReportSection() {
+  const { t } = useTranslation()
+
   return (
     <>
       <div className="pilot-report-bridge" aria-hidden="true">
-        <span>CREATOR ACCESS</span>
+        <span>{t('report.bridgeLeft')}</span>
         <i></i>
-        <strong>CREATOR OPPORTUNITY</strong>
+        <strong>{t('report.bridgeRight')}</strong>
       </div>
 
       <div className="pilot-report-grid">
         <div className="pilot-report-copy">
-          <p className="section-kicker">CREATOR OPPORTUNITY</p>
+          <p className="section-kicker">{t('report.kicker')}</p>
           <h3>
-            Everything creators need
+            {t('report.title1')}
             <br />
-            <em>before reaching out.</em>
+            <em>{t('report.titleEm')}</em>
           </h3>
-          <p>
-            Once Creator Access is active, product pages show the terms that
-            help you decide how to collaborate.
-          </p>
+          <p>{t('report.body')}</p>
           <dl className="pilot-report-list">
             <div>
-              <dt>Creator Price</dt>
-              <dd>Unlock after Creator Access</dd>
+              <dt>{t('report.dtPrice')}</dt>
+              <dd>{t('report.ddPrice')}</dd>
             </div>
             <div>
-              <dt>MOQ</dt>
-              <dd>Minimum order quantity</dd>
+              <dt>{t('report.dtMoq')}</dt>
+              <dd>{t('report.ddMoq')}</dd>
             </div>
             <div>
-              <dt>Sample Availability</dt>
-              <dd>See whether a sample is offered</dd>
+              <dt>{t('report.dtSample')}</dt>
+              <dd>{t('report.ddSample')}</dd>
             </div>
             <div>
-              <dt>Collaboration Types</dt>
-              <dd>Group Buy, Affiliate, UGC and more</dd>
+              <dt>{t('report.dtTypes')}</dt>
+              <dd>{t('report.ddTypes')}</dd>
             </div>
           </dl>
           <Link className="button button--dark" to="/marketplace">
-            Explore Marketplace
+            {t('report.cta')}
           </Link>
         </div>
 
         <div
           className="koaus-dashboard pilot-report-dashboard"
-          aria-label="Creator-only product information preview"
+          aria-label={t('report.dashAria')}
         >
           <div className="koaus-dashboard__top">
             <div>
-              <span>CREATOR ACCESS</span>
-              <strong>Creator Access Active</strong>
+              <span>{t('report.dashLabel')}</span>
+              <strong>{t('report.dashTitle')}</strong>
             </div>
             <span className="koaus-dashboard__status">
-              <i></i> ACTIVE
+              <i></i> {t('report.active')}
             </span>
           </div>
 
           <div className="koaus-dashboard__metrics">
             <article>
-              <span>Creator Price</span>
+              <span>{t('report.dtPrice')}</span>
               <strong>$14.50</strong>
-              <small>example</small>
+              <small>{t('common.example')}</small>
             </article>
             <article>
-              <span>MOQ</span>
+              <span>{t('report.dtMoq')}</span>
               <strong>20</strong>
-              <small>units</small>
+              <small>{t('common.unitShort')}</small>
             </article>
             <article>
-              <span>Sample</span>
-              <strong>Yes</strong>
-              <small>available</small>
+              <span>{t('report.sample')}</span>
+              <strong>{t('common.yes')}</strong>
+              <small>{t('report.sampleSmall')}</small>
             </article>
             <article>
-              <span>Collaboration</span>
+              <span>{t('report.collab')}</span>
               <strong>UGC</strong>
-              <small>Group Buy / UGC</small>
+              <small>{t('report.collabExample')}</small>
             </article>
           </div>
 
           <div className="koaus-dashboard__lower">
-            <div
-              className="koaus-dashboard__chart"
-              aria-label="Collaboration formats"
-            >
+            <div className="koaus-dashboard__chart" aria-label={t('report.formats')}>
               <div className="koaus-dashboard__chart-head">
-                <span>Formats</span>
-                <strong>Available types</strong>
+                <span>{t('report.formats')}</span>
+                <strong>{t('report.availableTypes')}</strong>
               </div>
               <div className="koaus-dashboard__bars" aria-hidden="true">
                 <div>
@@ -111,16 +108,13 @@ export default function ReportSection() {
             </div>
 
             <div className="koaus-dashboard__insight">
-              <span>NEXT STEP</span>
-              <strong>
-                Request a collaboration from the product page after Creator
-                Access is active.
-              </strong>
-              <small>NEXT · Request Collaboration</small>
+              <span>{t('report.next')}</span>
+              <strong>{t('report.insight')}</strong>
+              <small>{t('report.nextSmall')}</small>
             </div>
           </div>
 
-          <p>Example product terms for presentation. Not live pricing.</p>
+          <p>{t('report.disclaimer')}</p>
         </div>
       </div>
     </>

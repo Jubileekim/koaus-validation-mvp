@@ -144,6 +144,7 @@
 
 .br-form-card {
   max-width: 680px;
+  min-width: 0;
   padding: 36px 32px;
   background: #fff;
   border: 1px solid var(--line);

@@ -1,18 +1,19 @@
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
+
 export default function ProcessSection() {
+  const { t } = useTranslation()
+
   return (
     <>
       <header className="pilot-decision-heading">
-        <p className="section-kicker">HOW IT WORKS</p>
+        <p className="section-kicker">{t('process.kicker')}</p>
         <div className="pilot-decision-heading__copy">
           <h2 id="process-title">
-            Four steps from discovery
+            {t('process.title1')}
             <br />
-            <em>to collaboration interest.</em>
+            <em>{t('process.titleEm')}</em>
           </h2>
-          <p>
-            Browse curated products, get Creator Access, request a collaboration,
-            and KoaUS helps qualified opportunities move forward.
-          </p>
+          <p>{t('process.body')}</p>
         </div>
       </header>
 
@@ -20,7 +21,7 @@ export default function ProcessSection() {
         <div
           className="process-timeline"
           role="tablist"
-          aria-label="KoaUS creator collaboration process"
+          aria-label={t('process.aria')}
           style={{ '--process-active': '0' }}
         >
           <button
@@ -34,8 +35,8 @@ export default function ProcessSection() {
           >
             <span className="process-node__number">01</span>
             <span className="process-node__copy">
-              <strong>Discover</strong>
-              <small>Browse curated products</small>
+              <strong>{t('process.n1')}</strong>
+              <small>{t('process.n1s')}</small>
             </span>
           </button>
           <button
@@ -50,8 +51,8 @@ export default function ProcessSection() {
           >
             <span className="process-node__number">02</span>
             <span className="process-node__copy">
-              <strong>Access</strong>
-              <small>Unlock creator-only terms</small>
+              <strong>{t('process.n2')}</strong>
+              <small>{t('process.n2s')}</small>
             </span>
           </button>
           <button
@@ -66,8 +67,8 @@ export default function ProcessSection() {
           >
             <span className="process-node__number">03</span>
             <span className="process-node__copy">
-              <strong>Request</strong>
-              <small>Choose a collaboration format</small>
+              <strong>{t('process.n3')}</strong>
+              <small>{t('process.n3s')}</small>
             </span>
           </button>
           <button
@@ -82,8 +83,8 @@ export default function ProcessSection() {
           >
             <span className="process-node__number">04</span>
             <span className="process-node__copy">
-              <strong>Build</strong>
-              <small>Move qualified interest forward</small>
+              <strong>{t('process.n4')}</strong>
+              <small>{t('process.n4s')}</small>
             </span>
           </button>
         </div>
@@ -98,16 +99,13 @@ export default function ProcessSection() {
         >
           <span className="process-detail__number">01</span>
           <div className="process-detail__copy">
-            <small>CURRENT STEP</small>
-            <h3>Discover Products</h3>
-            <p>
-              Browse curated Korean products by category, brand and collaboration
-              opportunity.
-            </p>
+            <small>{t('process.current')}</small>
+            <h3>{t('process.d1Title')}</h3>
+            <p>{t('process.d1Body')}</p>
           </div>
           <div className="process-detail__output">
-            <small>OUTPUT</small>
-            <strong>CURATED PRODUCT MATCH</strong>
+            <small>{t('process.output')}</small>
+            <strong>{t('process.d1Out')}</strong>
           </div>
         </article>
 
@@ -120,16 +118,13 @@ export default function ProcessSection() {
         >
           <span className="process-detail__number">02</span>
           <div className="process-detail__copy">
-            <small>CURRENT STEP</small>
-            <h3>Get Creator Access</h3>
-            <p>
-              Share your creator profile to unlock creator-only pricing and
-              product terms.
-            </p>
+            <small>{t('process.current')}</small>
+            <h3>{t('process.d2Title')}</h3>
+            <p>{t('process.d2Body')}</p>
           </div>
           <div className="process-detail__output">
-            <small>OUTPUT</small>
-            <strong>CREATOR ACCESS PROFILE</strong>
+            <small>{t('process.output')}</small>
+            <strong>{t('process.d2Out')}</strong>
           </div>
         </article>
 
@@ -142,16 +137,13 @@ export default function ProcessSection() {
         >
           <span className="process-detail__number">03</span>
           <div className="process-detail__copy">
-            <small>CURRENT STEP</small>
-            <h3>Request Collaboration</h3>
-            <p>
-              Choose Group Buy, Affiliate, UGC or other available collaboration
-              formats.
-            </p>
+            <small>{t('process.current')}</small>
+            <h3>{t('process.d3Title')}</h3>
+            <p>{t('process.d3Body')}</p>
           </div>
           <div className="process-detail__output">
-            <small>OUTPUT</small>
-            <strong>COLLABORATION REQUEST</strong>
+            <small>{t('process.output')}</small>
+            <strong>{t('process.d3Out')}</strong>
           </div>
         </article>
 
@@ -164,16 +156,13 @@ export default function ProcessSection() {
         >
           <span className="process-detail__number">04</span>
           <div className="process-detail__copy">
-            <small>CURRENT STEP</small>
-            <h3>Build the Opportunity</h3>
-            <p>
-              KoaUS reviews collaboration interest and helps qualified
-              opportunities move forward.
-            </p>
+            <small>{t('process.current')}</small>
+            <h3>{t('process.d4Title')}</h3>
+            <p>{t('process.d4Body')}</p>
           </div>
           <div className="process-detail__output">
-            <small>OUTPUT</small>
-            <strong>QUALIFIED INTEREST REVIEW</strong>
+            <small>{t('process.output')}</small>
+            <strong>{t('process.d4Out')}</strong>
           </div>
         </article>
       </div>

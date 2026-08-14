@@ -4,6 +4,7 @@
 
 .ca-card {
   max-width: 640px;
+  min-width: 0;
   padding: 36px 32px;
   background: #fff;
   border: 1px solid var(--line);
@@ -91,6 +92,13 @@
 .ca-form .button {
   width: 100%;
   margin-top: 8px;
+}
+
+.ca-form .button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .ca-profile {

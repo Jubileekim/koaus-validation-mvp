@@ -11,8 +11,10 @@
 .collab-modal {
   position: relative;
   width: min(560px, 100%);
+  max-width: 100%;
   max-height: min(88vh, 760px);
   overflow: auto;
+  overscroll-behavior: contain;
   padding: 32px 28px 28px;
   background: #fff;
   color: var(--ink, #111);
@@ -128,6 +130,13 @@
   margin-top: 4px;
 }
 
+.collab-form .button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .collab-success p {
   margin: 0 0 12px;
   color: var(--muted, #6b6375);
@@ -145,6 +154,7 @@
 
   .collab-modal {
     width: 100%;
+    max-height: min(92dvh, 760px);
     padding: 28px 20px 22px;
     border-radius: 20px;
   }

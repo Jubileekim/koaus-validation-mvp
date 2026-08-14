@@ -10,8 +10,10 @@ import ReportSection from '../components/landing/ReportSection.jsx'
 import PricingSection from '../components/landing/PricingSection.jsx'
 import LaunchEventSection from '../components/landing/LaunchEventSection.jsx'
 import InquirySection from '../components/landing/InquirySection.jsx'
+import { useTranslation } from '../contexts/LocaleContext.jsx'
 
 export default function LandingPage() {
+  const { t } = useTranslation()
   // Port original landing JS behaviors needed for visual parity (no redesign).
   useEffect(() => {
     const cleanups = []
@@ -229,11 +231,11 @@ export default function LandingPage() {
   return (
     <>
       <a className="skip-link" href="#main-content">
-        Skip to content
+        {t('common.skip')}
       </a>
       <Header />
 
-      <nav className="section-rail" aria-label="Section navigation">
+      <nav className="section-rail" aria-label={t('common.sectionNav')}>
         <a
           className="is-active"
           href="#intro"
@@ -241,42 +243,42 @@ export default function LandingPage() {
           aria-current="location"
         >
           <span className="section-rail__label">
-            Start
+            {t('rail.start')}
           </span>
           <span className="section-rail__number">01</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#services" data-rail-target="services">
           <span className="section-rail__label">
-            Discover
+            {t('rail.discover')}
           </span>
           <span className="section-rail__number">02</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#process" data-rail-target="process">
           <span className="section-rail__label">
-            How it works
+            {t('rail.how')}
           </span>
           <span className="section-rail__number">03</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#pricing" data-rail-target="pricing">
           <span className="section-rail__label">
-            Pathways
+            {t('rail.pathways')}
           </span>
           <span className="section-rail__number">04</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#launch-event" data-rail-target="launch-event">
           <span className="section-rail__label">
-            Product drop
+            {t('rail.drop')}
           </span>
           <span className="section-rail__number">05</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#contact" data-rail-target="contact">
           <span className="section-rail__label">
-            For brands
+            {t('rail.brands')}
           </span>
           <span className="section-rail__number">06</span>
           <span className="section-rail__line" aria-hidden="true"></span>

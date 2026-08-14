@@ -1,6 +1,8 @@
 import { Link } from 'react-router'
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
 
 export default function HeroSection() {
+  const { t } = useTranslation()
   return (
     <section className="hero hero--ugc" id="intro" data-rail-section aria-labelledby="hero-title">
       <div className="ugc-mosaic" aria-hidden="true">
@@ -186,47 +188,55 @@ export default function HeroSection() {
 
       <div className="shell hero-ugc-inner">
         <div className="hero-ugc-copy" data-reveal>
-          <p className="eyebrow">
-            KOREAN PRODUCTS × U.S. CREATORS
-          </p>
+          <p className="eyebrow">{t('hero.eyebrow')}</p>
           <h1 id="hero-title">
-            <span className="hero-title-line">Discover Korean products</span>
-            <span className="hero-title-line">for your next <em>collaboration</em>.</span>
+            <span className="hero-title-line">{t('hero.titleLine1')}</span>
+            <span className="hero-title-line">
+              {t('hero.titleBeforeEm')}
+              <em>{t('hero.titleEm')}</em>
+              {t('hero.titleAfterEm')}
+            </span>
           </h1>
           <div className="hero-ugc-body hero-validation">
-            <p className="hero-validation__lead">
-              Curated Korean brands, creator-only pricing,
-              and collaboration opportunities — all in one place.
-            </p>
+            <p className="hero-validation__lead">{t('hero.lead')}</p>
             <div className="hero-validation__rows">
-              <div><strong>DISCOVER</strong><span>Curated Korean products</span></div>
-              <div><strong>ACCESS</strong><span>Creator-only pricing and MOQ</span></div>
-              <div><strong>COLLABORATE</strong><span>Group Buy, Affiliate, UGC</span></div>
+              <div>
+                <strong>{t('hero.row1Label')}</strong>
+                <span>{t('hero.row1Text')}</span>
+              </div>
+              <div>
+                <strong>{t('hero.row2Label')}</strong>
+                <span>{t('hero.row2Text')}</span>
+              </div>
+              <div>
+                <strong>{t('hero.row3Label')}</strong>
+                <span>{t('hero.row3Text')}</span>
+              </div>
             </div>
           </div>
 
           <div className="hero-actions">
             <Link className="button button--lime" to="/marketplace">
-              Browse Products →
+              {t('hero.browse')}
             </Link>
             <Link className="button button--glass" to="/creator-access">
-              Get Creator Access
+              {t('nav.creatorAccess')}
             </Link>
           </div>
         </div>
 
         <div className="hero-ugc-proof" data-reveal>
           <div>
-            <strong>Curated</strong>
-            <span>Korean products for U.S. creators</span>
+            <strong>{t('hero.proof1Title')}</strong>
+            <span>{t('hero.proof1Text')}</span>
           </div>
           <div>
-            <strong>Creator Access</strong>
-            <span>Unlock pricing, samples, and terms</span>
+            <strong>{t('hero.proof2Title')}</strong>
+            <span>{t('hero.proof2Text')}</span>
           </div>
           <div>
-            <strong>Collaborate</strong>
-            <span>Group Buy · Affiliate · UGC</span>
+            <strong>{t('hero.proof3Title')}</strong>
+            <span>{t('hero.proof3Text')}</span>
           </div>
         </div>
       </div>

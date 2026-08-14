@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { PRODUCTS } from '../../data/products.js'
 import ProductCard from '../marketplace/ProductCard.jsx'
+import { useTranslation } from '../../contexts/LocaleContext.jsx'
 import '../../styles/marketplace.css'
 
 function getPreviewProducts(products) {
@@ -10,6 +11,7 @@ function getPreviewProducts(products) {
 }
 
 export default function MarketplacePreviewSection() {
+  const { t } = useTranslation()
   const products = getPreviewProducts(PRODUCTS)
 
   return (
@@ -21,14 +23,14 @@ export default function MarketplacePreviewSection() {
     >
       <div className="shell">
         <header className="pilot-decision-heading">
-          <p className="section-kicker">CREATOR MARKETPLACE</p>
+          <p className="section-kicker">{t('preview.kicker')}</p>
           <div className="pilot-decision-heading__copy">
             <h2 id="landing-mp-title">
-              Fresh from Korea.
+              {t('preview.title1')}
               <br />
-              <em>Ready for collaboration.</em>
+              <em>{t('preview.titleEm')}</em>
             </h2>
-            <p>Explore curated products looking to work with U.S. creators.</p>
+            <p>{t('preview.body')}</p>
           </div>
         </header>
 
@@ -40,7 +42,7 @@ export default function MarketplacePreviewSection() {
 
         <div className="landing-mp__cta">
           <Link className="button button--dark" to="/marketplace">
-            View All Products
+            {t('preview.viewAll')}
           </Link>
         </div>
       </div>

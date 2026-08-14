@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
+import LanguageToggle from '../components/layout/LanguageToggle.jsx'
 import { saveBrandInquiry } from '../services/brandInquiryStorage.js'
+import { useTranslation } from '../contexts/LocaleContext.jsx'
 import '../styles/marketplace.css'
 import '../styles/brands.css'
 
@@ -25,7 +27,11 @@ const CATEGORIES = [
   'Other',
 ]
 
-const US_PRESENCE = ['Not launched', 'Testing the market', 'Already selling']
+const US_PRESENCE = [
+  ['Not launched', 'brands.presenceNone'],
+  ['Testing the market', 'brands.presenceTesting'],
+  ['Already selling', 'brands.presenceSelling'],
+]
 
 const COLLAB_OPTIONS = [
   'Group Buy',
@@ -36,43 +42,22 @@ const COLLAB_OPTIONS = [
 ]
 
 const WHY_ITEMS = [
-  {
-    title: 'Creator Discovery',
-    body: 'U.S. creators can discover curated Korean products that are open to collaboration.',
-  },
-  {
-    title: 'Creator-only Terms',
-    body: 'Pricing and collaboration terms are shared through Creator Access.',
-  },
-  {
-    title: 'Qualified Collaboration',
-    body: 'Creators can submit collaboration interest for products they want to work with.',
-  },
+  { title: 'brands.why1Title', body: 'brands.why1Body' },
+  { title: 'brands.why2Title', body: 'brands.why2Body' },
+  { title: 'brands.why3Title', body: 'brands.why3Body' },
 ]
 
 const STEPS = [
-  {
-    num: '01',
-    title: 'List Your Product',
-    body: 'Share basic brand and product information.',
-  },
-  {
-    num: '02',
-    title: 'Get Discovered',
-    body: 'Approved creators discover your product and creator-only collaboration terms.',
-  },
-  {
-    num: '03',
-    title: 'Receive Collaboration Interest',
-    body: 'KoaUS reviews creator requests and helps move qualified opportunities forward.',
-  },
+  { num: '01', title: 'brands.step1Title', body: 'brands.step1Body' },
+  { num: '02', title: 'brands.step2Title', body: 'brands.step2Body' },
+  { num: '03', title: 'brands.step3Title', body: 'brands.step3Body' },
 ]
 
 const METRICS = [
-  { value: '24', label: 'Demo Creator Profiles' },
-  { value: '6', label: 'Categories' },
-  { value: '3', label: 'Primary Platforms' },
-  { value: '12', label: 'U.S. Markets' },
+  { value: '24', label: 'brands.m1' },
+  { value: '6', label: 'brands.m2' },
+  { value: '3', label: 'brands.m3' },
+  { value: '12', label: 'brands.m4' },
 ]
 
 function isValidEmail(value) {
@@ -86,30 +71,38 @@ function createInquiryId() {
   return `inq-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
 }
 
-function validateForm(form) {
+function validateForm(form, t) {
   const errors = {}
   if (!form.brandName.trim()) {
-    errors.brandName = 'Please enter your brand name.'
+    errors.brandName = t('errors.brandName')
   }
   if (!form.contactEmail.trim()) {
-    errors.contactEmail = 'Please enter your email.'
+    errors.contactEmail = t('errors.emailRequired')
   } else if (!isValidEmail(form.contactEmail.trim())) {
-    errors.contactEmail = 'Please enter a valid email address.'
+    errors.contactEmail = t('errors.emailInvalid')
   }
   if (!form.productName.trim()) {
-    errors.productName = 'Please enter your product name.'
+    errors.productName = t('errors.productName')
   }
   if (!form.category) {
-    errors.category = 'Please select a category.'
+    errors.category = t('errors.category')
   }
   return errors
 }
 
 export default function BrandsPage() {
+  const { t } = useTranslation()
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
   const [success, setSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+
+  useEffect(() => {
+    setErrors((current) => {
+      if (Object.keys(current).length === 0) return current
+      return validateForm(form, t)
+    })
+  }, [t, form])
 
   const updateField = (field, value) => {
     setForm((current) => ({ ...current, [field]: value }))
@@ -138,7 +131,7 @@ export default function BrandsPage() {
     event.preventDefault()
     if (submitting) return
 
-    const nextErrors = validateForm(form)
+    const nextErrors = validateForm(form, t)
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
@@ -161,49 +154,50 @@ export default function BrandsPage() {
     setSubmitting(false)
     if (!saved) return
     setSuccess(true)
+    setErrors({})
   }
 
   return (
     <div className="mp-page">
       <div className="mp-topbar">
         <div className="shell mp-topbar__inner">
-          <Link className="wordmark" to="/" aria-label="Koaus home">
+          <Link className="wordmark" to="/" aria-label={t('nav.homeAria')}>
             koaus <span>/ brands</span>
           </Link>
-          <Link className="button button--ghost" to="/marketplace">
-            Browse Marketplace
-          </Link>
+          <div className="mp-topbar__actions">
+            <LanguageToggle />
+            <Link className="button button--ghost" to="/marketplace">
+              {t('nav.browseMarketplace')}
+            </Link>
+          </div>
         </div>
       </div>
 
       <main>
         <section className="shell br-hero">
-          <p className="br-eyebrow">FOR KOREAN BRANDS</p>
-          <h1>Put your products in front of U.S. creators.</h1>
-          <p className="br-lead">
-            Introduce Korean products to U.S. creators looking for group buys,
-            affiliate partnerships, and UGC collaborations.
-          </p>
+          <p className="br-eyebrow">{t('brands.eyebrow')}</p>
+          <h1>{t('brands.title')}</h1>
+          <p className="br-lead">{t('brands.lead')}</p>
           <div className="br-hero__actions">
             <a className="button button--dark" href="#list-your-product">
-              List Your Product
+              {t('brands.list')}
             </a>
             <Link className="button button--ghost" to="/marketplace">
-              Browse Marketplace
+              {t('nav.browseMarketplace')}
             </Link>
           </div>
         </section>
 
         <section className="shell br-section">
           <header className="br-section__head">
-            <p className="br-eyebrow">WHY KOAUS</p>
-            <h2>A marketplace built for creator collaboration.</h2>
+            <p className="br-eyebrow">{t('brands.why')}</p>
+            <h2>{t('brands.whyTitle')}</h2>
           </header>
           <div className="br-grid br-grid--3">
             {WHY_ITEMS.map((item) => (
               <article className="br-card" key={item.title}>
-                <h3>{item.title}</h3>
-                <p>{item.body}</p>
+                <h3>{t(item.title)}</h3>
+                <p>{t(item.body)}</p>
               </article>
             ))}
           </div>
@@ -211,17 +205,14 @@ export default function BrandsPage() {
 
         <section className="shell br-section">
           <header className="br-section__head">
-            <p className="br-eyebrow">CREATOR NETWORK</p>
-            <h2>A growing network of U.S. creators.</h2>
-            <p>
-              Creator profiles across beauty, lifestyle, fashion, wellness and
-              other consumer categories.
-            </p>
+            <p className="br-eyebrow">{t('brands.network')}</p>
+            <h2>{t('brands.networkTitle')}</h2>
+            <p>{t('brands.networkBody')}</p>
           </header>
 
           <div className="br-grid br-grid--3">
             <article className="br-card">
-              <h3>Primary Platforms</h3>
+              <h3>{t('brands.platforms')}</h3>
               <div className="br-chips">
                 <span>TikTok</span>
                 <span>Instagram</span>
@@ -229,22 +220,22 @@ export default function BrandsPage() {
               </div>
             </article>
             <article className="br-card">
-              <h3>Creator Categories</h3>
+              <h3>{t('brands.categories')}</h3>
               <div className="br-chips">
-                <span>Beauty</span>
-                <span>Lifestyle</span>
-                <span>Fashion</span>
-                <span>Wellness</span>
-                <span>Food</span>
-                <span>Other</span>
+                <span>{t('category.Beauty')}</span>
+                <span>{t('category.Lifestyle')}</span>
+                <span>{t('category.Fashion')}</span>
+                <span>{t('category.Wellness')}</span>
+                <span>{t('category.Food')}</span>
+                <span>{t('category.Other')}</span>
               </div>
             </article>
             <article className="br-card">
-              <h3>Creator Tiers</h3>
+              <h3>{t('brands.tiers')}</h3>
               <div className="br-chips">
-                <span>Nano</span>
-                <span>Micro</span>
-                <span>Mid-tier</span>
+                <span>{t('brands.nano')}</span>
+                <span>{t('brands.micro')}</span>
+                <span>{t('brands.mid')}</span>
               </div>
             </article>
           </div>
@@ -253,24 +244,24 @@ export default function BrandsPage() {
             {METRICS.map((metric) => (
               <article className="br-card br-metric" key={metric.label}>
                 <strong>{metric.value}</strong>
-                <span>{metric.label}</span>
+                <span>{t(metric.label)}</span>
               </article>
             ))}
           </div>
-          <p className="br-disclaimer">Demo data for MVP presentation.</p>
+          <p className="br-disclaimer">{t('brands.disclaimer')}</p>
         </section>
 
         <section className="shell br-section">
           <header className="br-section__head">
-            <p className="br-eyebrow">HOW IT WORKS</p>
-            <h2>From product intro to collaboration interest.</h2>
+            <p className="br-eyebrow">{t('brands.how')}</p>
+            <h2>{t('brands.howTitle')}</h2>
           </header>
           <div className="br-grid br-grid--3">
             {STEPS.map((step) => (
               <article className="br-card" key={step.num}>
                 <p className="br-step">{step.num}</p>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
+                <h3>{t(step.title)}</h3>
+                <p>{t(step.body)}</p>
               </article>
             ))}
           </div>
@@ -280,35 +271,32 @@ export default function BrandsPage() {
           <div className="br-form-card">
             {success ? (
               <div className="br-success">
-                <p className="br-eyebrow">BRAND INQUIRY</p>
-                <h2>✓ Product Inquiry Submitted</h2>
-                <p>Thanks for introducing your brand.</p>
-                <p>Your inquiry has been saved for KoaUS review.</p>
+                <p className="br-eyebrow">{t('brands.successKicker')}</p>
+                <h2>{t('brands.successTitle')}</h2>
+                <p>{t('brands.success1')}</p>
+                <p>{t('brands.success2')}</p>
                 <div className="br-success__actions">
                   <Link className="button button--dark" to="/marketplace">
-                    Browse Creator Marketplace
+                    {t('brands.browseCreators')}
                   </Link>
                   <button
                     className="button button--ghost"
                     type="button"
                     onClick={resetForm}
                   >
-                    Submit another product
+                    {t('brands.another')}
                   </button>
                 </div>
               </div>
             ) : (
               <>
-                <p className="br-eyebrow">LIST YOUR PRODUCT</p>
-                <h2>List Your Product</h2>
-                <p className="br-form-lead">
-                  Tell us about your brand and the product you'd like to
-                  introduce to U.S. creators.
-                </p>
+                <p className="br-eyebrow">{t('brands.formKicker')}</p>
+                <h2>{t('brands.formTitle')}</h2>
+                <p className="br-form-lead">{t('brands.formLead')}</p>
 
                 <form className="br-form" onSubmit={handleSubmit} noValidate>
                   <label className="br-field">
-                    <span>Brand Name *</span>
+                    <span>{t('brands.brandName')}</span>
                     <input
                       type="text"
                       value={form.brandName}
@@ -321,7 +309,7 @@ export default function BrandsPage() {
                   </label>
 
                   <label className="br-field">
-                    <span>Contact Email *</span>
+                    <span>{t('brands.contactEmail')}</span>
                     <input
                       type="email"
                       value={form.contactEmail}
@@ -334,20 +322,20 @@ export default function BrandsPage() {
                   </label>
 
                   <label className="br-field">
-                    <span>Website / Instagram</span>
+                    <span>{t('brands.website')}</span>
                     <input
                       type="text"
                       value={form.website}
                       onChange={(event) =>
                         updateField('website', event.target.value)
                       }
-                      placeholder="https:// or @handle"
+                      placeholder={t('brands.websitePh')}
                       autoComplete="url"
                     />
                   </label>
 
                   <label className="br-field">
-                    <span>Product Name *</span>
+                    <span>{t('brands.productName')}</span>
                     <input
                       type="text"
                       value={form.productName}
@@ -359,17 +347,17 @@ export default function BrandsPage() {
                   </label>
 
                   <label className="br-field">
-                    <span>Product Category *</span>
+                    <span>{t('brands.productCategory')}</span>
                     <select
                       value={form.category}
                       onChange={(event) =>
                         updateField('category', event.target.value)
                       }
                     >
-                      <option value="">Select a category</option>
+                      <option value="">{t('brands.selectCategory')}</option>
                       {CATEGORIES.map((category) => (
                         <option key={category} value={category}>
-                          {category}
+                          {t(`category.${category}`)}
                         </option>
                       ))}
                     </select>
@@ -377,24 +365,24 @@ export default function BrandsPage() {
                   </label>
 
                   <label className="br-field">
-                    <span>Current U.S. Presence</span>
+                    <span>{t('brands.usPresence')}</span>
                     <select
                       value={form.currentUSPresence}
                       onChange={(event) =>
                         updateField('currentUSPresence', event.target.value)
                       }
                     >
-                      <option value="">Select an option</option>
-                      {US_PRESENCE.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
+                      <option value="">{t('brands.selectOption')}</option>
+                      {US_PRESENCE.map(([value, key]) => (
+                        <option key={value} value={value}>
+                          {t(key)}
                         </option>
                       ))}
                     </select>
                   </label>
 
                   <fieldset className="br-fieldset">
-                    <legend>Interested In</legend>
+                    <legend>{t('brands.interested')}</legend>
                     <div className="br-checks">
                       {COLLAB_OPTIONS.map((option) => (
                         <label className="br-check" key={option}>
@@ -403,21 +391,21 @@ export default function BrandsPage() {
                             checked={form.collaborationInterests.includes(option)}
                             onChange={() => toggleInterest(option)}
                           />
-                          <span>{option}</span>
+                          <span>{t(`collabType.${option}`)}</span>
                         </label>
                       ))}
                     </div>
                   </fieldset>
 
                   <label className="br-field">
-                    <span>Message</span>
+                    <span>{t('brands.message')}</span>
                     <textarea
                       rows="5"
                       value={form.message}
                       onChange={(event) =>
                         updateField('message', event.target.value)
                       }
-                      placeholder="Tell us about your product and what kind of creator collaboration you're looking for..."
+                      placeholder={t('brands.messagePh')}
                     />
                   </label>
 
@@ -426,7 +414,7 @@ export default function BrandsPage() {
                     type="submit"
                     disabled={submitting}
                   >
-                    {submitting ? 'Submitting...' : 'Submit Product Inquiry'}
+                    {submitting ? t('common.submitting') : t('brands.submit')}
                   </button>
                 </form>
               </>
