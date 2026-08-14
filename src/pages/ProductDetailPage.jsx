@@ -172,28 +172,51 @@ export default function ProductDetailPage() {
                 </div>
               </dl>
               {unlocked ? (
-                <>
-                  {existingRequest ? (
+                existingRequest ? (
+                  <>
                     <p className="pd-access__requested">
-                      ✓ Collaboration Requested
+                      ✓ Collaboration Request Submitted
                     </p>
-                  ) : null}
-                  <p className="pd-access__note">
-                    Creator-only pricing is available for this product.
-                  </p>
-                  <button
-                    className="button button--dark"
-                    type="button"
-                    onClick={() => {
-                      if (!hasCreatorAccess() || !creator?.email) return
-                      setIsCollaborationModalOpen(true)
-                    }}
-                  >
-                    {existingRequest
-                      ? 'Request another collaboration'
-                      : 'Request Collaboration'}
-                  </button>
-                </>
+                    <p className="pd-access__note">
+                      Your request has been saved.
+                      <br />
+                      KoaUS will review the collaboration details.
+                    </p>
+                    <button
+                      className="pd-access__done"
+                      type="button"
+                      disabled
+                    >
+                      ✓ Request Submitted
+                    </button>
+                    <button
+                      className="pd-access__another"
+                      type="button"
+                      onClick={() => {
+                        if (!hasCreatorAccess() || !creator?.email) return
+                        setIsCollaborationModalOpen(true)
+                      }}
+                    >
+                      Submit another request
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="pd-access__note">
+                      Creator-only pricing is available for this product.
+                    </p>
+                    <button
+                      className="button button--dark"
+                      type="button"
+                      onClick={() => {
+                        if (!hasCreatorAccess() || !creator?.email) return
+                        setIsCollaborationModalOpen(true)
+                      }}
+                    >
+                      Request Collaboration
+                    </button>
+                  </>
+                )
               ) : (
                 <>
                   <p className="pd-access__note">

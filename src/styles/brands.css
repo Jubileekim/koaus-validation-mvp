@@ -1,0 +1,291 @@
+.br-hero {
+  padding: 56px 0 20px;
+  max-width: 760px;
+}
+
+.br-eyebrow {
+  margin: 0 0 12px;
+  color: var(--brand-red-500, #f04a32);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.br-hero h1,
+.br-section h2,
+.br-form-card h2 {
+  margin: 0 0 16px;
+  max-width: none;
+  font-size: clamp(2rem, 4.2vw, 3.3rem);
+  line-height: 1.08;
+  letter-spacing: -0.055em;
+}
+
+.br-section h2,
+.br-form-card h2 {
+  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+}
+
+.br-lead,
+.br-section__head p,
+.br-form-lead {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.br-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.br-section {
+  padding: 48px 0 8px;
+}
+
+.br-inquiry {
+  padding-bottom: 88px;
+  scroll-margin-top: 88px;
+}
+
+.br-section__head {
+  max-width: 720px;
+  margin-bottom: 28px;
+}
+
+.br-section__head h2 {
+  margin-bottom: 12px;
+}
+
+.br-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.br-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.br-grid--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 18px;
+}
+
+.br-card {
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.br-card h3 {
+  margin: 0 0 10px;
+  font-size: 1.12rem;
+  letter-spacing: -0.03em;
+}
+
+.br-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.br-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.br-chips span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.br-metric {
+  display: grid;
+  gap: 6px;
+}
+
+.br-metric strong {
+  font-size: 2rem;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.br-metric span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.br-disclaimer {
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 650;
+}
+
+.br-step {
+  margin: 0 0 10px;
+  color: var(--brand-red-500, #f04a32);
+  font-size: 0.82rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.br-form-card {
+  max-width: 680px;
+  padding: 36px 32px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.br-form-lead {
+  margin-bottom: 28px;
+}
+
+.br-form {
+  display: grid;
+  gap: 16px;
+}
+
+.br-field {
+  display: grid;
+  gap: 8px;
+}
+
+.br-field span {
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.br-field input,
+.br-field select,
+.br-field textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.br-field input,
+.br-field select {
+  min-height: 48px;
+}
+
+.br-field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.br-field input:focus,
+.br-field select:focus,
+.br-field textarea:focus {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.br-field em {
+  font-style: normal;
+  color: var(--brand-red-500, #f04a32);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.br-fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.br-fieldset legend {
+  margin-bottom: 10px;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.br-checks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+}
+
+.br-check {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-weight: 650;
+}
+
+.br-form .button {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.br-form .button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.br-success p {
+  margin: 0 0 10px;
+  color: var(--muted);
+}
+
+.br-success__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+@media (max-width: 1000px) {
+  .br-grid--3,
+  .br-grid--4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .br-hero {
+    padding-top: 36px;
+  }
+
+  .br-hero__actions,
+  .br-success__actions {
+    flex-direction: column;
+  }
+
+  .br-hero__actions .button,
+  .br-success__actions .button {
+    width: 100%;
+  }
+
+  .br-grid--3,
+  .br-grid--4 {
+    grid-template-columns: 1fr;
+  }
+
+  .br-checks {
+    grid-template-columns: 1fr;
+  }
+
+  .br-form-card {
+    padding: 28px 20px;
+  }
+}
