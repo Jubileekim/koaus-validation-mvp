@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+
 export default function HeroSection() {
   return (
     <section className="hero hero--ugc" id="intro" data-rail-section aria-labelledby="hero-title">
@@ -184,53 +186,47 @@ export default function HeroSection() {
 
       <div className="shell hero-ugc-inner">
         <div className="hero-ugc-copy" data-reveal>
-          <p className="eyebrow" data-i18n="heroEyebrow">
-            US MARKET VALIDATION
+          <p className="eyebrow">
+            KOREAN PRODUCTS × U.S. CREATORS
           </p>
-          <h1 id="hero-title" data-i18n="heroTitle">
-            <span className="hero-title-line">미국에 대량으로 보내기 전에,</span>
-            <span className="hero-title-line"><em>실제로 팔리고 남는지</em> 먼저 확인하세요.</span>
+          <h1 id="hero-title">
+            <span className="hero-title-line">Discover Korean products</span>
+            <span className="hero-title-line">for your next <em>collaboration</em>.</span>
           </h1>
-          <div className="hero-ugc-body hero-validation" data-i18n="heroBody">
+          <div className="hero-ugc-body hero-validation">
             <p className="hero-validation__lead">
-              KoaUS는 한국 소비재 제품을 미국 소비자에게 실제로 노출하고
-              시장 반응, 고객 피드백, 배송비, 판매원가와 예상 마진까지 검증합니다.
+              Curated Korean brands, creator-only pricing,
+              and collaboration opportunities — all in one place.
             </p>
             <div className="hero-validation__rows">
-              <div><strong>MARKET FIT</strong><span>제품·시장 적합도</span></div>
-              <div><strong>CREATIVE</strong><span>수요·메시지 반응 테스트</span></div>
-              <div><strong>ECONOMICS</strong><span>배송·VOC·마진 검증</span></div>
+              <div><strong>DISCOVER</strong><span>Curated Korean products</span></div>
+              <div><strong>ACCESS</strong><span>Creator-only pricing and MOQ</span></div>
+              <div><strong>COLLABORATE</strong><span>Group Buy, Affiliate, UGC</span></div>
             </div>
           </div>
 
           <div className="hero-actions">
-            <a
-              className="button button--lime"
-              href="#contact"
-              data-i18n="heroPrimary"
-              >제품 검증 시작하기 →</a
-            >
-            <a
-              className="button button--glass"
-              href="#process"
-              data-i18n="heroSecondary"
-              >샘플 리포트 보기</a
-            >
+            <Link className="button button--lime" to="/marketplace">
+              Browse Products →
+            </Link>
+            <Link className="button button--glass" to="/creator-access">
+              Get Creator Access
+            </Link>
           </div>
         </div>
 
         <div className="hero-ugc-proof" data-reveal>
           <div>
-            <strong>Product Scan</strong>
-            <span data-i18n="proofCreators">시장·경쟁·가격 사전 분석</span>
+            <strong>Curated</strong>
+            <span>Korean products for U.S. creators</span>
           </div>
           <div>
-            <strong>4–8 weeks</strong>
-            <span data-i18n="proofDays">검증부터 GO/IMPROVE/STOP까지</span>
+            <strong>Creator Access</strong>
+            <span>Unlock pricing, samples, and terms</span>
           </div>
           <div>
-            <strong>Fit → Margin</strong>
-            <span data-i18n="proofSystem">반응·배송·원가·마진 연결</span>
+            <strong>Collaborate</strong>
+            <span>Group Buy · Affiliate · UGC</span>
           </div>
         </div>
       </div>

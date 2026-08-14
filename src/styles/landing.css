@@ -5383,3 +5383,82 @@ html[lang="en"] .hero--ugc h1 {
 .export-voucher-page .desktop-nav .is-current {
   text-decoration-color: var(--brand-orange-500);
 }
+
+/* Marketplace landing connections — layout reuse only */
+.landing-mp__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: 36px;
+}
+
+.landing-mp .mp-card__name {
+  max-width: none;
+  font-size: 1.18rem;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.landing-mp__cta {
+  margin-top: 32px;
+}
+
+.koaus-pricing__cards--pathways {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.koaus-pricing__cards--pathways .koaus-plan-card {
+  min-height: 0;
+}
+
+.koaus-pricing__cards--pathways .button {
+  text-decoration: none;
+}
+
+.pilot-report-copy .button {
+  margin-top: 24px;
+  text-decoration: none;
+}
+
+.landing-brand-cta__title {
+  margin: 0 0 16px;
+  color: #f7f4ed;
+  font-size: clamp(2rem, 3.2vw, 2.8rem);
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+}
+
+.landing-brand-cta__body {
+  margin: 0;
+  color: #bdb9b0;
+  line-height: 1.7;
+}
+
+a.launch-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+@media (max-width: 1100px) {
+  .landing-mp__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1050px) {
+  .koaus-pricing__cards--pathways {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .landing-mp__grid {
+    grid-template-columns: 1fr;
+  }
+}

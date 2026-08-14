@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+
 export default function LaunchEventSection() {
   return (
     <section
@@ -9,59 +11,61 @@ export default function LaunchEventSection() {
     >
       <div className="shell koaus-launch-event__grid">
         <div className="koaus-launch-event__copy">
-          <span className="koaus-event-badge">✦ FIRST VALIDATION PILOT</span>
-          <p data-final-i18n="eventLead">미국시장 검증이 처음이신가요?</p>
-          <h2 id="event-title" data-final-i18n="eventTitle">
-            첫 검증 파트너 혜택으로<br /><em>더 가볍게<br />시작해보세요.</em>
+          <span className="koaus-event-badge">✦ CREATOR PRODUCT DROP</span>
+          <p>Be early to new Korean products.</p>
+          <h2 id="event-title">
+            Be first to discover
+            <br />
+            <em>
+              new Korean
+              <br />
+              products.
+            </em>
           </h2>
-          <p className="koaus-event-description" data-final-i18n="eventBody">
-            선착순 3개 브랜드에 KoaUS 운영관리비 20% 할인(최대 60만 원)과
-            Product Scan 사전 진단 혜택을 제공합니다.
+          <p className="koaus-event-description">
+            Join Creator Access to receive updates when new collaboration-ready
+            products are added.
           </p>
-          <button
-            className="button button--dark koaus-plan-select"
-            type="button"
-            data-plan="Validation - First Validation Pilot"
-            data-final-i18n="eventCta"
-          >
-            검증 파일럿 혜택 받기
-          </button>
+          <Link className="button button--dark" to="/creator-access">
+            Get Creator Access
+          </Link>
         </div>
         <article className="koaus-event-card">
           <div className="koaus-event-card__top">
             <div>
-              <span>VALIDATION PACKAGE</span>
-              <h3 data-final-i18n="eventCardTitle">
-                첫 검증 파트너 운영관리비 20% 할인
-              </h3>
+              <span>CREATOR ACCESS</span>
+              <h3>Get product-drop updates</h3>
             </div>
-            <span className="koaus-event-roundel">LIMITED<br />3 BRANDS</span>
+            <span className="koaus-event-roundel">
+              NEW
+              <br />
+              DROPS
+            </span>
           </div>
           <div className="koaus-event-price">
-            <strong data-final-i18n="eventDiscountLabel"
-              >운영관리비 20% 할인</strong
-            ><small data-final-i18n="eventDiscountCap">최대 60만 원</small>
+            <strong>Creator-only terms</strong>
+            <small>Unlock pricing, MOQ and samples</small>
           </div>
           <div className="koaus-event-benefits">
             <ul>
-              <li data-final-i18n="event1">Product Scan 1회</li>
-              <li data-final-i18n="event2">Creative &amp; Demand Test 실행</li>
-              <li data-final-i18n="event3">UGC / Short-form Creative 포함</li>
-              <li data-final-i18n="event4">CTR·CPC·구매의향 측정</li>
+              <li>New collaboration-ready products</li>
+              <li>Creator-only pricing unlock</li>
+              <li>Group Buy, Affiliate, UGC</li>
+              <li>Sample availability on product pages</li>
             </ul>
             <ul>
-              <li data-final-i18n="event5">소량 배송·VOC 수집</li>
-              <li data-final-i18n="event6">물류비·예상 마진 분석</li>
-              <li data-final-i18n="event7">US Market Validation Report</li>
-              <li data-final-i18n="event8">전략 미팅 1회</li>
+              <li>Product-drop updates</li>
+              <li>Request Collaboration from product pages</li>
+              <li>Save your creator profile on this device</li>
+              <li>Browse the curated marketplace anytime</li>
             </ul>
           </div>
-          <p data-final-i18n="eventNote">
-            할인은 KoaUS 운영관리비에만 적용되며 최대 60만 원까지입니다.
-            제품 제공비, 배송·관세, 광고 집행비는 제외됩니다.
+          <p>
+            Updates are a preference saved with Creator Access. This MVP does
+            not send emails yet.
           </p>
         </article>
       </div>
     </section>
-  );
+  )
 }

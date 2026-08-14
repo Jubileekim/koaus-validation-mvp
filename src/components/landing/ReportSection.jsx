@@ -1,101 +1,128 @@
+import { Link } from 'react-router'
+
 export default function ReportSection() {
   return (
     <>
-    <div className="pilot-report-bridge" aria-hidden="true">
-      <span>01–04</span>
-      <i></i>
-      <strong>US MARKET VALIDATION REPORT</strong>
-    </div>
-
-    <div className="pilot-report-grid">
-      <div className="pilot-report-copy">
-        <p className="section-kicker" data-final-i18n="resultsKicker">
-          YOUR VALIDATION REPORT
-        </p>
-        <h3 data-final-i18n="resultsTitle">
-          광고 숫자만이 아니라,<br /><em>투자 결정을 위한 검증 지표</em>를 남깁니다.
-        </h3>
-        <p data-final-i18n="resultsBody">
-          시장 신호, Creative 적합도, 고객 목소리, 공헌이익을 한 리포트로
-          정리해 대량 선적 전에 GO / IMPROVE / STOP을 판단할 수 있게 합니다.
-        </p>
-        <dl className="pilot-report-list">
-          <div>
-            <dt>Market Fit</dt>
-            <dd data-final-i18n="metricContent">경쟁·타깃·가격·메시지 적합도</dd>
-          </div>
-          <div>
-            <dt>Creative</dt>
-            <dd data-final-i18n="metricAudience">UGC·광고 반응과 수요 신호</dd>
-          </div>
-          <div>
-            <dt>Fulfillment</dt>
-            <dd data-final-i18n="metricCommerce">소량 배송·VOC·물류비</dd>
-          </div>
-          <div>
-            <dt>Decision</dt>
-            <dd data-final-i18n="metricDecision">GO / IMPROVE / STOP 제안</dd>
-          </div>
-        </dl>
+      <div className="pilot-report-bridge" aria-hidden="true">
+        <span>CREATOR ACCESS</span>
+        <i></i>
+        <strong>CREATOR OPPORTUNITY</strong>
       </div>
 
-      <div
-        className="koaus-dashboard pilot-report-dashboard"
-        aria-label="미국 시장 검증 리포트 예시"
-      >
-        <div className="koaus-dashboard__top">
-          <div>
-            <span>SAMPLE REPORT</span>
-            <strong>US Market Validation Report</strong>
-          </div>
-          <span className="koaus-dashboard__status"><i></i> IMPROVE</span>
-        </div>
-
-        <div className="koaus-dashboard__metrics">
-          <article>
-            <span>Market Signal</span><strong>72</strong><small>/ 100</small>
-          </article>
-          <article>
-            <span>Creative Fit</span><strong>81</strong><small>/ 100</small>
-          </article>
-          <article>
-            <span>Customer Voice</span><strong>76</strong><small>/ 100</small>
-          </article>
-          <article>
-            <span>Contribution Margin</span><strong>22.8%</strong><small>estimated</small>
-          </article>
-        </div>
-
-        <div className="koaus-dashboard__lower">
-          <div className="koaus-dashboard__chart" aria-label="Validation score breakdown">
-            <div className="koaus-dashboard__chart-head">
-              <span>Score breakdown</span><strong>Top signals</strong>
+      <div className="pilot-report-grid">
+        <div className="pilot-report-copy">
+          <p className="section-kicker">CREATOR OPPORTUNITY</p>
+          <h3>
+            Everything creators need
+            <br />
+            <em>before reaching out.</em>
+          </h3>
+          <p>
+            Once Creator Access is active, product pages show the terms that
+            help you decide how to collaborate.
+          </p>
+          <dl className="pilot-report-list">
+            <div>
+              <dt>Creator Price</dt>
+              <dd>Unlock after Creator Access</dd>
             </div>
-            <div className="koaus-dashboard__bars" aria-hidden="true">
-              <div><i style={{ '--bar': '81%' }}></i><span>C</span></div>
-              <div><i style={{ '--bar': '76%' }}></i><span>V</span></div>
-              <div><i style={{ '--bar': '72%' }}></i><span>M</span></div>
-              <div><i style={{ '--bar': '46%' }}></i><span>E</span></div>
+            <div>
+              <dt>MOQ</dt>
+              <dd>Minimum order quantity</dd>
+            </div>
+            <div>
+              <dt>Sample Availability</dt>
+              <dd>See whether a sample is offered</dd>
+            </div>
+            <div>
+              <dt>Collaboration Types</dt>
+              <dd>Group Buy, Affiliate, UGC and more</dd>
+            </div>
+          </dl>
+          <Link className="button button--dark" to="/marketplace">
+            Explore Marketplace
+          </Link>
+        </div>
+
+        <div
+          className="koaus-dashboard pilot-report-dashboard"
+          aria-label="Creator-only product information preview"
+        >
+          <div className="koaus-dashboard__top">
+            <div>
+              <span>CREATOR ACCESS</span>
+              <strong>Creator Access Active</strong>
+            </div>
+            <span className="koaus-dashboard__status">
+              <i></i> ACTIVE
+            </span>
+          </div>
+
+          <div className="koaus-dashboard__metrics">
+            <article>
+              <span>Creator Price</span>
+              <strong>$14.50</strong>
+              <small>example</small>
+            </article>
+            <article>
+              <span>MOQ</span>
+              <strong>20</strong>
+              <small>units</small>
+            </article>
+            <article>
+              <span>Sample</span>
+              <strong>Yes</strong>
+              <small>available</small>
+            </article>
+            <article>
+              <span>Collaboration</span>
+              <strong>UGC</strong>
+              <small>Group Buy / UGC</small>
+            </article>
+          </div>
+
+          <div className="koaus-dashboard__lower">
+            <div
+              className="koaus-dashboard__chart"
+              aria-label="Collaboration formats"
+            >
+              <div className="koaus-dashboard__chart-head">
+                <span>Formats</span>
+                <strong>Available types</strong>
+              </div>
+              <div className="koaus-dashboard__bars" aria-hidden="true">
+                <div>
+                  <i style={{ '--bar': '88%' }}></i>
+                  <span>G</span>
+                </div>
+                <div>
+                  <i style={{ '--bar': '74%' }}></i>
+                  <span>A</span>
+                </div>
+                <div>
+                  <i style={{ '--bar': '81%' }}></i>
+                  <span>U</span>
+                </div>
+                <div>
+                  <i style={{ '--bar': '46%' }}></i>
+                  <span>S</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="koaus-dashboard__insight">
+              <span>NEXT STEP</span>
+              <strong>
+                Request a collaboration from the product page after Creator
+                Access is active.
+              </strong>
+              <small>NEXT · Request Collaboration</small>
             </div>
           </div>
 
-          <div className="koaus-dashboard__insight">
-            <span>RECOMMENDATION</span>
-            <strong data-final-i18n="dashboardInsight">
-              고객 반응은 긍정적이나 현재 단품 배송 구조에서는 물류비 비중이 높습니다.
-              2-Pack Bundle 또는 패키지 경량화 후 재검증을 권장합니다.
-            </strong>
-            <small data-final-i18n="dashboardNext">
-              NEXT · IMPROVE → Bundle / Packaging retest
-            </small>
-          </div>
+          <p>Example product terms for presentation. Not live pricing.</p>
         </div>
-
-        <p data-final-i18n="dashboardDisclaimer">
-          표시된 수치는 화면 설명을 위한 예시 데이터입니다.
-        </p>
       </div>
-    </div>
     </>
-  );
+  )
 }

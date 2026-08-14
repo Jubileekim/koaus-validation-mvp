@@ -4,6 +4,7 @@ import Footer from '../components/layout/Footer.jsx'
 import HeroSection from '../components/landing/HeroSection.jsx'
 import ProblemSection from '../components/landing/ProblemSection.jsx'
 import SolutionSection from '../components/landing/SolutionSection.jsx'
+import MarketplacePreviewSection from '../components/landing/MarketplacePreviewSection.jsx'
 import ProcessSection from '../components/landing/ProcessSection.jsx'
 import ReportSection from '../components/landing/ReportSection.jsx'
 import PricingSection from '../components/landing/PricingSection.jsx'
@@ -227,8 +228,8 @@ export default function LandingPage() {
 
   return (
     <>
-      <a className="skip-link" href="#main-content" data-i18n="skip">
-        본문으로 바로가기
+      <a className="skip-link" href="#main-content">
+        Skip to content
       </a>
       <Header />
 
@@ -239,43 +240,43 @@ export default function LandingPage() {
           data-rail-target="intro"
           aria-current="location"
         >
-          <span className="section-rail__label" data-final-i18n="railIntro">
-            시작
+          <span className="section-rail__label">
+            Start
           </span>
           <span className="section-rail__number">01</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#services" data-rail-target="services">
-          <span className="section-rail__label" data-final-i18n="railSolution">
-            문제 → 검증
+          <span className="section-rail__label">
+            Discover
           </span>
           <span className="section-rail__number">02</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#process" data-rail-target="process">
-          <span className="section-rail__label" data-final-i18n="railProcess">
-            검증 → 결정
+          <span className="section-rail__label">
+            How it works
           </span>
           <span className="section-rail__number">03</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#pricing" data-rail-target="pricing">
-          <span className="section-rail__label" data-final-i18n="railPricing">
-            패키지
+          <span className="section-rail__label">
+            Pathways
           </span>
           <span className="section-rail__number">04</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#launch-event" data-rail-target="launch-event">
-          <span className="section-rail__label" data-final-i18n="railBenefit">
-            첫 검증 혜택
+          <span className="section-rail__label">
+            Product drop
           </span>
           <span className="section-rail__number">05</span>
           <span className="section-rail__line" aria-hidden="true"></span>
         </a>
         <a href="#contact" data-rail-target="contact">
-          <span className="section-rail__label" data-final-i18n="railContact">
-            검증 문의
+          <span className="section-rail__label">
+            For brands
           </span>
           <span className="section-rail__number">06</span>
           <span className="section-rail__line" aria-hidden="true"></span>
@@ -299,6 +300,8 @@ export default function LandingPage() {
           </div>
         </section>
 
+        <MarketplacePreviewSection />
+
         <section
           className="section pilot-decision-section"
           id="process"
@@ -306,6 +309,7 @@ export default function LandingPage() {
           data-reveal
           aria-labelledby="process-title"
         >
+          <span className="anchor-target" id="for-creators" aria-hidden="true"></span>
           <div className="shell pilot-decision-shell">
             <ProcessSection />
             <ReportSection />
