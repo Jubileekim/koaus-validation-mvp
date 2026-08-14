@@ -1,0 +1,259 @@
+.pd-main {
+  padding: 28px 0 88px;
+}
+
+.pd-back {
+  display: inline-flex;
+  margin-bottom: 28px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pd-back:hover {
+  color: var(--ink);
+}
+
+.pd-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.pd-visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 520px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: linear-gradient(145deg, #2a241f 0%, #171411 70%);
+  color: #fff;
+  box-shadow: var(--shadow);
+}
+
+.pd-visual__initials {
+  font-size: clamp(3.2rem, 6vw, 5rem);
+  font-weight: 850;
+  letter-spacing: -0.06em;
+}
+
+.pd-visual__brand,
+.pd-visual__category {
+  position: absolute;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pd-visual__brand {
+  left: 24px;
+  top: 22px;
+}
+
+.pd-visual__category {
+  right: 24px;
+  bottom: 22px;
+  opacity: 0.8;
+}
+
+.pd-info h1 {
+  margin: 6px 0 12px;
+  max-width: none;
+  font-size: clamp(2rem, 3.6vw, 3.1rem);
+  line-height: 1.08;
+  letter-spacing: -0.05em;
+}
+
+.pd-kicker {
+  margin: 0 0 8px;
+  color: var(--brand-red-500, #f04a32);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.pd-brand {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.pd-tagline {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.pd-description {
+  margin: 0 0 24px;
+  max-width: 42rem;
+}
+
+.pd-facts {
+  display: grid;
+  gap: 0;
+  margin: 0 0 28px;
+  border-top: 1px solid var(--line);
+}
+
+.pd-facts div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.pd-facts dt {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.pd-facts dd {
+  margin: 0;
+  font-weight: 800;
+}
+
+.pd-sample {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.pd-sample.is-available {
+  background: #eef6e8;
+  color: #2d5a28;
+}
+
+.pd-sample.is-unavailable {
+  background: #f3eee8;
+  color: var(--muted);
+}
+
+.pd-block {
+  margin-bottom: 28px;
+}
+
+.pd-block h2 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+}
+
+.pd-highlights {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.pd-highlights li {
+  font-weight: 650;
+}
+
+.pd-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pd-chip {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  font-size: 0.84rem;
+  font-weight: 750;
+}
+
+.pd-access {
+  padding: 24px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.pd-access__eyebrow {
+  margin: 0 0 16px;
+  color: var(--brand-red-500, #f04a32);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.pd-access dl {
+  margin: 0 0 16px;
+}
+
+.pd-access dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.pd-access dt {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.pd-access dd {
+  margin: 0;
+  font-weight: 800;
+}
+
+.pd-access__note {
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+
+.pd-access .button {
+  width: 100%;
+}
+
+.pd-missing {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  max-width: 520px;
+  padding: 48px 36px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.pd-missing h1 {
+  margin: 0;
+  max-width: none;
+  font-size: 2.2rem;
+}
+
+.pd-missing p {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+@media (max-width: 900px) {
+  .pd-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-visual {
+    min-height: 360px;
+  }
+}
