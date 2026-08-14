@@ -1,0 +1,128 @@
+.ca-main {
+  padding: 40px 0 88px;
+}
+
+.ca-card {
+  max-width: 640px;
+  padding: 36px 32px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.ca-eyebrow {
+  margin: 0 0 10px;
+  color: var(--brand-red-500, #f04a32);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.14em;
+}
+
+.ca-card h1 {
+  margin: 0 0 14px;
+  max-width: none;
+  font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.045em;
+}
+
+.ca-lead,
+.ca-note {
+  margin: 0 0 28px;
+  color: var(--muted);
+}
+
+.ca-form {
+  display: grid;
+  gap: 16px;
+}
+
+.ca-field {
+  display: grid;
+  gap: 8px;
+}
+
+.ca-field span {
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.ca-field input,
+.ca-field select {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.ca-field input:focus,
+.ca-field select:focus {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.ca-field em {
+  font-style: normal;
+  color: var(--brand-red-500, #f04a32);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.ca-check {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-weight: 650;
+}
+
+.ca-check input {
+  margin-top: 4px;
+}
+
+.ca-pref {
+  margin: -6px 0 8px;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.ca-form .button {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.ca-profile {
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  font-weight: 750;
+}
+
+.ca-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ca-success p {
+  margin: 0;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .ca-card {
+    padding: 28px 20px;
+  }
+
+  .ca-actions {
+    flex-direction: column;
+  }
+
+  .ca-actions .button {
+    width: 100%;
+  }
+}

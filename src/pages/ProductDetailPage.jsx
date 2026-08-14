@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router'
 import { PRODUCTS } from '../data/products.js'
+import { hasCreatorAccess } from '../services/creatorStorage.js'
 import '../styles/marketplace.css'
 import '../styles/product-detail.css'
 
@@ -44,6 +45,7 @@ export default function ProductDetailPage() {
   }
 
   const accessTo = `/creator-access?redirect=/products/${product.id}`
+  const unlocked = hasCreatorAccess()
 
   return (
     <div className="mp-page">
@@ -126,29 +128,52 @@ export default function ProductDetailPage() {
               </div>
             </section>
 
-            <aside className="pd-access">
+            <aside className={unlocked ? 'pd-access is-unlocked' : 'pd-access'}>
               <p className="pd-access__eyebrow">CREATOR ACCESS</p>
+              {unlocked ? (
+                <p className="pd-access__status">✓ Access Active</p>
+              ) : null}
               <dl>
                 <div>
                   <dt>Creator Price</dt>
-                  <dd>🔒 Locked</dd>
+                  <dd>
+                    {unlocked
+                      ? `$${Number(product.creatorPrice).toFixed(2)}`
+                      : '🔒 Locked'}
+                  </dd>
                 </div>
                 <div>
                   <dt>Creator Margin</dt>
-                  <dd>🔒 Locked</dd>
+                  <dd>
+                    {unlocked ? `${product.creatorMargin}%` : '🔒 Locked'}
+                  </dd>
                 </div>
                 <div>
                   <dt>MOQ</dt>
-                  <dd>🔒 Locked</dd>
+                  <dd>{unlocked ? `${product.moq} units` : '🔒 Locked'}</dd>
                 </div>
               </dl>
-              <p className="pd-access__note">
-                Creator pricing and collaboration terms are available to
-                approved creators.
-              </p>
-              <Link className="button button--dark" to={accessTo}>
-                Unlock Creator Access
-              </Link>
+              {unlocked ? (
+                <>
+                  <p className="pd-access__note">
+                    Creator-only pricing is available for this product.
+                  </p>
+                  <button className="button button--dark" type="button" disabled>
+                    Request Collaboration
+                  </button>
+                  <p className="pd-access__coming">Coming next</p>
+                </>
+              ) : (
+                <>
+                  <p className="pd-access__note">
+                    Creator pricing and collaboration terms are available to
+                    approved creators.
+                  </p>
+                  <Link className="button button--dark" to={accessTo}>
+                    Unlock Creator Access
+                  </Link>
+                </>
+              )}
             </aside>
           </div>
         </div>
