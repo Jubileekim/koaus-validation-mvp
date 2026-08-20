@@ -1,18 +1,24 @@
-import { Link } from 'react-router'
 import { PRODUCTS } from '../../data/products.js'
-import ProductCard from '../marketplace/ProductCard.jsx'
+import FeaturedProductsCarousel from './FeaturedProductsCarousel.jsx'
 import { useTranslation } from '../../contexts/LocaleContext.jsx'
 import '../../styles/marketplace.css'
 
-function getPreviewProducts(products) {
-  const newest = products.filter((product) => product.isNew)
-  const source = newest.length > 0 ? newest : products
-  return source.slice(0, 4)
+const FEATURED_IDS = [
+  'planlight-swellcut',
+  'merythod-dual-concealer',
+  'prettyskin-collagen-mask',
+  'mildlab-liftinal-ampoule',
+  'dermasby-caviar-cream',
+  'sky-im-h27',
+]
+
+function getFeaturedProducts(products) {
+  return FEATURED_IDS.map((id) => products.find((product) => product.id === id)).filter(Boolean)
 }
 
 export default function MarketplacePreviewSection() {
   const { t } = useTranslation()
-  const products = getPreviewProducts(PRODUCTS)
+  const products = getFeaturedProducts(PRODUCTS)
 
   return (
     <section
@@ -34,17 +40,11 @@ export default function MarketplacePreviewSection() {
           </div>
         </header>
 
-        <div className="landing-mp__grid">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-
-        <div className="landing-mp__cta">
-          <Link className="button button--dark" to="/marketplace">
-            {t('preview.viewAll')}
-          </Link>
-        </div>
+        <FeaturedProductsCarousel
+          products={products}
+          ctaLabel={t('preview.viewAll')}
+          ctaLink="/marketplace"
+        />
       </div>
     </section>
   )

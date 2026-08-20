@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router'
-import LanguageToggle from '../components/layout/LanguageToggle.jsx'
+import { useNavigate, useSearchParams } from 'react-router'
+import Header from '../components/layout/Header.jsx'
+import Button from '../components/ui/Button.jsx'
+import FormField from '../components/ui/FormField.jsx'
 import {
   getCreatorProfile,
   hasCreatorAccess,
@@ -89,6 +91,7 @@ export default function CreatorAccessPage() {
   const [isActive, setIsActive] = useState(() => hasCreatorAccess())
   const [success, setSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
   const [activeProfile, setActiveProfile] = useState(existingProfile)
 
   useEffect(() => {
@@ -99,6 +102,7 @@ export default function CreatorAccessPage() {
   }, [t, form])
 
   const updateField = (field, value) => {
+    setSaveFailed(false)
     setForm((current) => ({ ...current, [field]: value }))
   }
 
@@ -110,6 +114,7 @@ export default function CreatorAccessPage() {
     setErrors({})
     setSuccess(false)
     setSubmitting(false)
+    setSaveFailed(false)
   }
 
   const handleSubmit = (event) => {
@@ -120,6 +125,7 @@ export default function CreatorAccessPage() {
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
+    setSaveFailed(false)
     setSubmitting(true)
     const profile = {
       email: form.email.trim(),
@@ -136,6 +142,7 @@ export default function CreatorAccessPage() {
     const saved = saveCreatorProfile(profile)
     if (!saved) {
       setSubmitting(false)
+      setSaveFailed(true)
       return
     }
 
@@ -154,19 +161,7 @@ export default function CreatorAccessPage() {
 
   return (
     <div className="mp-page">
-      <div className="mp-topbar">
-        <div className="shell mp-topbar__inner">
-          <Link className="wordmark" to="/" aria-label={t('nav.homeAria')}>
-            koaus <span>/ creator access</span>
-          </Link>
-          <div className="mp-topbar__actions">
-            <LanguageToggle />
-            <Link className="button button--ghost" to="/marketplace">
-              {t('nav.browseMarketplace')}
-            </Link>
-          </div>
-        </div>
-      </div>
+      <Header />
 
       <main className="shell ca-main">
         {success ? (
@@ -186,12 +181,10 @@ export default function CreatorAccessPage() {
             </ul>
             <p className="ca-note">{t('creator.activeNote')}</p>
             <div className="ca-actions">
-              <Link className="button button--dark" to="/marketplace">
-                {t('nav.browseMarketplace')}
-              </Link>
-              <button className="button button--ghost" type="button" onClick={handleReset}>
+              <Button to="/marketplace">{t('nav.browseMarketplace')}</Button>
+              <Button variant="ghost" type="button" onClick={handleReset}>
                 {t('creator.reset')}
-              </button>
+              </Button>
             </div>
           </div>
         ) : (
@@ -201,85 +194,82 @@ export default function CreatorAccessPage() {
             <p className="ca-lead">{t('creator.lead')}</p>
 
             <form className="ca-form" onSubmit={handleSubmit} noValidate>
-              <label className="ca-field">
-                <span>{t('creator.email')}</span>
-                <input
-                  type="email"
-                  value={form.email}
-                  onChange={(event) => updateField('email', event.target.value)}
-                  autoComplete="email"
-                />
-                {errors.email ? <em>{errors.email}</em> : null}
-              </label>
+              <FormField
+                className="ca-field"
+                label={t('creator.email')}
+                type="email"
+                value={form.email}
+                onChange={(event) => updateField('email', event.target.value)}
+                autoComplete="email"
+                error={errors.email}
+              />
 
-              <label className="ca-field">
-                <span>{t('creator.name')}</span>
-                <input
-                  type="text"
-                  value={form.creatorName}
-                  onChange={(event) => updateField('creatorName', event.target.value)}
-                  autoComplete="name"
-                />
-                {errors.creatorName ? <em>{errors.creatorName}</em> : null}
-              </label>
+              <FormField
+                className="ca-field"
+                label={t('creator.name')}
+                type="text"
+                value={form.creatorName}
+                onChange={(event) => updateField('creatorName', event.target.value)}
+                autoComplete="name"
+                error={errors.creatorName}
+              />
 
-              <label className="ca-field">
-                <span>{t('creator.platform')}</span>
-                <select
-                  value={form.platform}
-                  onChange={(event) => updateField('platform', event.target.value)}
-                >
-                  <option value="">{t('creator.selectPlatform')}</option>
-                  <option value="TikTok">TikTok</option>
-                  <option value="Instagram">Instagram</option>
-                  <option value="YouTube">YouTube</option>
-                </select>
-                {errors.platform ? <em>{errors.platform}</em> : null}
-              </label>
+              <FormField
+                className="ca-field"
+                as="select"
+                label={t('creator.platform')}
+                value={form.platform}
+                onChange={(event) => updateField('platform', event.target.value)}
+                error={errors.platform}
+              >
+                <option value="">{t('creator.selectPlatform')}</option>
+                <option value="TikTok">TikTok</option>
+                <option value="Instagram">Instagram</option>
+                <option value="YouTube">YouTube</option>
+              </FormField>
 
-              <label className="ca-field">
-                <span>{t('creator.url')}</span>
-                <input
-                  type="url"
-                  value={form.profileUrl}
-                  onChange={(event) => updateField('profileUrl', event.target.value)}
-                  placeholder="https://"
-                  autoComplete="url"
-                />
-                {errors.profileUrl ? <em>{errors.profileUrl}</em> : null}
-              </label>
+              <FormField
+                className="ca-field"
+                label={t('creator.url')}
+                type="url"
+                value={form.profileUrl}
+                onChange={(event) => updateField('profileUrl', event.target.value)}
+                placeholder="https://"
+                autoComplete="url"
+                error={errors.profileUrl}
+              />
 
-              <label className="ca-field">
-                <span>{t('creator.followers')}</span>
-                <select
-                  value={form.followerRange}
-                  onChange={(event) => updateField('followerRange', event.target.value)}
-                >
-                  <option value="">{t('creator.selectRange')}</option>
-                  {FOLLOWER_RANGES.map(([value, key]) => (
-                    <option key={value} value={value}>
-                      {t(key)}
-                    </option>
-                  ))}
-                </select>
-                {errors.followerRange ? <em>{errors.followerRange}</em> : null}
-              </label>
+              <FormField
+                className="ca-field"
+                as="select"
+                label={t('creator.followers')}
+                value={form.followerRange}
+                onChange={(event) => updateField('followerRange', event.target.value)}
+                error={errors.followerRange}
+              >
+                <option value="">{t('creator.selectRange')}</option>
+                {FOLLOWER_RANGES.map(([value, key]) => (
+                  <option key={value} value={value}>
+                    {t(key)}
+                  </option>
+                ))}
+              </FormField>
 
-              <label className="ca-field">
-                <span>{t('creator.category')}</span>
-                <select
-                  value={form.category}
-                  onChange={(event) => updateField('category', event.target.value)}
-                >
-                  <option value="">{t('creator.selectCategory')}</option>
-                  {CONTENT_CATEGORIES.map((category) => (
-                    <option key={category} value={category}>
-                      {t(`category.${category}`)}
-                    </option>
-                  ))}
-                </select>
-                {errors.category ? <em>{errors.category}</em> : null}
-              </label>
+              <FormField
+                className="ca-field"
+                as="select"
+                label={t('creator.category')}
+                value={form.category}
+                onChange={(event) => updateField('category', event.target.value)}
+                error={errors.category}
+              >
+                <option value="">{t('creator.selectCategory')}</option>
+                {CONTENT_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {t(`category.${category}`)}
+                  </option>
+                ))}
+              </FormField>
 
               <label className="ca-check">
                 <input
@@ -293,13 +283,15 @@ export default function CreatorAccessPage() {
               </label>
               <p className="ca-pref">{t('creator.pref')}</p>
 
-              <button
-                className="button button--dark"
-                type="submit"
-                disabled={submitting}
-              >
+              {saveFailed ? (
+                <p className="form-save-error" role="alert">
+                  {t('errors.storageSave')}
+                </p>
+              ) : null}
+
+              <Button type="submit" disabled={submitting}>
                 {submitting ? t('common.saving') : t('creator.submit')}
-              </button>
+              </Button>
             </form>
           </div>
         )}

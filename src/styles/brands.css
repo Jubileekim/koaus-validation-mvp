@@ -1,6 +1,6 @@
 .br-hero {
-  padding: 56px 0 20px;
-  max-width: 760px;
+  padding: 36px 0 16px;
+  max-width: 960px;
 }
 
 .br-eyebrow {
@@ -11,19 +11,23 @@
   letter-spacing: 0.14em;
 }
 
-.br-hero h1,
-.br-section h2,
-.br-form-card h2 {
-  margin: 0 0 16px;
-  max-width: none;
-  font-size: clamp(2rem, 4.2vw, 3.3rem);
-  line-height: 1.08;
+html[lang="en"] .br-hero h1,
+html[lang="ko"] .br-hero h1,
+.br-hero h1 {
+  margin: 0 0 14px;
+  max-width: 14.5em;
+  font-size: clamp(2.4rem, 4vw + 1.5rem, 4.5rem);
+  line-height: 0.98;
   letter-spacing: -0.055em;
 }
 
 .br-section h2,
 .br-form-card h2 {
+  margin: 0 0 16px;
+  max-width: none;
   font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+  line-height: 1.08;
+  letter-spacing: -0.055em;
 }
 
 .br-lead,
@@ -38,7 +42,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 28px;
+  margin-top: 22px;
 }
 
 .br-section {
@@ -264,7 +268,7 @@
 
 @media (max-width: 640px) {
   .br-hero {
-    padding-top: 36px;
+    padding-top: 24px;
   }
 
   .br-hero__actions,

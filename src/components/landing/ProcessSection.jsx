@@ -1,7 +1,65 @@
+import { useRef, useState } from 'react'
 import { useTranslation } from '../../contexts/LocaleContext.jsx'
+
+const STEPS = [
+  {
+    number: '01',
+    name: 'process.n1',
+    summary: 'process.n1s',
+    title: 'process.d1Title',
+    body: 'process.d1Body',
+    output: 'process.d1Out',
+  },
+  {
+    number: '02',
+    name: 'process.n2',
+    summary: 'process.n2s',
+    title: 'process.d2Title',
+    body: 'process.d2Body',
+    output: 'process.d2Out',
+  },
+  {
+    number: '03',
+    name: 'process.n3',
+    summary: 'process.n3s',
+    title: 'process.d3Title',
+    body: 'process.d3Body',
+    output: 'process.d3Out',
+  },
+  {
+    number: '04',
+    name: 'process.n4',
+    summary: 'process.n4s',
+    title: 'process.d4Title',
+    body: 'process.d4Body',
+    output: 'process.d4Out',
+  },
+]
 
 export default function ProcessSection() {
   const { t } = useTranslation()
+  const [activeIndex, setActiveIndex] = useState(0)
+  const nodeRefs = useRef([])
+
+  const activateStep = (nextIndex, focus = false) => {
+    const normalizedIndex = Math.max(0, Math.min(nextIndex, STEPS.length - 1))
+    setActiveIndex(normalizedIndex)
+    if (focus) {
+      window.requestAnimationFrame(() => nodeRefs.current[normalizedIndex]?.focus())
+    }
+  }
+
+  const handleKeyDown = (event, index) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return
+    event.preventDefault()
+
+    let nextIndex = index
+    if (event.key === 'ArrowRight') nextIndex = (index + 1) % STEPS.length
+    if (event.key === 'ArrowLeft') nextIndex = (index - 1 + STEPS.length) % STEPS.length
+    if (event.key === 'Home') nextIndex = 0
+    if (event.key === 'End') nextIndex = STEPS.length - 1
+    activateStep(nextIndex, true)
+  }
 
   return (
     <>
@@ -22,149 +80,62 @@ export default function ProcessSection() {
           className="process-timeline"
           role="tablist"
           aria-label={t('process.aria')}
-          style={{ '--process-active': '0' }}
+          style={{ '--process-active': String(activeIndex) }}
         >
-          <button
-            className="process-node is-active"
-            id="process-step-1"
-            type="button"
-            role="tab"
-            aria-selected="true"
-            aria-controls="process-detail-1"
-            data-process-index="0"
-          >
-            <span className="process-node__number">01</span>
-            <span className="process-node__copy">
-              <strong>{t('process.n1')}</strong>
-              <small>{t('process.n1s')}</small>
-            </span>
-          </button>
-          <button
-            className="process-node"
-            id="process-step-2"
-            type="button"
-            role="tab"
-            aria-selected="false"
-            aria-controls="process-detail-2"
-            data-process-index="1"
-            tabIndex="-1"
-          >
-            <span className="process-node__number">02</span>
-            <span className="process-node__copy">
-              <strong>{t('process.n2')}</strong>
-              <small>{t('process.n2s')}</small>
-            </span>
-          </button>
-          <button
-            className="process-node"
-            id="process-step-3"
-            type="button"
-            role="tab"
-            aria-selected="false"
-            aria-controls="process-detail-3"
-            data-process-index="2"
-            tabIndex="-1"
-          >
-            <span className="process-node__number">03</span>
-            <span className="process-node__copy">
-              <strong>{t('process.n3')}</strong>
-              <small>{t('process.n3s')}</small>
-            </span>
-          </button>
-          <button
-            className="process-node"
-            id="process-step-4"
-            type="button"
-            role="tab"
-            aria-selected="false"
-            aria-controls="process-detail-4"
-            data-process-index="3"
-            tabIndex="-1"
-          >
-            <span className="process-node__number">04</span>
-            <span className="process-node__copy">
-              <strong>{t('process.n4')}</strong>
-              <small>{t('process.n4s')}</small>
-            </span>
-          </button>
+          {STEPS.map((step, index) => {
+            const active = index === activeIndex
+            return (
+              <button
+                className={`process-node${active ? ' is-active' : ''}`}
+                id={`process-step-${index + 1}`}
+                key={step.number}
+                ref={(node) => {
+                  nodeRefs.current[index] = node
+                }}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                aria-controls={`process-detail-${index + 1}`}
+                tabIndex={active ? 0 : -1}
+                onClick={() => activateStep(index)}
+                onKeyDown={(event) => handleKeyDown(event, index)}
+              >
+                <span className="process-node__number">{step.number}</span>
+                <span className="process-node__copy">
+                  <strong>{t(step.name)}</strong>
+                  <small>{t(step.summary)}</small>
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
 
       <div className="process-detail-panels">
-        <article
-          className="process-detail is-active"
-          id="process-detail-1"
-          role="tabpanel"
-          aria-labelledby="process-step-1"
-        >
-          <span className="process-detail__number">01</span>
-          <div className="process-detail__copy">
-            <small>{t('process.current')}</small>
-            <h3>{t('process.d1Title')}</h3>
-            <p>{t('process.d1Body')}</p>
-          </div>
-          <div className="process-detail__output">
-            <small>{t('process.output')}</small>
-            <strong>{t('process.d1Out')}</strong>
-          </div>
-        </article>
-
-        <article
-          className="process-detail"
-          id="process-detail-2"
-          role="tabpanel"
-          aria-labelledby="process-step-2"
-          hidden
-        >
-          <span className="process-detail__number">02</span>
-          <div className="process-detail__copy">
-            <small>{t('process.current')}</small>
-            <h3>{t('process.d2Title')}</h3>
-            <p>{t('process.d2Body')}</p>
-          </div>
-          <div className="process-detail__output">
-            <small>{t('process.output')}</small>
-            <strong>{t('process.d2Out')}</strong>
-          </div>
-        </article>
-
-        <article
-          className="process-detail"
-          id="process-detail-3"
-          role="tabpanel"
-          aria-labelledby="process-step-3"
-          hidden
-        >
-          <span className="process-detail__number">03</span>
-          <div className="process-detail__copy">
-            <small>{t('process.current')}</small>
-            <h3>{t('process.d3Title')}</h3>
-            <p>{t('process.d3Body')}</p>
-          </div>
-          <div className="process-detail__output">
-            <small>{t('process.output')}</small>
-            <strong>{t('process.d3Out')}</strong>
-          </div>
-        </article>
-
-        <article
-          className="process-detail"
-          id="process-detail-4"
-          role="tabpanel"
-          aria-labelledby="process-step-4"
-          hidden
-        >
-          <span className="process-detail__number">04</span>
-          <div className="process-detail__copy">
-            <small>{t('process.current')}</small>
-            <h3>{t('process.d4Title')}</h3>
-            <p>{t('process.d4Body')}</p>
-          </div>
-          <div className="process-detail__output">
-            <small>{t('process.output')}</small>
-            <strong>{t('process.d4Out')}</strong>
-          </div>
-        </article>
+        {STEPS.map((step, index) => {
+          const active = index === activeIndex
+          return (
+            <article
+              className={`process-detail${active ? ' is-active' : ''}`}
+              id={`process-detail-${index + 1}`}
+              key={step.number}
+              role="tabpanel"
+              aria-labelledby={`process-step-${index + 1}`}
+              hidden={!active}
+            >
+              <span className="process-detail__number">{step.number}</span>
+              <div className="process-detail__copy">
+                <small>{t('process.current')}</small>
+                <h3>{t(step.title)}</h3>
+                <p>{t(step.body)}</p>
+              </div>
+              <div className="process-detail__output">
+                <small>{t('process.output')}</small>
+                <strong>{t(step.output)}</strong>
+              </div>
+            </article>
+          )
+        })}
       </div>
     </>
   )

@@ -1,4 +1,5 @@
-import { Link } from 'react-router'
+import { useEffect, useState } from 'react'
+import { Link, useLocation } from 'react-router'
 import { hasCreatorAccess } from '../../services/creatorStorage.js'
 import { useTranslation } from '../../contexts/LocaleContext.jsx'
 import LanguageToggle from './LanguageToggle.jsx'
@@ -6,6 +7,16 @@ import LanguageToggle from './LanguageToggle.jsx'
 export default function Header() {
   const access = hasCreatorAccess()
   const { t } = useTranslation()
+  const location = useLocation()
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [location.pathname])
+
+  const creatorLabel = access
+    ? t('nav.creatorAccessActive')
+    : t('nav.creatorAccess')
 
   return (
     <header className="site-header">
@@ -15,20 +26,21 @@ export default function Header() {
         </Link>
         <nav className="desktop-nav" aria-label={t('nav.primaryAria')}>
           <Link to="/marketplace">{t('nav.marketplace')}</Link>
-          <a href="#for-creators">{t('nav.creators')}</a>
+          <Link to="/creator-access">{t('nav.creators')}</Link>
           <Link to="/brands">{t('nav.brands')}</Link>
         </nav>
         <div className="header-actions">
           <LanguageToggle />
           <Link className="button button--dark" to="/creator-access">
-            {access ? t('nav.creatorAccessActive') : t('nav.creatorAccess')}
+            {creatorLabel}
           </Link>
           <button
             className="menu-toggle"
             type="button"
-            aria-expanded="false"
+            aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={t('nav.openMenu')}
+            onClick={() => setMenuOpen((open) => !open)}
           >
             ☰
           </button>
@@ -38,14 +50,12 @@ export default function Header() {
         className="mobile-menu"
         id="mobile-menu"
         aria-label={t('nav.mobileAria')}
-        hidden
+        hidden={!menuOpen}
       >
         <Link to="/marketplace">{t('nav.marketplace')}</Link>
-        <a href="#for-creators">{t('nav.creators')}</a>
+        <Link to="/creator-access">{t('nav.creators')}</Link>
         <Link to="/brands">{t('nav.brands')}</Link>
-        <Link to="/creator-access">
-          {access ? t('nav.creatorAccessActive') : t('nav.creatorAccess')}
-        </Link>
+        <Link to="/creator-access">{creatorLabel}</Link>
       </nav>
     </header>
   )

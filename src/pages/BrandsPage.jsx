@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
-import LanguageToggle from '../components/layout/LanguageToggle.jsx'
+import Header from '../components/layout/Header.jsx'
+import Button from '../components/ui/Button.jsx'
+import FormField from '../components/ui/FormField.jsx'
 import { saveBrandInquiry } from '../services/brandInquiryStorage.js'
 import { useTranslation } from '../contexts/LocaleContext.jsx'
 import '../styles/marketplace.css'
@@ -96,6 +97,7 @@ export default function BrandsPage() {
   const [errors, setErrors] = useState({})
   const [success, setSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
 
   useEffect(() => {
     setErrors((current) => {
@@ -105,10 +107,12 @@ export default function BrandsPage() {
   }, [t, form])
 
   const updateField = (field, value) => {
+    setSaveFailed(false)
     setForm((current) => ({ ...current, [field]: value }))
   }
 
   const toggleInterest = (option) => {
+    setSaveFailed(false)
     setForm((current) => {
       const selected = current.collaborationInterests.includes(option)
       return {
@@ -125,6 +129,7 @@ export default function BrandsPage() {
     setErrors({})
     setSuccess(false)
     setSubmitting(false)
+    setSaveFailed(false)
   }
 
   const handleSubmit = (event) => {
@@ -135,6 +140,7 @@ export default function BrandsPage() {
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
+    setSaveFailed(false)
     setSubmitting(true)
     const inquiry = {
       id: createInquiryId(),
@@ -152,26 +158,17 @@ export default function BrandsPage() {
 
     const saved = saveBrandInquiry(inquiry)
     setSubmitting(false)
-    if (!saved) return
+    if (!saved) {
+      setSaveFailed(true)
+      return
+    }
     setSuccess(true)
     setErrors({})
   }
 
   return (
     <div className="mp-page">
-      <div className="mp-topbar">
-        <div className="shell mp-topbar__inner">
-          <Link className="wordmark" to="/" aria-label={t('nav.homeAria')}>
-            koaus <span>/ brands</span>
-          </Link>
-          <div className="mp-topbar__actions">
-            <LanguageToggle />
-            <Link className="button button--ghost" to="/marketplace">
-              {t('nav.browseMarketplace')}
-            </Link>
-          </div>
-        </div>
-      </div>
+      <Header />
 
       <main>
         <section className="shell br-hero">
@@ -179,12 +176,10 @@ export default function BrandsPage() {
           <h1>{t('brands.title')}</h1>
           <p className="br-lead">{t('brands.lead')}</p>
           <div className="br-hero__actions">
-            <a className="button button--dark" href="#list-your-product">
-              {t('brands.list')}
-            </a>
-            <Link className="button button--ghost" to="/marketplace">
+            <Button href="#list-your-product">{t('brands.list')}</Button>
+            <Button variant="ghost" to="/marketplace">
               {t('nav.browseMarketplace')}
-            </Link>
+            </Button>
           </div>
         </section>
 
@@ -276,16 +271,10 @@ export default function BrandsPage() {
                 <p>{t('brands.success1')}</p>
                 <p>{t('brands.success2')}</p>
                 <div className="br-success__actions">
-                  <Link className="button button--dark" to="/marketplace">
-                    {t('brands.browseCreators')}
-                  </Link>
-                  <button
-                    className="button button--ghost"
-                    type="button"
-                    onClick={resetForm}
-                  >
+                  <Button to="/marketplace">{t('brands.browseCreators')}</Button>
+                  <Button variant="ghost" type="button" onClick={resetForm}>
                     {t('brands.another')}
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -295,91 +284,87 @@ export default function BrandsPage() {
                 <p className="br-form-lead">{t('brands.formLead')}</p>
 
                 <form className="br-form" onSubmit={handleSubmit} noValidate>
-                  <label className="br-field">
-                    <span>{t('brands.brandName')}</span>
-                    <input
-                      type="text"
-                      value={form.brandName}
-                      onChange={(event) =>
-                        updateField('brandName', event.target.value)
-                      }
-                      autoComplete="organization"
-                    />
-                    {errors.brandName ? <em>{errors.brandName}</em> : null}
-                  </label>
+                  <FormField
+                    className="br-field"
+                    label={t('brands.brandName')}
+                    type="text"
+                    value={form.brandName}
+                    onChange={(event) =>
+                      updateField('brandName', event.target.value)
+                    }
+                    autoComplete="organization"
+                    error={errors.brandName}
+                  />
 
-                  <label className="br-field">
-                    <span>{t('brands.contactEmail')}</span>
-                    <input
-                      type="email"
-                      value={form.contactEmail}
-                      onChange={(event) =>
-                        updateField('contactEmail', event.target.value)
-                      }
-                      autoComplete="email"
-                    />
-                    {errors.contactEmail ? <em>{errors.contactEmail}</em> : null}
-                  </label>
+                  <FormField
+                    className="br-field"
+                    label={t('brands.contactEmail')}
+                    type="email"
+                    value={form.contactEmail}
+                    onChange={(event) =>
+                      updateField('contactEmail', event.target.value)
+                    }
+                    autoComplete="email"
+                    error={errors.contactEmail}
+                  />
 
-                  <label className="br-field">
-                    <span>{t('brands.website')}</span>
-                    <input
-                      type="text"
-                      value={form.website}
-                      onChange={(event) =>
-                        updateField('website', event.target.value)
-                      }
-                      placeholder={t('brands.websitePh')}
-                      autoComplete="url"
-                    />
-                  </label>
+                  <FormField
+                    className="br-field"
+                    label={t('brands.website')}
+                    type="text"
+                    value={form.website}
+                    onChange={(event) =>
+                      updateField('website', event.target.value)
+                    }
+                    placeholder={t('brands.websitePh')}
+                    autoComplete="url"
+                  />
 
-                  <label className="br-field">
-                    <span>{t('brands.productName')}</span>
-                    <input
-                      type="text"
-                      value={form.productName}
-                      onChange={(event) =>
-                        updateField('productName', event.target.value)
-                      }
-                    />
-                    {errors.productName ? <em>{errors.productName}</em> : null}
-                  </label>
+                  <FormField
+                    className="br-field"
+                    label={t('brands.productName')}
+                    type="text"
+                    value={form.productName}
+                    onChange={(event) =>
+                      updateField('productName', event.target.value)
+                    }
+                    error={errors.productName}
+                  />
 
-                  <label className="br-field">
-                    <span>{t('brands.productCategory')}</span>
-                    <select
-                      value={form.category}
-                      onChange={(event) =>
-                        updateField('category', event.target.value)
-                      }
-                    >
-                      <option value="">{t('brands.selectCategory')}</option>
-                      {CATEGORIES.map((category) => (
-                        <option key={category} value={category}>
-                          {t(`category.${category}`)}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.category ? <em>{errors.category}</em> : null}
-                  </label>
+                  <FormField
+                    className="br-field"
+                    as="select"
+                    label={t('brands.productCategory')}
+                    value={form.category}
+                    onChange={(event) =>
+                      updateField('category', event.target.value)
+                    }
+                    error={errors.category}
+                  >
+                    <option value="">{t('brands.selectCategory')}</option>
+                    {CATEGORIES.map((category) => (
+                      <option key={category} value={category}>
+                        {t(`category.${category}`)}
+                      </option>
+                    ))}
+                  </FormField>
 
-                  <label className="br-field">
-                    <span>{t('brands.usPresence')}</span>
-                    <select
-                      value={form.currentUSPresence}
-                      onChange={(event) =>
-                        updateField('currentUSPresence', event.target.value)
-                      }
-                    >
-                      <option value="">{t('brands.selectOption')}</option>
-                      {US_PRESENCE.map(([value, key]) => (
-                        <option key={value} value={value}>
-                          {t(key)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
+                  <FormField
+                    className="br-field"
+                    as="select"
+                    label={t('brands.usPresence')}
+                    value={form.currentUSPresence}
+                    onChange={(event) =>
+                      updateField('currentUSPresence', event.target.value)
+                    }
+                  >
+                    <option value="">{t('brands.selectOption')}</option>
+                    {US_PRESENCE.map(([value, key]) => (
+                      <option key={value} value={value}>
+                        {t(key)}
+                      </option>
+                    ))}
+                  </FormField>
 
                   <fieldset className="br-fieldset">
                     <legend>{t('brands.interested')}</legend>
@@ -397,25 +382,27 @@ export default function BrandsPage() {
                     </div>
                   </fieldset>
 
-                  <label className="br-field">
-                    <span>{t('brands.message')}</span>
-                    <textarea
-                      rows="5"
-                      value={form.message}
-                      onChange={(event) =>
-                        updateField('message', event.target.value)
-                      }
-                      placeholder={t('brands.messagePh')}
-                    />
-                  </label>
+                  <FormField
+                    className="br-field"
+                    as="textarea"
+                    label={t('brands.message')}
+                    rows="5"
+                    value={form.message}
+                    onChange={(event) =>
+                      updateField('message', event.target.value)
+                    }
+                    placeholder={t('brands.messagePh')}
+                  />
 
-                  <button
-                    className="button button--dark"
-                    type="submit"
-                    disabled={submitting}
-                  >
+                  {saveFailed ? (
+                    <p className="form-save-error" role="alert">
+                      {t('errors.storageSave')}
+                    </p>
+                  ) : null}
+
+                  <Button type="submit" disabled={submitting}>
                     {submitting ? t('common.submitting') : t('brands.submit')}
-                  </button>
+                  </Button>
                 </form>
               </>
             )}

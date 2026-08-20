@@ -12,13 +12,11 @@ export default function SolutionSection() {
             <small>{t('solution.p1Meta')}</small>
           </div>
           <h3>{t('solution.p1Title')}</h3>
-          <p>{t('solution.p1Body')}</p>
         </div>
         <div className="decision-connector" aria-hidden="true">
           <span>→</span>
         </div>
         <div className="decision-solution">
-          <span className="decision-solution__type">{t('solution.s1Type')}</span>
           <h3>{t('solution.s1Title')}</h3>
           <ul>
             <li>{t('solution.s1a')}</li>
@@ -36,13 +34,11 @@ export default function SolutionSection() {
             <small>{t('solution.p2Meta')}</small>
           </div>
           <h3>{t('solution.p2Title')}</h3>
-          <p>{t('solution.p2Body')}</p>
         </div>
         <div className="decision-connector" aria-hidden="true">
           <span>→</span>
         </div>
         <div className="decision-solution">
-          <span className="decision-solution__type">{t('solution.s2Type')}</span>
           <h3>{t('solution.s2Title')}</h3>
           <ul>
             <li>{t('solution.s2a')}</li>
@@ -60,13 +56,11 @@ export default function SolutionSection() {
             <small>{t('solution.p3Meta')}</small>
           </div>
           <h3>{t('solution.p3Title')}</h3>
-          <p>{t('solution.p3Body')}</p>
         </div>
         <div className="decision-connector" aria-hidden="true">
           <span>→</span>
         </div>
         <div className="decision-solution">
-          <span className="decision-solution__type">{t('solution.s3Type')}</span>
           <h3>{t('solution.s3Title')}</h3>
           <ul>
             <li>{t('solution.s3a')}</li>

@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import LanguageToggle from '../components/layout/LanguageToggle.jsx'
+import Header from '../components/layout/Header.jsx'
 import { useTranslation } from '../contexts/LocaleContext.jsx'
 import '../styles/marketplace.css'
 import '../styles/not-found.css'
@@ -9,19 +9,7 @@ export default function NotFoundPage() {
 
   return (
     <div className="mp-page">
-      <div className="mp-topbar">
-        <div className="shell mp-topbar__inner">
-          <Link className="wordmark" to="/" aria-label={t('nav.homeAria')}>
-            koaus
-          </Link>
-          <div className="mp-topbar__actions">
-            <LanguageToggle />
-            <Link className="button button--ghost" to="/marketplace">
-              {t('nav.browseMarketplace')}
-            </Link>
-          </div>
-        </div>
-      </div>
+      <Header />
       <main className="shell nf-main">
         <div className="nf-card">
           <p className="nf-kicker">404</p>

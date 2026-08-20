@@ -12,7 +12,6 @@ export default function ProblemSection() {
           <br />
           {t('problem.title2')}
         </h2>
-        <p>{t('problem.body')}</p>
       </div>
 
       <div className="decision-head__arrow" aria-hidden="true">

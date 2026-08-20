@@ -1,34 +1,43 @@
 import { Link } from 'react-router'
 import { useTranslation } from '../../contexts/LocaleContext.jsx'
-
-function initials(name) {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0])
-    .join('')
-    .toUpperCase()
-}
+import { getProductGallery, productInitials } from '../../utils/productMedia.js'
+import ProductImage from './ProductImage.jsx'
 
 export default function ProductCard({ product }) {
   const { t, pick } = useTranslation()
+  const mainImage = product.images?.main || getProductGallery(product)[0] || ''
+  const href = `/products/${product.id}`
+
+  const placeholder = (
+    <div className="mp-card__fallback">
+      <span className="mp-card__initials">{productInitials(product.name)}</span>
+    </div>
+  )
 
   return (
     <article className="mp-card">
-      <div className="mp-card__visual" aria-hidden="true">
-        <span className="mp-card__initials">{initials(product.name)}</span>
-        <span className="mp-card__visual-brand">{product.brand}</span>
-        <span className="mp-card__visual-category">{t(`category.${product.category}`)}</span>
-      </div>
+      <Link className="mp-card__visual" to={href} tabIndex={-1} aria-hidden="true">
+        <ProductImage
+          src={mainImage}
+          alt=""
+          className="mp-card__image"
+          fallback={placeholder}
+        />
+        {product.isNew ? (
+          <span className="mp-card__badge mp-card__badge--overlay">
+            {t('common.new')}
+          </span>
+        ) : null}
+        <span className="mp-card__visual-category">
+          {t(`category.${product.category}`)}
+        </span>
+      </Link>
 
       <div className="mp-card__body">
-        <div className="mp-card__meta">
-          <span className="mp-card__category">{t(`category.${product.category}`)}</span>
-          {product.isNew ? <span className="mp-card__badge">{t('common.new')}</span> : null}
-        </div>
         <p className="mp-card__brand">{product.brand}</p>
-        <h2 className="mp-card__name">{product.name}</h2>
+        <h2 className="mp-card__name">
+          <Link to={href}>{product.name}</Link>
+        </h2>
         <p className="mp-card__tagline">{pick(product.tagline)}</p>
 
         <dl className="mp-card__facts">
@@ -48,7 +57,7 @@ export default function ProductCard({ product }) {
           </div>
         </dl>
 
-        <Link className="button button--dark" to={`/products/${product.id}`}>
+        <Link className="button button--dark" to={href}>
           {t('card.view')}
         </Link>
       </div>

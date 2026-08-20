@@ -54,6 +54,7 @@ export default function CollaborationRequestModal({
   const [errors, setErrors] = useState({})
   const [success, setSuccess] = useState(false)
   const [submitting, setSubmitting] = useState(false)
+  const [saveFailed, setSaveFailed] = useState(false)
 
   const collaborationTypes = Array.isArray(product?.collaborationTypes)
     ? product.collaborationTypes
@@ -82,6 +83,7 @@ export default function CollaborationRequestModal({
     setErrors({})
     setSuccess(false)
     setSubmitting(false)
+    setSaveFailed(false)
   }, [isOpen, product?.id])
 
   useEffect(() => {
@@ -95,6 +97,7 @@ export default function CollaborationRequestModal({
   if (!isOpen || !product || !creator) return null
 
   const updateField = (field, value) => {
+    setSaveFailed(false)
     setForm((current) => ({ ...current, [field]: value }))
   }
 
@@ -106,6 +109,7 @@ export default function CollaborationRequestModal({
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return
 
+    setSaveFailed(false)
     setSubmitting(true)
     const quantity = String(form.estimatedQuantity).trim()
     const request = {
@@ -125,6 +129,7 @@ export default function CollaborationRequestModal({
     const saved = saveCollaborationRequest(request)
     if (!saved) {
       setSubmitting(false)
+      setSaveFailed(true)
       return
     }
 
@@ -222,6 +227,12 @@ export default function CollaborationRequestModal({
                 />
                 {errors.message ? <em>{errors.message}</em> : null}
               </label>
+
+              {saveFailed ? (
+                <p className="form-save-error" role="alert">
+                  {t('errors.storageSave')}
+                </p>
+              ) : null}
 
               <button
                 className="button button--dark"

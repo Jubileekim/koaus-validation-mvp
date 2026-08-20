@@ -20,7 +20,7 @@
   letter-spacing: 0.14em;
 }
 
-.ca-card h1 {
+.mp-page .ca-card h1 {
   margin: 0 0 14px;
   max-width: none;
   font-size: clamp(1.8rem, 3.4vw, 2.5rem);
