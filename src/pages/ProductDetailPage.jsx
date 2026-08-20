@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import CollaborationRequestModal from '../components/collaboration/CollaborationRequestModal.jsx'
 import Header from '../components/layout/Header.jsx'
@@ -66,8 +66,21 @@ function SampleStatus({ product, t }) {
 }
 
 export default function ProductDetailPage() {
-  const { t, pick } = useTranslation()
   const { productId } = useParams()
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'auto',
+    })
+  }, [productId])
+
+  return <ProductDetailContent key={productId} productId={productId} />
+}
+
+function ProductDetailContent({ productId }) {
+  const { t, pick } = useTranslation()
   const product = PRODUCTS.find((item) => item.id === productId)
   const [isCollaborationModalOpen, setIsCollaborationModalOpen] = useState(false)
   const [requestVersion, setRequestVersion] = useState(0)
