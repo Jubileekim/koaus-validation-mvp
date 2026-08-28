@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import { PRODUCTS } from '../data/products.js'
-import Header from '../components/layout/Header.jsx'
 import MarketplaceHeader from '../components/marketplace/MarketplaceHeader.jsx'
 import ProductSearch from '../components/marketplace/ProductSearch.jsx'
 import ProductFilters from '../components/marketplace/ProductFilters.jsx'
@@ -56,31 +55,54 @@ export default function MarketplacePage() {
       ? t('marketplace.countOne')
       : t('marketplace.countMany', { n: visibleProducts.length })
 
+  
   return (
-    <div className="mp-page">
-      <Header />
+  <main className="shell mp-main">
+    <MarketplaceHeader />
 
-      <main className="shell mp-main">
-        <MarketplaceHeader />
-
-        <div className="mp-toolbar">
-          <ProductSearch value={search} onChange={setSearch} />
-          <ProductSort value={sort} onChange={setSort} />
-        </div>
-        <ProductFilters value={category} onChange={setCategory} />
-
-        <p className="mp-count">{countLabel}</p>
-
-        {visibleProducts.length === 0 ? (
-          <EmptyState onClear={clearFilters} />
-        ) : (
-          <div className="mp-grid">
-            {visibleProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
-      </main>
+    <div className="mp-toolbar">
+      <ProductSearch value={search} onChange={setSearch} />
+      <ProductSort value={sort} onChange={setSort} />
     </div>
-  )
+
+    <ProductFilters value={category} onChange={setCategory} />
+
+    <p className="mp-count">{countLabel}</p>
+
+    {visibleProducts.length === 0 ? (
+      <EmptyState onClear={clearFilters} />
+    ) : (
+      <div className="mp-grid">
+        {visibleProducts.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    )}
+  </main>
+)
+
+return (
+  <main className="shell mp-main">
+    <MarketplaceHeader />
+
+    <div className="mp-toolbar">
+      <ProductSearch value={search} onChange={setSearch} />
+      <ProductSort value={sort} onChange={setSort} />
+    </div>
+
+    <ProductFilters value={category} onChange={setCategory} />
+
+    <p className="mp-count">{countLabel}</p>
+
+    {visibleProducts.length === 0 ? (
+      <EmptyState onClear={clearFilters} />
+    ) : (
+      <div className="mp-grid">
+        {visibleProducts.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
+      </div>
+    )}
+  </main>
+)
 }
