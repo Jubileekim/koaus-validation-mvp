@@ -6,6 +6,8 @@ import CreatorAccessPage from './pages/CreatorAccessPage.jsx'
 import BrandsPage from './pages/BrandsPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 import RootLayout from './components/layout/RootLayout.jsx'
+import EditorialPage from './pages/EditorialPage.jsx'
+import EditorialDetailPage from './pages/EditorialDetailPage.jsx'
 
 export default function App() {
   return (
@@ -20,6 +22,8 @@ export default function App() {
         <Route path="/creator-access" element={<CreatorAccessPage />} />
         <Route path="/brands" element={<BrandsPage />} />
         <Route path="*" element={<NotFoundPage />} />
+        <Route path="/editorial" element={<EditorialPage />}/>
+        <Route path="/editorial/:postId" element={<EditorialDetailPage />}/>
       </Route>
     </Routes>
   )
