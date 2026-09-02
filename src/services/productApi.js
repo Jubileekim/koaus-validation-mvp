@@ -10,3 +10,19 @@ export async function getProducts() {
 
   return response.json()
 }
+
+export async function getProductById(productId) {
+  const response = await fetch(
+    `${API_URL}/api/products/${productId}`,
+  )
+
+  if (response.status === 404) {
+    return null
+  }
+
+  if (!response.ok) {
+    throw new Error('Failed to load product')
+  }
+
+  return response.json()
+}

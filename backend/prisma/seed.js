@@ -44,64 +44,89 @@ async function main() {
     },
   })
 
-  // 전에 테스트용으로 넣었던 임시 상품 제거
-  await prisma.product.deleteMany({
-    where: {
-      id: {
-        in: [
-          'product-stationery-01',
-          'product-lifestyle-01',
-          'product-stationery-02',
-        ],
-      },
-    },
-  })
-
-  // Mission 6의 PRODUCTS 데이터를 실제 DB로 이동
   for (const product of PRODUCTS) {
+    const productData = {
+      name: product.name,
+      nameKo: product.nameKo || null,
+      brand: product.brand || null,
+      category: product.category || null,
+
+      country: product.country || null,
+      brandOrigin: product.brandOrigin || null,
+      sourceUrl: product.sourceUrl || null,
+
+      description:
+        product.description?.en ||
+        product.description?.ko ||
+        null,
+
+      descriptionI18n:
+        product.description || undefined,
+
+      tagline:
+        product.tagline || undefined,
+
+      retailPrice:
+        product.retailPrice ?? null,
+
+      price:
+        product.retailPrice ?? null,
+
+      creatorPrice:
+        product.creatorPrice ?? null,
+
+      creatorMargin:
+        product.creatorMargin ?? null,
+
+      moq:
+        product.moq ?? null,
+
+      shipsTo:
+        product.shipsTo || null,
+
+      sampleAvailable:
+        product.sampleAvailable ?? false,
+
+      isNew:
+        product.isNew ?? false,
+
+      images:
+        product.images || undefined,
+
+      imageUrl:
+        product.images?.main || null,
+
+      externalUrl:
+        product.sourceUrl || null,
+
+      collaborationTypes:
+        product.collaborationTypes || undefined,
+
+      highlights:
+        product.highlights || undefined,
+
+      creatorFit:
+        product.creatorFit || undefined,
+
+      contentIdeas:
+        product.contentIdeas || undefined,
+    }
+
     await prisma.product.upsert({
       where: {
         id: product.id,
       },
-      update: {
-        name: product.name,
-        nameKo: product.nameKo || null,
-        brand: product.brand || null,
-        category: product.category || null,
-        description:
-          product.description?.en ||
-          product.description?.ko ||
-          null,
-        tagline: product.tagline || undefined,
-        retailPrice: product.retailPrice ?? null,
-        price: product.retailPrice ?? null,
-        creatorMargin: product.creatorMargin ?? null,
-        sampleAvailable: product.sampleAvailable ?? false,
-        isNew: product.isNew ?? false,
-        images: product.images || undefined,
-      },
+      update: productData,
       create: {
         id: product.id,
-        name: product.name,
-        nameKo: product.nameKo || null,
-        brand: product.brand || null,
-        category: product.category || null,
-        description:
-          product.description?.en ||
-          product.description?.ko ||
-          null,
-        tagline: product.tagline || undefined,
-        retailPrice: product.retailPrice ?? null,
-        price: product.retailPrice ?? null,
-        creatorMargin: product.creatorMargin ?? null,
-        sampleAvailable: product.sampleAvailable ?? false,
-        isNew: product.isNew ?? false,
-        images: product.images || undefined,
+        ...productData,
       },
     })
   }
 
-  console.log(`Seed completed: ${PRODUCTS.length} products added`)
+  console.log(
+    `Seed completed: ${PRODUCTS.length} products with detail data added`,
+  )
 }
 
 main()

@@ -154,6 +154,32 @@ app.get('/api/products', async (req, res) => {
   }
 })
 
+// 상품 1개 상세 조회
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const product = await prisma.product.findUnique({
+      where: {
+        id,
+      },
+    })
+
+    if (!product) {
+      return res.status(404).json({
+        message: 'Product not found',
+      })
+    }
+
+    res.status(200).json(product)
+  } catch (error) {
+    console.error('GET /api/products/:id failed:', error)
+
+    res.status(500).json({
+      message: 'Failed to load product',
+    })
+  }
+})
 
 app.listen(PORT, () => {
   console.log(`KOAUS server running on http://localhost:${PORT}`)

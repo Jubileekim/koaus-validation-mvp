@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router'
 import CollaborationRequestModal from '../components/collaboration/CollaborationRequestModal.jsx'
 import ProductCard from '../components/marketplace/ProductCard.jsx'
 import ProductGallery from '../components/marketplace/ProductGallery.jsx'
-import { PRODUCTS } from '../data/products.js'
+import { getProductById, getProducts } from '../services/productApi.js'
 import { getRequestsByCreator } from '../services/collaborationStorage.js'
 import {
   getCreatorProfile,
@@ -39,12 +39,14 @@ function originCopy(t, product) {
   return madeIn
 }
 
-function getRelatedProducts(product) {
-  return PRODUCTS.filter(
-    (item) =>
-      item.category === product.category &&
-      item.id !== product.id,
-  ).slice(0, 3)
+function getRelatedProducts(products, product) {
+  return products
+    .filter(
+      (item) =>
+        item.category === product.category &&
+        item.id !== product.id,
+    )
+    .slice(0, 3)
 }
 
 function LifestyleVisual({ src }) {
@@ -82,6 +84,13 @@ function SampleStatus({ product, t }) {
 
 export default function ProductDetailPage() {
   const { productId } = useParams()
+  const { t } = useTranslation()
+
+  const [product, setProduct] = useState(null)
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
+  const [reloadVersion, setReloadVersion] = useState(0)
 
   useEffect(() => {
     window.scrollTo({
@@ -91,45 +100,81 @@ export default function ProductDetailPage() {
     })
   }, [productId])
 
-  return (
-    <ProductDetailContent
-      key={productId}
-      productId={productId}
-    />
-  )
-}
+  useEffect(() => {
+    let cancelled = false
 
-function ProductDetailContent({ productId }) {
-  const { t, pick } = useTranslation()
+    async function loadProduct() {
+      try {
+        setLoading(true)
+        setLoadError(false)
 
-  const product = PRODUCTS.find(
-    (item) => item.id === productId,
-  )
+        const [nextProduct, allProducts] = await Promise.all([
+          getProductById(productId),
+          getProducts(),
+        ])
 
-  const [isCollaborationModalOpen, setIsCollaborationModalOpen] =
-    useState(false)
+        if (cancelled) return
 
-  const [requestVersion, setRequestVersion] = useState(0)
+        setProduct(nextProduct)
+        setProducts(
+          Array.isArray(allProducts) ? allProducts : [],
+        )
+      } catch (error) {
+        console.error('Failed to load product:', error)
 
-  const creator = getCreatorProfile()
-  const unlocked = hasCreatorAccess()
+        if (!cancelled) {
+          setLoadError(true)
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
 
-  const existingRequest =
-    requestVersion >= 0 &&
-    unlocked &&
-    creator?.email &&
-    product
-      ? getRequestsByCreator(creator.email).find(
-          (item) => item.productId === product.id,
-        ) || null
-      : null
+    loadProduct()
+
+    return () => {
+      cancelled = true
+    }
+  }, [productId, reloadVersion])
+
+  if (loading) {
+    return (
+      <main className="shell pd-main">
+        <p>Loading product...</p>
+      </main>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <main className="shell pd-main">
+        <div className="pd-missing">
+          <h1>Unable to load product</h1>
+          <p>
+            The product could not be loaded from the server.
+          </p>
+
+          <button
+            className="button button--dark"
+            type="button"
+            onClick={() =>
+              setReloadVersion((current) => current + 1)
+            }
+          >
+            Try again
+          </button>
+        </div>
+      </main>
+    )
+  }
 
   if (!product) {
     return (
       <main className="shell pd-main">
         <div className="pd-missing">
           <h1>{t('product.notFoundTitle')}</h1>
-
           <p>{t('product.notFoundBody')}</p>
 
           <Link
@@ -143,8 +188,56 @@ function ProductDetailContent({ productId }) {
     )
   }
 
+  const related = getRelatedProducts(
+    products,
+    product,
+  )
+
+  return (
+    <ProductDetailContent
+      key={product.id}
+      product={product}
+      related={related}
+    />
+  )
+}
+
+function ProductDetailContent({
+  product,
+  related,
+}) {
+  const { t, pick } = useTranslation()
+
+  const [
+    isCollaborationModalOpen,
+    setIsCollaborationModalOpen,
+  ] = useState(false)
+
+  const [requestVersion, setRequestVersion] =
+    useState(0)
+
+  const creator = getCreatorProfile()
+  const unlocked = hasCreatorAccess()
+
+  const existingRequest =
+    requestVersion >= 0 &&
+    unlocked &&
+    creator?.email
+      ? getRequestsByCreator(
+          creator.email,
+        ).find(
+          (item) =>
+            item.productId === product.id,
+        ) || null
+      : null
+
   const accessTo =
     `/creator-access?redirect=/products/${product.id}`
+
+  const description =
+    pick(product.descriptionI18n) ||
+    product.description ||
+    ''
 
   const highlights =
     pick(product.highlights) || []
@@ -153,16 +246,20 @@ function ProductDetailContent({ productId }) {
     pick(product.contentIdeas) || []
 
   const contentAngles =
-    pick(product.creatorFit?.contentAngles) || []
+    pick(
+      product.creatorFit?.contentAngles,
+    ) || []
 
   const lifestyleImage =
     getLifestyleImage(product)
 
-  const related =
-    getRelatedProducts(product)
-
   const openCollaboration = () => {
-    if (!hasCreatorAccess() || !creator?.email) return
+    if (
+      !hasCreatorAccess() ||
+      !creator?.email
+    ) {
+      return
+    }
 
     setIsCollaborationModalOpen(true)
   }
@@ -182,7 +279,9 @@ function ProductDetailContent({ productId }) {
 
           <div className="pd-info">
             <p className="pd-kicker">
-              {t(`category.${product.category}`)}
+              {t(
+                `category.${product.category}`,
+              )}
               {' · '}
               {originCopy(t, product)}
             </p>
@@ -198,17 +297,22 @@ function ProductDetailContent({ productId }) {
             </p>
 
             <p className="pd-description">
-              {pick(product.description)}
+              {description}
             </p>
 
             <dl className="pd-facts">
               <div>
                 <dt>{t('card.msrp')}</dt>
-                <dd>${product.retailPrice}</dd>
+                <dd>
+                  ${product.retailPrice}
+                </dd>
               </div>
 
               <div>
-                <dt>{t('product.sample')}</dt>
+                <dt>
+                  {t('product.sample')}
+                </dt>
+
                 <dd>
                   <SampleStatus
                     product={product}
@@ -231,18 +335,23 @@ function ProductDetailContent({ productId }) {
 
               {unlocked ? (
                 <p className="pd-access__status">
-                  {t('product.accessActive')}
+                  {t(
+                    'product.accessActive',
+                  )}
                 </p>
               ) : null}
 
               <dl>
                 <div>
                   <dt>
-                    {t('product.creatorPrice')}
+                    {t(
+                      'product.creatorPrice',
+                    )}
                   </dt>
 
                   <dd>
-                    {unlocked
+                    {unlocked &&
+                    product.creatorPrice != null
                       ? `$${Number(
                           product.creatorPrice,
                         ).toFixed(2)}`
@@ -252,21 +361,27 @@ function ProductDetailContent({ productId }) {
 
                 <div>
                   <dt>
-                    {t('product.creatorMargin')}
+                    {t(
+                      'product.creatorMargin',
+                    )}
                   </dt>
 
                   <dd>
-                    {unlocked
+                    {unlocked &&
+                    product.creatorMargin != null
                       ? `${product.creatorMargin}%`
                       : t('common.locked')}
                   </dd>
                 </div>
 
                 <div>
-                  <dt>{t('product.moq')}</dt>
+                  <dt>
+                    {t('product.moq')}
+                  </dt>
 
                   <dd>
-                    {unlocked
+                    {unlocked &&
+                    product.moq != null
                       ? t('common.units', {
                           n: product.moq,
                         })
@@ -277,7 +392,9 @@ function ProductDetailContent({ productId }) {
                 {unlocked ? (
                   <div>
                     <dt>
-                      {t('product.sample')}
+                      {t(
+                        'product.sample',
+                      )}
                     </dt>
 
                     <dd>
@@ -326,7 +443,9 @@ function ProductDetailContent({ productId }) {
                         openCollaboration
                       }
                     >
-                      {t('product.another')}
+                      {t(
+                        'product.another',
+                      )}
                     </button>
                   </>
                 ) : (
@@ -344,7 +463,9 @@ function ProductDetailContent({ productId }) {
                         openCollaboration
                       }
                     >
-                      {t('product.request')}
+                      {t(
+                        'product.request',
+                      )}
                     </button>
                   </>
                 )
@@ -360,7 +481,9 @@ function ProductDetailContent({ productId }) {
                     className="button button--dark"
                     to={accessTo}
                   >
-                    {t('product.unlock')}
+                    {t(
+                      'product.unlock',
+                    )}
                   </Link>
                 </>
               )}
@@ -371,14 +494,16 @@ function ProductDetailContent({ productId }) {
         <section className="pd-section pd-story">
           <div className="pd-story__copy">
             <p className="pd-section__kicker">
-              {t('product.storyKicker')}
+              {t(
+                'product.storyKicker',
+              )}
             </p>
 
-            <h2>{t('product.story')}</h2>
+            <h2>
+              {t('product.story')}
+            </h2>
 
-            <p>
-              {pick(product.description)}
-            </p>
+            <p>{description}</p>
           </div>
 
           {lifestyleImage ? (
@@ -391,7 +516,9 @@ function ProductDetailContent({ productId }) {
         {highlights.length > 0 ? (
           <section className="pd-section">
             <p className="pd-section__kicker">
-              {t('product.highlightsKicker')}
+              {t(
+                'product.highlightsKicker',
+              )}
             </p>
 
             <h2>
@@ -408,7 +535,10 @@ function ProductDetailContent({ productId }) {
                     <span>
                       {String(
                         index + 1,
-                      ).padStart(2, '0')}
+                      ).padStart(
+                        2,
+                        '0',
+                      )}
                     </span>
 
                     <p>{highlight}</p>
@@ -422,17 +552,23 @@ function ProductDetailContent({ productId }) {
         {product.creatorFit ? (
           <section className="pd-section">
             <p className="pd-section__kicker">
-              {t('product.fitKicker')}
+              {t(
+                'product.fitKicker',
+              )}
             </p>
 
             <h2>
-              {t('product.fitTitle')}
+              {t(
+                'product.fitTitle',
+              )}
             </h2>
 
             <div className="pd-fit-grid">
               <article className="pd-fit-card">
                 <h3>
-                  {t('product.bestFor')}
+                  {t(
+                    'product.bestFor',
+                  )}
                 </h3>
 
                 <div className="pd-chips">
@@ -498,32 +634,39 @@ function ProductDetailContent({ productId }) {
 
         <section className="pd-section">
           <p className="pd-section__kicker">
-            {t('product.collabKicker')}
+            {t(
+              'product.collabKicker',
+            )}
           </p>
 
           <h2>
-            {t('product.collabTypes')}
+            {t(
+              'product.collabTypes',
+            )}
           </h2>
 
           <div className="pd-chips">
-            {product.collaborationTypes.map(
-              (type) => (
-                <span
-                  className="pd-chip"
-                  key={type}
-                >
-                  {t(
-                    `collabType.${type}`,
-                  )}
-                </span>
-              ),
-            )}
+            {(
+              product.collaborationTypes ||
+              []
+            ).map((type) => (
+              <span
+                className="pd-chip"
+                key={type}
+              >
+                {t(
+                  `collabType.${type}`,
+                )}
+              </span>
+            ))}
           </div>
         </section>
 
         <section className="pd-section">
           <p className="pd-section__kicker">
-            {t('product.detailsKicker')}
+            {t(
+              'product.detailsKicker',
+            )}
           </p>
 
           <h2>
@@ -533,27 +676,39 @@ function ProductDetailContent({ productId }) {
           <dl className="pd-specs">
             <div>
               <dt>
-                {t('product.origin')}
+                {t(
+                  'product.origin',
+                )}
               </dt>
 
               <dd>
-                {originCopy(t, product)}
+                {originCopy(
+                  t,
+                  product,
+                )}
               </dd>
             </div>
 
             <div>
               <dt>
-                {t('product.shipsTo')}
+                {t(
+                  'product.shipsTo',
+                )}
               </dt>
 
               <dd>
-                {t('common.shipsToUS')}
+                {product.shipsTo ||
+                  t(
+                    'common.shipsToUS',
+                  )}
               </dd>
             </div>
 
             <div>
               <dt>
-                {t('product.sample')}
+                {t(
+                  'product.sample',
+                )}
               </dt>
 
               <dd>
@@ -570,9 +725,11 @@ function ProductDetailContent({ productId }) {
               </dt>
 
               <dd>
-                {t('common.units', {
-                  n: product.moq,
-                })}
+                {product.moq != null
+                  ? t('common.units', {
+                      n: product.moq,
+                    })
+                  : '-'}
               </dd>
             </div>
 
@@ -593,11 +750,15 @@ function ProductDetailContent({ productId }) {
         {contentIdeas.length > 0 ? (
           <section className="pd-section">
             <p className="pd-section__kicker">
-              {t('product.ideasKicker')}
+              {t(
+                'product.ideasKicker',
+              )}
             </p>
 
             <h2>
-              {t('product.contentIdeas')}
+              {t(
+                'product.contentIdeas',
+              )}
             </h2>
 
             <div className="pd-ideas">
@@ -610,7 +771,10 @@ function ProductDetailContent({ productId }) {
                     <span>
                       {String(
                         index + 1,
-                      ).padStart(2, '0')}
+                      ).padStart(
+                        2,
+                        '0',
+                      )}
                     </span>
 
                     <p>{idea}</p>
@@ -630,16 +794,20 @@ function ProductDetailContent({ productId }) {
             </p>
 
             <h2>
-              {t('product.related')}
+              {t(
+                'product.related',
+              )}
             </h2>
 
             <div className="pd-related__grid">
-              {related.map((item) => (
-                <ProductCard
-                  key={item.id}
-                  product={item}
-                />
-              ))}
+              {related.map(
+                (item) => (
+                  <ProductCard
+                    key={item.id}
+                    product={item}
+                  />
+                ),
+              )}
             </div>
           </section>
         ) : null}
@@ -659,7 +827,8 @@ function ProductDetailContent({ productId }) {
           }
           onSuccess={() =>
             setRequestVersion(
-              (current) => current + 1,
+              (current) =>
+                current + 1,
             )
           }
         />
