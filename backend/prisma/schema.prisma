@@ -34,13 +34,21 @@ model Post {
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  category    String?
-  price       Float?
-  imageUrl    String?
-  externalUrl String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String   @id @default(cuid())
+  name            String
+  nameKo          String?
+  brand           String?
+  category        String?
+  description     String?
+  tagline         Json?
+  retailPrice     Float?
+  price           Float?
+  creatorMargin   Int?
+  sampleAvailable Boolean  @default(false)
+  isNew           Boolean  @default(false)
+  images          Json?
+  imageUrl        String?
+  externalUrl     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

@@ -1,4 +1,5 @@
 import prisma from '../db/prisma.js'
+import { PRODUCTS } from '../../src/data/products.js'
 
 async function main() {
   const editor = await prisma.editor.upsert({
@@ -43,52 +44,64 @@ async function main() {
     },
   })
 
-  await prisma.product.upsert({
+  // 전에 테스트용으로 넣었던 임시 상품 제거
+  await prisma.product.deleteMany({
     where: {
-      id: 'product-stationery-01',
-    },
-    update: {},
-    create: {
-      id: 'product-stationery-01',
-      name: 'Korean Study Planner',
-      description:
-        'A simple Korean study planner curated by KOAUS.',
-      category: 'Stationery',
-      price: 12.99,
+      id: {
+        in: [
+          'product-stationery-01',
+          'product-lifestyle-01',
+          'product-stationery-02',
+        ],
+      },
     },
   })
 
-  await prisma.product.upsert({
-    where: {
-      id: 'product-lifestyle-01',
-    },
-    update: {},
-    create: {
-      id: 'product-lifestyle-01',
-      name: 'Seoul Daily Pouch',
-      description:
-        'A compact lifestyle pouch inspired by everyday Seoul.',
-      category: 'Lifestyle',
-      price: 18.99,
-    },
-  })
+  // Mission 6의 PRODUCTS 데이터를 실제 DB로 이동
+  for (const product of PRODUCTS) {
+    await prisma.product.upsert({
+      where: {
+        id: product.id,
+      },
+      update: {
+        name: product.name,
+        nameKo: product.nameKo || null,
+        brand: product.brand || null,
+        category: product.category || null,
+        description:
+          product.description?.en ||
+          product.description?.ko ||
+          null,
+        tagline: product.tagline || undefined,
+        retailPrice: product.retailPrice ?? null,
+        price: product.retailPrice ?? null,
+        creatorMargin: product.creatorMargin ?? null,
+        sampleAvailable: product.sampleAvailable ?? false,
+        isNew: product.isNew ?? false,
+        images: product.images || undefined,
+      },
+      create: {
+        id: product.id,
+        name: product.name,
+        nameKo: product.nameKo || null,
+        brand: product.brand || null,
+        category: product.category || null,
+        description:
+          product.description?.en ||
+          product.description?.ko ||
+          null,
+        tagline: product.tagline || undefined,
+        retailPrice: product.retailPrice ?? null,
+        price: product.retailPrice ?? null,
+        creatorMargin: product.creatorMargin ?? null,
+        sampleAvailable: product.sampleAvailable ?? false,
+        isNew: product.isNew ?? false,
+        images: product.images || undefined,
+      },
+    })
+  }
 
-  await prisma.product.upsert({
-    where: {
-      id: 'product-stationery-02',
-    },
-    update: {},
-    create: {
-      id: 'product-stationery-02',
-      name: 'Korean Highlight Marker Set',
-      description:
-        'A curated marker set for journaling and study.',
-      category: 'Stationery',
-      price: 9.99,
-    },
-  })
-
-  console.log('Seed data created successfully')
+  console.log(`Seed completed: ${PRODUCTS.length} products added`)
 }
 
 main()
