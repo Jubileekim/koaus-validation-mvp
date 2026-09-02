@@ -1,0 +1,261 @@
+.ew-page {
+    min-height: 100vh;
+    background: #f7f3ec;
+    color: #111;
+  }
+  
+  .ew-shell {
+    padding-top: 42px;
+    padding-bottom: 120px;
+  }
+  
+  .ew-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 26px;
+    border-bottom: 1px solid #bdb8ae;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+  }
+  
+  .ew-back {
+    color: #111;
+    text-decoration: none;
+    letter-spacing: 0;
+  }
+  
+  .ew-back:hover {
+    text-decoration: underline;
+  }
+  
+  .ew-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(250px, 0.6fr);
+    gap: 60px;
+    align-items: end;
+    padding: 72px 0 64px;
+    border-bottom: 1px solid #111;
+  }
+  
+  .ew-eyebrow {
+    grid-column: 1 / -1;
+    margin: 0 0 -20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+  }
+  
+  .ew-header h1 {
+    margin: 0;
+    max-width: 850px;
+    font-size: clamp(58px, 8vw, 112px);
+    font-weight: 500;
+    line-height: 0.87;
+    letter-spacing: -0.065em;
+  }
+  
+  .ew-intro {
+    max-width: 400px;
+    margin: 0 0 5px;
+    color: #625f58;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+  
+  .ew-form {
+    border-bottom: 1px solid #111;
+  }
+  
+  .ew-field {
+    display: grid;
+    grid-template-columns: 230px 1fr;
+    min-height: 112px;
+    border-bottom: 1px solid #c8c2b7;
+  }
+  
+  .ew-field--story {
+    min-height: 380px;
+  }
+  
+  .ew-field__label {
+    display: flex;
+    gap: 24px;
+    padding: 32px 30px 32px 0;
+    border-right: 1px solid #c8c2b7;
+  }
+  
+  .ew-field__label span {
+    color: #9a958c;
+    font-size: 10px;
+  }
+  
+  .ew-field__label label {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  
+  .ew-field__control {
+    padding: 24px 0 24px 40px;
+  }
+  
+  .ew-field input,
+  .ew-field textarea,
+  .ew-field select {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+  
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+  
+    background: transparent;
+    color: #111;
+  
+    font: inherit;
+  }
+  
+  .ew-field input {
+    padding: 8px 0 14px;
+    border-bottom: 1px solid #918c83;
+    font-size: 22px;
+  }
+  
+  .ew-field select {
+    max-width: 280px;
+    padding: 8px 0 14px;
+    border-bottom: 1px solid #918c83;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .ew-field textarea {
+    min-height: 320px;
+    padding: 6px 0;
+    resize: vertical;
+  
+    font-size: 20px;
+    line-height: 1.75;
+  }
+  
+  .ew-field input::placeholder,
+  .ew-field textarea::placeholder {
+    color: #aaa59c;
+  }
+  
+  .ew-field input:focus,
+  .ew-field textarea:focus,
+  .ew-field select:focus {
+    border-color: #111;
+  }
+  
+  .ew-help {
+    margin: 12px 0 0;
+    color: #777168;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  
+  .ew-error,
+  .ew-submit-error {
+    color: #a3362b;
+    font-size: 12px;
+  }
+  
+  .ew-submit-error {
+    margin: 25px 0;
+  }
+  
+  .ew-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    padding-top: 36px;
+  }
+  
+  .ew-status {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .ew-status span {
+    padding: 7px 10px;
+    border: 1px solid #c7c1b7;
+    color: #908a81;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  
+  .ew-status span.is-complete {
+    border-color: #111;
+    background: #111;
+    color: #fff;
+  }
+  
+  .ew-submit {
+    min-width: 230px;
+    padding: 20px 28px;
+  
+    border: 1px solid #111;
+    background: #111;
+    color: #fff;
+  
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+  
+    cursor: pointer;
+    transition:
+      transform 160ms ease,
+      opacity 160ms ease;
+  }
+  
+  .ew-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+  }
+  
+  .ew-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.25;
+  }
+  
+  @media (max-width: 760px) {
+    .ew-header {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  
+    .ew-header h1 {
+      font-size: clamp(56px, 17vw, 90px);
+    }
+  
+    .ew-field {
+      grid-template-columns: 1fr;
+    }
+  
+    .ew-field__label {
+      padding-bottom: 12px;
+      border-right: 0;
+    }
+  
+    .ew-field__control {
+      padding-left: 0;
+    }
+  
+    .ew-footer {
+      align-items: stretch;
+      flex-direction: column;
+    }
+  
+    .ew-submit {
+      width: 100%;
+    }
+  }
+  

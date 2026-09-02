@@ -46,3 +46,48 @@ export async function createPost(postData) {
 
   return data
 }
+
+export async function updatePost(postId, postData) {
+  const response = await fetch(
+    `${API_URL}/api/posts/${postId}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(postData),
+    },
+  )
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || 'Failed to update post',
+    )
+  }
+
+  return data
+}
+
+export async function deletePost(postId, password) {
+    const response = await fetch(
+      `${API_URL}/api/posts/${postId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'x-post-password': password,
+        },
+      },
+    )
+  
+    const data = await response.json()
+  
+    if (!response.ok) {
+      throw new Error(
+        data.message || 'Failed to delete post',
+      )
+    }
+  
+    return data
+  }
