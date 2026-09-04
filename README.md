@@ -134,8 +134,6 @@ Product Detail
 - React Context API
 - Fetch API
 
-
-
 ## Backend
 
 - Node.js
@@ -146,6 +144,11 @@ Product Detail
 - dotenv
 - cors
 
+## Infrastructure
+
+- Vercel — Frontend / Backend deployment
+- Supabase — Managed PostgreSQL
+
 ---
 
 # Architecture
@@ -155,15 +158,15 @@ Browser
   │
   │ HTTP Request
   ▼
-React / Vite Frontend
+React / Vite Frontend (Vercel)
   │
   │ fetch()
   ▼
-Express REST API
+Express REST API (Vercel)
   │
   │ Prisma
   ▼
-PostgreSQL
+Supabase PostgreSQL
 ```
 
 예를 들어 Editorial 목록을 불러올 때의 흐름은 다음과 같습니다.
@@ -196,7 +199,6 @@ Editorial 글 작성자 정보를 저장합니다.
 
 주요 필드:
 
-
 | Field       | Description |
 | ----------- | ----------- |
 | `id`        | Editor ID   |
@@ -205,7 +207,6 @@ Editorial 글 작성자 정보를 저장합니다.
 | `avatarUrl` | 프로필 이미지     |
 | `createdAt` | 생성일         |
 
-
 ---
 
 ## Post
@@ -213,7 +214,6 @@ Editorial 글 작성자 정보를 저장합니다.
 Editorial 게시물을 저장합니다.
 
 주요 필드:
-
 
 | Field          | Description      |
 | -------------- | ---------------- |
@@ -229,7 +229,6 @@ Editorial 게시물을 저장합니다.
 | `passwordHash` | 수정/삭제용 비밀번호 Hash |
 | `createdAt`    | 생성일              |
 | `updatedAt`    | 수정일              |
-
 
 ---
 
@@ -257,13 +256,17 @@ Marketplace 상품 데이터를 저장합니다.
 
 # REST API
 
-Base URL:
+Production Base URL:
+
+```text
+https://koaus-mission7-backend.vercel.app
+```
+
+Local Base URL:
 
 ```text
 http://localhost:3000
 ```
-
-배포 환경에서는 실제 Backend 배포 URL을 사용합니다.
 
 ---
 
@@ -485,7 +488,6 @@ HTTP Status Code와 JSON 메시지를 함께 반환합니다.
 
 주요 상태 코드:
 
-
 | Status | Meaning    |
 | ------ | ---------- |
 | `200`  | 요청 성공      |
@@ -494,7 +496,6 @@ HTTP Status Code와 JSON 메시지를 함께 반환합니다.
 | `403`  | 비밀번호 검증 실패 |
 | `404`  | 데이터 없음     |
 | `500`  | 서버 오류      |
-
 
 프론트엔드에서도 API 실패 시
 Loading / Error / Empty State를 구분하여 표시합니다.
@@ -540,10 +541,16 @@ true / false
 
 ## Frontend
 
-`.env`
+로컬 개발:
 
 ```env
 VITE_API_URL=http://localhost:3000
+```
+
+Production(Vercel):
+
+```env
+VITE_API_URL=https://koaus-mission7-backend.vercel.app
 ```
 
 프론트엔드에서는 다음 환경변수를 사용합니다.
@@ -559,9 +566,12 @@ import.meta.env.VITE_API_URL
 `backend/.env`
 
 ```env
-DATABASE_URL="YOUR_DATABASE_URL"
-SHADOW_DATABASE_URL="YOUR_SHADOW_DATABASE_URL"
+DATABASE_URL="YOUR_POOLED_DATABASE_URL"
+DIRECT_URL="YOUR_DIRECT_DATABASE_URL"
 ```
+
+- `DATABASE_URL` — 애플리케이션 런타임에서 사용하는 Supabase pooled connection
+- `DIRECT_URL` — Prisma migration 등 CLI 작업에 사용하는 direct/session connection
 
 실제 `.env` 파일은 Git에 Commit하지 않습니다.
 
@@ -612,7 +622,6 @@ koaus-validation-mvp/
 
 # Routes
 
-
 | Route                     | Description    |
 | ------------------------- | -------------- |
 | `/`                       | Landing Page   |
@@ -625,7 +634,6 @@ koaus-validation-mvp/
 | `/creator-access`         | Creator Access |
 | `/brands`                 | Brand Page     |
 | `*`                       | Not Found      |
-
 
 ---
 
@@ -650,10 +658,20 @@ http://localhost:5173
 
 ## 2. Database
 
-`backend` 폴더에서:
+Supabase PostgreSQL을 사용합니다.
+
+`backend/.env`에 아래 환경변수를 설정합니다.
+
+```env
+DATABASE_URL="YOUR_POOLED_DATABASE_URL"
+DIRECT_URL="YOUR_DIRECT_DATABASE_URL"
+```
+
+이미 생성된 migration을 새 데이터베이스에 적용해야 하는 경우:
 
 ```bash
-npx prisma dev
+cd backend
+npx prisma migrate deploy
 ```
 
 ---
@@ -678,16 +696,13 @@ http://localhost:3000
 
 # Development Environment
 
-로컬 개발 시 일반적으로 세 개의 터미널을 사용합니다.
+Supabase를 데이터베이스로 사용하므로 별도의 로컬 Prisma DB 프로세스를 실행할 필요가 없습니다.
 
 ```text
 Terminal 1
-backend → npx prisma dev
-
-Terminal 2
 backend → npm run dev
 
-Terminal 3
+Terminal 2
 project root → npm run dev
 ```
 
@@ -707,7 +722,7 @@ project root → npm run dev
 
 ### 2. 데이터 저장 구조
 
-✅ PostgreSQL 사용
+✅ Supabase PostgreSQL 사용
 
 ✅ Prisma Schema 기반 데이터 모델 정의
 
@@ -729,7 +744,11 @@ project root → npm run dev
 
 ### 4. 배포
 
-✅ Backend 및 Database 배포 완료
+✅ Frontend Vercel 배포 완료
+
+✅ Backend Vercel 배포 완료
+
+✅ Supabase PostgreSQL 연결 완료
 
 ✅ 배포 API URL을 Vercel Frontend에 연결 완료
 
@@ -764,41 +783,40 @@ GitHub:
 
 [https://github.com/Jubileekim/koaus-validation-mvp](https://github.com/Jubileekim/koaus-validation-mvp)
 
+Pull Request:
+
+[Mission 7 PR #2](https://github.com/Jubileekim/koaus-validation-mvp/pull/2)
+
+> PR은 코드 리뷰 후 최종 merge 예정입니다.
+
 ---
 
 # Deployment
 
 Frontend:
 
-```text
-Vercel deployment URL
-→ 배포 완료 후 추가
-```
+https://koaus-validation-mvp.vercel.app
 
 Backend:
 
-```text
-Backend API URL
-→ 배포 완료 후 추가
-```
+https://koaus-mission7-backend.vercel.app
+
+Backend Health Check:
+
+https://koaus-mission7-backend.vercel.app/api/health
 
 Database:
 
-```text
-Managed PostgreSQL
-→ 배포 완료 후 연결
-```
+Supabase PostgreSQL
 
 ---
 
 ## Sprint Mission 7
 
-Codeit Bootcamp
+Codeit Bootcamp  
 Frontend MVP → Full-stack Client / Server MVP
 
-```
-
-### 여기까지 하면 제출용 정리 상태
+### 제출용 정리 상태
 
 ```text
 .env.example                  ✅
@@ -808,6 +826,8 @@ README API 문서화             ✅
 DB 모델 설명                  ✅
 환경 분리 설명                ✅
 Mission 7 요구사항 체크        ✅
-배포 URL                      ✅
+Frontend 배포 URL             ✅
+Backend 배포 URL              ✅
+Supabase PostgreSQL           ✅
+PR #2 Open                    ✅
 ```
-
