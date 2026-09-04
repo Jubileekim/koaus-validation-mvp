@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum PostType {
+  ARTICLE
+  REEL
+}
+
+model Editor {
+  id        String   @id @default(cuid())
+  name      String
+  bio       String?
+  avatarUrl String?
+  posts     Post[]
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id           String   @id @default(cuid())
+
+  title        String
+  titleKo      String?
+
+  content      String
+  contentKo    String?
+
+  type         PostType @default(ARTICLE)
+
+  imageUrl     String?
+  videoUrl     String?
+
+  editorId     String
+  editor       Editor   @relation(fields: [editorId], references: [id], onDelete: Cascade)
+
+  passwordHash String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Product {
+  id       String  @id @default(cuid())
+  name     String
+  nameKo   String?
+  brand    String?
+  category String?
+
+  country     String?
+  brandOrigin String?
+  sourceUrl   String?
+
+  description     String?
+  descriptionI18n Json?
+  tagline         Json?
+
+  retailPrice   Float?
+  price         Float?
+  creatorPrice  Float?
+  creatorMargin Int?
+  moq           Int?
+
+  shipsTo         String?
+  sampleAvailable Boolean @default(false)
+  isNew           Boolean @default(false)
+
+  images      Json?
+  imageUrl    String?
+  externalUrl String?
+
+  collaborationTypes Json?
+  highlights         Json?
+  creatorFit         Json?
+  contentIdeas       Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

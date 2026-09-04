@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from '../../contexts/LocaleContext.jsx'
 import {
   getProductGallery,
@@ -8,18 +8,23 @@ import ProductImage from './ProductImage.jsx'
 
 export default function ProductGallery({ product }) {
   const { t } = useTranslation()
-  const sources = useMemo(() => getProductGallery(product), [product])
+
+  const sources = useMemo(
+    () => getProductGallery(product),
+    [product],
+  )
+
   const [failed, setFailed] = useState(() => new Set())
   const [selected, setSelected] = useState(sources[0] || '')
 
-  useEffect(() => {
-    const next = getProductGallery(product)
-    setFailed(new Set())
-    setSelected(next[0] || '')
-  }, [product])
+  const visible = sources.filter(
+    (src) => !failed.has(src),
+  )
 
-  const visible = sources.filter((src) => !failed.has(src))
-  const active = visible.includes(selected) ? selected : visible[0] || ''
+  const active = visible.includes(selected)
+    ? selected
+    : visible[0] || ''
+
   const showThumbs = visible.length > 1
 
   const markFailed = (src) => {
@@ -31,9 +36,18 @@ export default function ProductGallery({ product }) {
   }
 
   const placeholder = (
-    <div className="pd-gallery__fallback" aria-hidden="true">
-      <span className="pd-gallery__brand">{product.brand}</span>
-      <span className="pd-gallery__initials">{productInitials(product.name)}</span>
+    <div
+      className="pd-gallery__fallback"
+      aria-hidden="true"
+    >
+      <span className="pd-gallery__brand">
+        {product.brand}
+      </span>
+
+      <span className="pd-gallery__initials">
+        {productInitials(product.name)}
+      </span>
+
       <span className="pd-gallery__category">
         {t(`category.${product.category}`)}
       </span>
@@ -41,7 +55,10 @@ export default function ProductGallery({ product }) {
   )
 
   return (
-    <div className="pd-gallery" aria-label={t('product.galleryLabel')}>
+    <div
+      className="pd-gallery"
+      aria-label={t('product.galleryLabel')}
+    >
       <div className="pd-gallery__stage">
         <ProductImage
           src={active}
@@ -51,8 +68,12 @@ export default function ProductGallery({ product }) {
           onFail={markFailed}
         />
       </div>
+
       {showThumbs ? (
-        <div className="pd-gallery__thumbs" role="list">
+        <div
+          className="pd-gallery__thumbs"
+          role="list"
+        >
           {visible.map((src, index) => (
             <button
               key={src}
@@ -64,7 +85,9 @@ export default function ProductGallery({ product }) {
                   : 'pd-gallery__thumb'
               }
               onClick={() => setSelected(src)}
-              aria-label={t('product.thumbnail', { n: index + 1 })}
+              aria-label={t('product.thumbnail', {
+                n: index + 1,
+              })}
               aria-pressed={src === active}
             >
               <ProductImage
