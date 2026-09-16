@@ -71,23 +71,23 @@ export async function updatePost(postId, postData) {
 }
 
 export async function deletePost(postId, password) {
-    const response = await fetch(
-      `${API_URL}/api/posts/${postId}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'x-post-password': password,
-        },
+  const response = await fetch(
+    `${API_URL}/api/posts/${postId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        'x-post-password': password,
       },
+    },
+  )
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || 'Failed to delete post',
     )
-  
-    const data = await response.json()
-  
-    if (!response.ok) {
-      throw new Error(
-        data.message || 'Failed to delete post',
-      )
-    }
-  
-    return data
   }
+
+  return data
+}
