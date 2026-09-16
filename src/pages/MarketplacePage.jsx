@@ -132,7 +132,7 @@ export default function MarketplacePage() {
       />
 
       {loading ? (
-        <p className="mp-count">Loading products...</p>
+        <p className="mp-count">{t('marketplace.loading')}</p>
       ) : null}
 
       {loadError ? (
