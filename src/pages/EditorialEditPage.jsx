@@ -162,11 +162,14 @@ export default function EditorialEditPage() {
           <div className="ew-field">
             <div className="ew-field__label">
               <span>02</span>
-              <label>English title</label>
+              <label htmlFor="edit-title">
+                English title
+              </label>
             </div>
 
             <div className="ew-field__control">
               <input
+                id="edit-title"
                 value={title}
                 onChange={(event) =>
                   setTitle(event.target.value)
