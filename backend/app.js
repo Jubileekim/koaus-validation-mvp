@@ -38,6 +38,15 @@ app.get('/api/health', (req, res) => {
 // 게시글 전체 조회
 app.get('/api/posts', async (req, res) => {
   try {
+    const limit = Math.min(
+      Number(req.query.limit) || 20,
+      100,
+    )
+    const offset = Math.max(
+      Number(req.query.offset) || 0,
+      0,
+    )
+
     const posts = await prisma.post.findMany({
       include: {
         editor: true,
@@ -45,6 +54,8 @@ app.get('/api/posts', async (req, res) => {
       orderBy: {
         createdAt: 'desc',
       },
+      take: limit,
+      skip: offset,
     })
 
     res
