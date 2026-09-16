@@ -14,6 +14,8 @@ export const translations = {
       primaryAria: 'Primary navigation',
       mobileAria: 'Mobile navigation',
       openMenu: 'Open menu',
+      editorial: 'Editorial',
+      write: 'Write',
     },
     footer: {
       statement: 'Connecting Korean products with U.S. creators.',
@@ -465,6 +467,8 @@ export const translations = {
       primaryAria: '주요 메뉴',
       mobileAria: '모바일 메뉴',
       openMenu: '메뉴 열기',
+      editorial: '에디토리얼',
+      write: '글쓰기',
     },
     footer: {
       statement: '한국 브랜드와 미국 크리에이터를 연결합니다.',

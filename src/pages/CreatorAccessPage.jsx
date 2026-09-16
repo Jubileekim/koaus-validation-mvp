@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router'
-import Header from '../components/layout/Header.jsx'
 import Button from '../components/ui/Button.jsx'
 import FormField from '../components/ui/FormField.jsx'
 import {
@@ -159,10 +158,7 @@ export default function CreatorAccessPage() {
   const followerLabel =
     FOLLOWER_RANGES.find(([value]) => value === activeProfile?.followerRange)?.[1]
 
-  return (
-    <div className="mp-page">
-      <Header />
-
+    return (
       <main className="shell ca-main">
         {success ? (
           <div className="ca-card ca-success">
@@ -296,6 +292,5 @@ export default function CreatorAccessPage() {
           </div>
         )}
       </main>
-    </div>
   )
 }

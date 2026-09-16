@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 import CollaborationRequestModal from '../components/collaboration/CollaborationRequestModal.jsx'
-import Header from '../components/layout/Header.jsx'
 import ProductCard from '../components/marketplace/ProductCard.jsx'
 import ProductGallery from '../components/marketplace/ProductGallery.jsx'
-import { PRODUCTS } from '../data/products.js'
+import { getProductById, getProducts } from '../services/productApi.js'
 import { getRequestsByCreator } from '../services/collaborationStorage.js'
 import {
   getCreatorProfile,
@@ -25,22 +24,36 @@ function countryLabel(t, country) {
 }
 
 function originCopy(t, product) {
-  const madeIn = t('common.madeIn', { country: countryLabel(t, product.country) })
-  if (product.brandOrigin === 'Korea' && product.country && product.country !== 'Korea') {
+  const madeIn = t('common.madeIn', {
+    country: countryLabel(t, product.country),
+  })
+
+  if (
+    product.brandOrigin === 'Korea' &&
+    product.country &&
+    product.country !== 'Korea'
+  ) {
     return `${t('product.koreanBrand')} · ${madeIn}`
   }
+
   return madeIn
 }
 
-function getRelatedProducts(product) {
-  return PRODUCTS.filter(
-    (item) => item.category === product.category && item.id !== product.id,
-  ).slice(0, 3)
+function getRelatedProducts(products, product) {
+  return products
+    .filter(
+      (item) =>
+        item.category === product.category &&
+        item.id !== product.id,
+    )
+    .slice(0, 3)
 }
 
 function LifestyleVisual({ src }) {
   const [failed, setFailed] = useState(!src)
+
   if (!src || failed) return null
+
   return (
     <div className="pd-story__visual">
       <img
@@ -57,16 +70,27 @@ function SampleStatus({ product, t }) {
   return (
     <span
       className={
-        product.sampleAvailable ? 'pd-sample is-available' : 'pd-sample is-unavailable'
+        product.sampleAvailable
+          ? 'pd-sample is-available'
+          : 'pd-sample is-unavailable'
       }
     >
-      {product.sampleAvailable ? t('product.sampleOn') : t('product.sampleOff')}
+      {product.sampleAvailable
+        ? t('product.sampleOn')
+        : t('product.sampleOff')}
     </span>
   )
 }
 
 export default function ProductDetailPage() {
   const { productId } = useParams()
+  const { t } = useTranslation()
+
+  const [product, setProduct] = useState(null)
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(false)
+  const [reloadVersion, setReloadVersion] = useState(0)
 
   useEffect(() => {
     window.scrollTo({
@@ -76,58 +100,177 @@ export default function ProductDetailPage() {
     })
   }, [productId])
 
-  return <ProductDetailContent key={productId} productId={productId} />
-}
+  useEffect(() => {
+    let cancelled = false
 
-function ProductDetailContent({ productId }) {
-  const { t, pick } = useTranslation()
-  const product = PRODUCTS.find((item) => item.id === productId)
-  const [isCollaborationModalOpen, setIsCollaborationModalOpen] = useState(false)
-  const [requestVersion, setRequestVersion] = useState(0)
+    async function loadProduct() {
+      try {
+        setLoading(true)
+        setLoadError(false)
 
-  const creator = getCreatorProfile()
-  const unlocked = hasCreatorAccess()
-  const existingRequest =
-    requestVersion >= 0 && unlocked && creator?.email && product
-      ? getRequestsByCreator(creator.email).find(
-          (item) => item.productId === product.id,
-        ) || null
-      : null
+        const [nextProduct, allProducts] = await Promise.all([
+          getProductById(productId),
+          getProducts(),
+        ])
 
-  if (!product) {
+        if (cancelled) return
+
+        setProduct(nextProduct)
+        setProducts(
+          Array.isArray(allProducts) ? allProducts : [],
+        )
+      } catch (error) {
+        console.error('Failed to load product:', error)
+
+        if (!cancelled) {
+          setLoadError(true)
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
+    }
+
+    loadProduct()
+
+    return () => {
+      cancelled = true
+    }
+  }, [productId, reloadVersion])
+
+  if (loading) {
     return (
-      <div className="mp-page">
-        <Header />
-        <main className="shell pd-main">
-          <div className="pd-missing">
-            <h1>{t('product.notFoundTitle')}</h1>
-            <p>{t('product.notFoundBody')}</p>
-            <Link className="button button--dark" to="/marketplace">
-              {t('nav.backToMarketplace')}
-            </Link>
-          </div>
-        </main>
-      </div>
+      <main className="shell pd-main">
+        <p>Loading product...</p>
+      </main>
     )
   }
 
-  const accessTo = `/creator-access?redirect=/products/${product.id}`
-  const highlights = pick(product.highlights) || []
-  const contentIdeas = pick(product.contentIdeas) || []
-  const contentAngles = pick(product.creatorFit?.contentAngles) || []
-  const lifestyleImage = getLifestyleImage(product)
-  const related = getRelatedProducts(product)
+  if (loadError) {
+    return (
+      <main className="shell pd-main">
+        <div className="pd-missing">
+          <h1>Unable to load product</h1>
+          <p>
+            The product could not be loaded from the server.
+          </p>
+
+          <button
+            className="button button--dark"
+            type="button"
+            onClick={() =>
+              setReloadVersion((current) => current + 1)
+            }
+          >
+            Try again
+          </button>
+        </div>
+      </main>
+    )
+  }
+
+  if (!product) {
+    return (
+      <main className="shell pd-main">
+        <div className="pd-missing">
+          <h1>{t('product.notFoundTitle')}</h1>
+          <p>{t('product.notFoundBody')}</p>
+
+          <Link
+            className="button button--dark"
+            to="/marketplace"
+          >
+            {t('nav.backToMarketplace')}
+          </Link>
+        </div>
+      </main>
+    )
+  }
+
+  const related = getRelatedProducts(
+    products,
+    product,
+  )
+
+  return (
+    <ProductDetailContent
+      key={product.id}
+      product={product}
+      related={related}
+    />
+  )
+}
+
+function ProductDetailContent({
+  product,
+  related,
+}) {
+  const { t, pick } = useTranslation()
+
+  const [
+    isCollaborationModalOpen,
+    setIsCollaborationModalOpen,
+  ] = useState(false)
+
+  const [requestVersion, setRequestVersion] =
+    useState(0)
+
+  const creator = getCreatorProfile()
+  const unlocked = hasCreatorAccess()
+
+  const existingRequest =
+    requestVersion >= 0 &&
+    unlocked &&
+    creator?.email
+      ? getRequestsByCreator(
+          creator.email,
+        ).find(
+          (item) =>
+            item.productId === product.id,
+        ) || null
+      : null
+
+  const accessTo =
+    `/creator-access?redirect=/products/${product.id}`
+
+  const description =
+    pick(product.descriptionI18n) ||
+    product.description ||
+    ''
+
+  const highlights =
+    pick(product.highlights) || []
+
+  const contentIdeas =
+    pick(product.contentIdeas) || []
+
+  const contentAngles =
+    pick(
+      product.creatorFit?.contentAngles,
+    ) || []
+
+  const lifestyleImage =
+    getLifestyleImage(product)
+
   const openCollaboration = () => {
-    if (!hasCreatorAccess() || !creator?.email) return
+    if (
+      !hasCreatorAccess() ||
+      !creator?.email
+    ) {
+      return
+    }
+
     setIsCollaborationModalOpen(true)
   }
 
   return (
-    <div className="mp-page">
-      <Header />
-
+    <>
       <main className="shell pd-main">
-        <Link className="pd-back" to="/marketplace">
+        <Link
+          className="pd-back"
+          to="/marketplace"
+        >
           ← {t('nav.backToMarketplace')}
         </Link>
 
@@ -136,102 +279,211 @@ function ProductDetailContent({ productId }) {
 
           <div className="pd-info">
             <p className="pd-kicker">
-              {t(`category.${product.category}`)} · {originCopy(t, product)}
+              {t(
+                `category.${product.category}`,
+              )}
+              {' · '}
+              {originCopy(t, product)}
             </p>
-            <p className="pd-brand">{product.brand}</p>
+
+            <p className="pd-brand">
+              {product.brand}
+            </p>
+
             <h1>{product.name}</h1>
-            <p className="pd-tagline">{pick(product.tagline)}</p>
-            <p className="pd-description">{pick(product.description)}</p>
+
+            <p className="pd-tagline">
+              {pick(product.tagline)}
+            </p>
+
+            <p className="pd-description">
+              {description}
+            </p>
 
             <dl className="pd-facts">
               <div>
                 <dt>{t('card.msrp')}</dt>
-                <dd>${product.retailPrice}</dd>
-              </div>
-              <div>
-                <dt>{t('product.sample')}</dt>
                 <dd>
-                  <SampleStatus product={product} t={t} />
+                  ${product.retailPrice}
+                </dd>
+              </div>
+
+              <div>
+                <dt>
+                  {t('product.sample')}
+                </dt>
+
+                <dd>
+                  <SampleStatus
+                    product={product}
+                    t={t}
+                  />
                 </dd>
               </div>
             </dl>
 
-            <aside className={unlocked ? 'pd-access is-unlocked' : 'pd-access'}>
-              <p className="pd-access__eyebrow">{t('product.access')}</p>
+            <aside
+              className={
+                unlocked
+                  ? 'pd-access is-unlocked'
+                  : 'pd-access'
+              }
+            >
+              <p className="pd-access__eyebrow">
+                {t('product.access')}
+              </p>
+
               {unlocked ? (
-                <p className="pd-access__status">{t('product.accessActive')}</p>
+                <p className="pd-access__status">
+                  {t(
+                    'product.accessActive',
+                  )}
+                </p>
               ) : null}
+
               <dl>
                 <div>
-                  <dt>{t('product.creatorPrice')}</dt>
+                  <dt>
+                    {t(
+                      'product.creatorPrice',
+                    )}
+                  </dt>
+
                   <dd>
-                    {unlocked
-                      ? `$${Number(product.creatorPrice).toFixed(2)}`
+                    {unlocked &&
+                    product.creatorPrice != null
+                      ? `$${Number(
+                          product.creatorPrice,
+                        ).toFixed(2)}`
                       : t('common.locked')}
                   </dd>
                 </div>
+
                 <div>
-                  <dt>{t('product.creatorMargin')}</dt>
+                  <dt>
+                    {t(
+                      'product.creatorMargin',
+                    )}
+                  </dt>
+
                   <dd>
-                    {unlocked ? `${product.creatorMargin}%` : t('common.locked')}
-                  </dd>
-                </div>
-                <div>
-                  <dt>{t('product.moq')}</dt>
-                  <dd>
-                    {unlocked
-                      ? t('common.units', { n: product.moq })
+                    {unlocked &&
+                    product.creatorMargin != null
+                      ? `${product.creatorMargin}%`
                       : t('common.locked')}
                   </dd>
                 </div>
+
+                <div>
+                  <dt>
+                    {t('product.moq')}
+                  </dt>
+
+                  <dd>
+                    {unlocked &&
+                    product.moq != null
+                      ? t('common.units', {
+                          n: product.moq,
+                        })
+                      : t('common.locked')}
+                  </dd>
+                </div>
+
                 {unlocked ? (
                   <div>
-                    <dt>{t('product.sample')}</dt>
+                    <dt>
+                      {t(
+                        'product.sample',
+                      )}
+                    </dt>
+
                     <dd>
-                      <SampleStatus product={product} t={t} />
+                      <SampleStatus
+                        product={product}
+                        t={t}
+                      />
                     </dd>
                   </div>
                 ) : null}
               </dl>
+
               {unlocked ? (
                 existingRequest ? (
                   <>
                     <p className="pd-access__requested">
-                      {t('product.submittedTitle')}
+                      {t(
+                        'product.submittedTitle',
+                      )}
                     </p>
+
                     <p className="pd-access__note">
-                      {t('product.submittedBody1')}
+                      {t(
+                        'product.submittedBody1',
+                      )}
                       <br />
-                      {t('product.submittedBody2')}
+                      {t(
+                        'product.submittedBody2',
+                      )}
                     </p>
-                    <button className="pd-access__done" type="button" disabled>
-                      {t('product.submittedCta')}
+
+                    <button
+                      className="pd-access__done"
+                      type="button"
+                      disabled
+                    >
+                      {t(
+                        'product.submittedCta',
+                      )}
                     </button>
+
                     <button
                       className="pd-access__another"
                       type="button"
-                      onClick={openCollaboration}
+                      onClick={
+                        openCollaboration
+                      }
                     >
-                      {t('product.another')}
+                      {t(
+                        'product.another',
+                      )}
                     </button>
                   </>
                 ) : (
                   <>
-                    <p className="pd-access__note">{t('product.pricingReady')}</p>
+                    <p className="pd-access__note">
+                      {t(
+                        'product.pricingReady',
+                      )}
+                    </p>
+
                     <button
                       className="button button--dark"
                       type="button"
-                      onClick={openCollaboration}
+                      onClick={
+                        openCollaboration
+                      }
                     >
-                      {t('product.request')}
+                      {t(
+                        'product.request',
+                      )}
                     </button>
                   </>
                 )
               ) : (
                 <>
-                  <p className="pd-access__note">{t('product.pricingLocked')}</p>
-                  <Link className="button button--dark" to={accessTo}>
-                    {t('product.unlock')}
+                  <p className="pd-access__note">
+                    {t(
+                      'product.pricingLocked',
+                    )}
+                  </p>
+
+                  <Link
+                    className="button button--dark"
+                    to={accessTo}
+                  >
+                    {t(
+                      'product.unlock',
+                    )}
                   </Link>
                 </>
               )}
@@ -241,61 +493,139 @@ function ProductDetailContent({ productId }) {
 
         <section className="pd-section pd-story">
           <div className="pd-story__copy">
-            <p className="pd-section__kicker">{t('product.storyKicker')}</p>
-            <h2>{t('product.story')}</h2>
-            <p>{pick(product.description)}</p>
+            <p className="pd-section__kicker">
+              {t(
+                'product.storyKicker',
+              )}
+            </p>
+
+            <h2>
+              {t('product.story')}
+            </h2>
+
+            <p>{description}</p>
           </div>
+
           {lifestyleImage ? (
-            <LifestyleVisual src={lifestyleImage} />
+            <LifestyleVisual
+              src={lifestyleImage}
+            />
           ) : null}
         </section>
 
         {highlights.length > 0 ? (
           <section className="pd-section">
-            <p className="pd-section__kicker">{t('product.highlightsKicker')}</p>
-            <h2>{t('product.highlights')}</h2>
+            <p className="pd-section__kicker">
+              {t(
+                'product.highlightsKicker',
+              )}
+            </p>
+
+            <h2>
+              {t('product.highlights')}
+            </h2>
+
             <div className="pd-feature-grid">
-              {highlights.map((highlight, index) => (
-                <article className="pd-feature" key={highlight}>
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  <p>{highlight}</p>
-                </article>
-              ))}
+              {highlights.map(
+                (highlight, index) => (
+                  <article
+                    className="pd-feature"
+                    key={highlight}
+                  >
+                    <span>
+                      {String(
+                        index + 1,
+                      ).padStart(
+                        2,
+                        '0',
+                      )}
+                    </span>
+
+                    <p>{highlight}</p>
+                  </article>
+                ),
+              )}
             </div>
           </section>
         ) : null}
 
         {product.creatorFit ? (
           <section className="pd-section">
-            <p className="pd-section__kicker">{t('product.fitKicker')}</p>
-            <h2>{t('product.fitTitle')}</h2>
+            <p className="pd-section__kicker">
+              {t(
+                'product.fitKicker',
+              )}
+            </p>
+
+            <h2>
+              {t(
+                'product.fitTitle',
+              )}
+            </h2>
+
             <div className="pd-fit-grid">
               <article className="pd-fit-card">
-                <h3>{t('product.bestFor')}</h3>
+                <h3>
+                  {t(
+                    'product.bestFor',
+                  )}
+                </h3>
+
                 <div className="pd-chips">
-                  {(product.creatorFit.bestFor || []).map((tag) => (
-                    <span className="pd-chip" key={tag}>
-                      {displayFitTag(t, tag)}
+                  {(
+                    product.creatorFit
+                      .bestFor || []
+                  ).map((tag) => (
+                    <span
+                      className="pd-chip"
+                      key={tag}
+                    >
+                      {displayFitTag(
+                        t,
+                        tag,
+                      )}
                     </span>
                   ))}
                 </div>
               </article>
+
               <article className="pd-fit-card">
-                <h3>{t('product.platforms')}</h3>
+                <h3>
+                  {t(
+                    'product.platforms',
+                  )}
+                </h3>
+
                 <div className="pd-chips">
-                  {(product.creatorFit.platforms || []).map((tag) => (
-                    <span className="pd-chip" key={tag}>
+                  {(
+                    product.creatorFit
+                      .platforms || []
+                  ).map((tag) => (
+                    <span
+                      className="pd-chip"
+                      key={tag}
+                    >
                       {tag}
                     </span>
                   ))}
                 </div>
               </article>
+
               <article className="pd-fit-card">
-                <h3>{t('product.contentAngles')}</h3>
+                <h3>
+                  {t(
+                    'product.contentAngles',
+                  )}
+                </h3>
+
                 <ul>
-                  {contentAngles.map((angle) => (
-                    <li key={angle}>{angle}</li>
-                  ))}
+                  {contentAngles.map(
+                    (angle) => (
+                      <li key={angle}>
+                        {angle}
+                      </li>
+                    ),
+                  )}
                 </ul>
               </article>
             </div>
@@ -303,69 +633,181 @@ function ProductDetailContent({ productId }) {
         ) : null}
 
         <section className="pd-section">
-          <p className="pd-section__kicker">{t('product.collabKicker')}</p>
-          <h2>{t('product.collabTypes')}</h2>
+          <p className="pd-section__kicker">
+            {t(
+              'product.collabKicker',
+            )}
+          </p>
+
+          <h2>
+            {t(
+              'product.collabTypes',
+            )}
+          </h2>
+
           <div className="pd-chips">
-            {product.collaborationTypes.map((type) => (
-              <span className="pd-chip" key={type}>
-                {t(`collabType.${type}`)}
+            {(
+              product.collaborationTypes ||
+              []
+            ).map((type) => (
+              <span
+                className="pd-chip"
+                key={type}
+              >
+                {t(
+                  `collabType.${type}`,
+                )}
               </span>
             ))}
           </div>
         </section>
 
         <section className="pd-section">
-          <p className="pd-section__kicker">{t('product.detailsKicker')}</p>
-          <h2>{t('product.details')}</h2>
+          <p className="pd-section__kicker">
+            {t(
+              'product.detailsKicker',
+            )}
+          </p>
+
+          <h2>
+            {t('product.details')}
+          </h2>
+
           <dl className="pd-specs">
             <div>
-              <dt>{t('product.origin')}</dt>
-              <dd>{originCopy(t, product)}</dd>
-            </div>
-            <div>
-              <dt>{t('product.shipsTo')}</dt>
-              <dd>{t('common.shipsToUS')}</dd>
-            </div>
-            <div>
-              <dt>{t('product.sample')}</dt>
+              <dt>
+                {t(
+                  'product.origin',
+                )}
+              </dt>
+
               <dd>
-                <SampleStatus product={product} t={t} />
+                {originCopy(
+                  t,
+                  product,
+                )}
               </dd>
             </div>
+
             <div>
-              <dt>{t('product.moq')}</dt>
-              <dd>{t('common.units', { n: product.moq })}</dd>
+              <dt>
+                {t(
+                  'product.shipsTo',
+                )}
+              </dt>
+
+              <dd>
+                {product.shipsTo ||
+                  t(
+                    'common.shipsToUS',
+                  )}
+              </dd>
             </div>
+
             <div>
-              <dt>{t('product.retailPrice')}</dt>
-              <dd>${product.retailPrice}</dd>
+              <dt>
+                {t(
+                  'product.sample',
+                )}
+              </dt>
+
+              <dd>
+                <SampleStatus
+                  product={product}
+                  t={t}
+                />
+              </dd>
+            </div>
+
+            <div>
+              <dt>
+                {t('product.moq')}
+              </dt>
+
+              <dd>
+                {product.moq != null
+                  ? t('common.units', {
+                      n: product.moq,
+                    })
+                  : '-'}
+              </dd>
+            </div>
+
+            <div>
+              <dt>
+                {t(
+                  'product.retailPrice',
+                )}
+              </dt>
+
+              <dd>
+                ${product.retailPrice}
+              </dd>
             </div>
           </dl>
         </section>
 
         {contentIdeas.length > 0 ? (
           <section className="pd-section">
-            <p className="pd-section__kicker">{t('product.ideasKicker')}</p>
-            <h2>{t('product.contentIdeas')}</h2>
+            <p className="pd-section__kicker">
+              {t(
+                'product.ideasKicker',
+              )}
+            </p>
+
+            <h2>
+              {t(
+                'product.contentIdeas',
+              )}
+            </h2>
+
             <div className="pd-ideas">
-              {contentIdeas.map((idea, index) => (
-                <article className="pd-idea" key={idea}>
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  <p>{idea}</p>
-                </article>
-              ))}
+              {contentIdeas.map(
+                (idea, index) => (
+                  <article
+                    className="pd-idea"
+                    key={idea}
+                  >
+                    <span>
+                      {String(
+                        index + 1,
+                      ).padStart(
+                        2,
+                        '0',
+                      )}
+                    </span>
+
+                    <p>{idea}</p>
+                  </article>
+                ),
+              )}
             </div>
           </section>
         ) : null}
 
         {related.length > 0 ? (
           <section className="pd-section pd-related">
-            <p className="pd-section__kicker">{t('product.relatedKicker')}</p>
-            <h2>{t('product.related')}</h2>
+            <p className="pd-section__kicker">
+              {t(
+                'product.relatedKicker',
+              )}
+            </p>
+
+            <h2>
+              {t(
+                'product.related',
+              )}
+            </h2>
+
             <div className="pd-related__grid">
-              {related.map((item) => (
-                <ProductCard key={item.id} product={item} />
-              ))}
+              {related.map(
+                (item) => (
+                  <ProductCard
+                    key={item.id}
+                    product={item}
+                  />
+                ),
+              )}
             </div>
           </section>
         ) : null}
@@ -375,11 +817,22 @@ function ProductDetailContent({ productId }) {
         <CollaborationRequestModal
           product={product}
           creator={creator}
-          isOpen={isCollaborationModalOpen}
-          onClose={() => setIsCollaborationModalOpen(false)}
-          onSuccess={() => setRequestVersion((current) => current + 1)}
+          isOpen={
+            isCollaborationModalOpen
+          }
+          onClose={() =>
+            setIsCollaborationModalOpen(
+              false,
+            )
+          }
+          onSuccess={() =>
+            setRequestVersion(
+              (current) =>
+                current + 1,
+            )
+          }
         />
       ) : null}
-    </div>
+    </>
   )
 }

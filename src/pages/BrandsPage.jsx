@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import Header from '../components/layout/Header.jsx'
 import Button from '../components/ui/Button.jsx'
 import FormField from '../components/ui/FormField.jsx'
 import { saveBrandInquiry } from '../services/brandInquiryStorage.js'
@@ -166,13 +165,11 @@ export default function BrandsPage() {
     setErrors({})
   }
 
+  
   return (
-    <div className="mp-page">
-      <Header />
-
-      <main>
-        <section className="shell br-hero">
-          <p className="br-eyebrow">{t('brands.eyebrow')}</p>
+    <main>
+      <section className="shell br-hero">
+        <p className="br-eyebrow">{t('brands.eyebrow')}</p>
           <h1>{t('brands.title')}</h1>
           <p className="br-lead">{t('brands.lead')}</p>
           <div className="br-hero__actions">
@@ -409,6 +406,5 @@ export default function BrandsPage() {
           </div>
         </section>
       </main>
-    </div>
-  )
+      )
 }
