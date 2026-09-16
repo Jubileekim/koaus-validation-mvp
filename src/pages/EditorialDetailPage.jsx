@@ -57,9 +57,7 @@ function ShopProductBlock({ productId, locale }) {
 
       <div className="editorial-shop-block__copy">
         <p className="editorial-shop-block__eyebrow">
-          {locale === 'ko'
-            ? 'SHOP THE STORY'
-            : 'SHOP THE STORY'}
+          SHOP THE STORY
         </p>
 
         <p className="editorial-shop-block__brand">
