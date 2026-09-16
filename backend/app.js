@@ -9,8 +9,12 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 3000
 
-app.use(cors())
-app.use(express.json())
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN?.split(',') ?? '*',
+  }),
+)
+app.use(express.json({ limit: '1mb' }))
 
 // API 응답에서 비밀번호 해시 제거
 function removePasswordHash(post) {
