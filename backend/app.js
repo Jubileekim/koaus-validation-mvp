@@ -425,9 +425,7 @@ app.delete('/api/posts/:id', async (req, res) => {
     )
 
     res.status(500).json({
-      message:
-        error.message ||
-        'Failed to delete post',
+      message: 'Failed to delete post',
     })
   }
 })
