@@ -44,7 +44,7 @@ export default function EditorialWritePage() {
         password,
       })
 
-      navigate('/editorial')
+      navigate(`/editorial/${createdPost.id}`)
     } catch (error) {
       console.error('Failed to create post:', error)
 
