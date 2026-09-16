@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router'
 import { useTranslation } from '../../contexts/LocaleContext.jsx'
-import LanguageToggle from './LanguageToggle.jsx'
 
 export default function Header() {
   const { t } = useTranslation()
@@ -45,8 +44,6 @@ export default function Header() {
         </nav>
 
         <div className="header-actions">
-          <LanguageToggle />
-
           <Link
             className="button button--dark"
             to="/editorial/write"
