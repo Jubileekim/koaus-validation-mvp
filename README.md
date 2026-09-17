@@ -5,10 +5,12 @@
 
 - **Sprint Mission 6** — React 기반 Frontend MVP
 - **Sprint Mission 7** — Express + Prisma + PostgreSQL 기반 Full-stack MVP
+- **Sprint Mission 8** — Session 기반 회원 인증 + Editorial 댓글 (진행 중)
 
-Mission 6의 기존 프로젝트 문서는 아래에서 확인할 수 있습니다.
+Mission 6 / Mission 8 상세 문서는 아래에서 확인할 수 있습니다.
 
-→ [Mission 6 README](./docs/mission6.md)
+→ [Mission 6 README](./docs/mission6.md)  
+→ [Mission 8 Spec](./docs/mission8.md)
 
 # KOAUS — Editorial Commerce MVP
 
@@ -21,6 +23,9 @@ Editorial Commerce MVP입니다.
 React 프론트엔드 MVP를 기반으로,
 Sprint Mission 7에서 Express API, PostgreSQL 데이터베이스,
 Prisma ORM을 추가하여 실제 클라이언트-서버 구조로 확장했습니다.
+
+Sprint Mission 8에서는 Session 기반 유저 인증과
+Editorial 댓글 기능을 추가하는 고도화를 **진행 중**입니다.
 
 ---
 
@@ -44,6 +49,163 @@ Prisma ORM을 추가하여 실제 클라이언트-서버 구조로 확장했습�
 - KO / EN Editorial 콘텐츠
 - Article / Reel 콘텐츠 타입
 - Editorial 콘텐츠 내 Marketplace 상품 연결
+
+---
+
+## Sprint Mission 8
+
+Mission 8에서는 고도화 기능으로 **유저 기능(Session 기반 인증 + Editorial 댓글)** 을 선택했습니다.
+
+상세 설계·구현 상태·검증 시나리오는 [docs/mission8.md](./docs/mission8.md)를 참고하세요.
+
+### 1. 선택한 고도화 기능
+
+- 회원가입 / 로그인 / 로그아웃
+- Session 기반 로그인 상태 유지
+- Editorial 게시물 댓글 조회 / 작성 / 삭제
+- 본인 댓글 삭제 + ADMIN 전체 댓글 삭제
+- Loading / Error / Empty 상태 처리 (설계 및 일부 백엔드 기반)
+
+### 2. 기존 MVP 한계 (Mission 7)
+
+- 사용자를 식별할 수 없음
+- 로그인 상태를 유지할 수 없음
+- 사용자별 권한 제어가 어려움
+- Editorial을 읽은 사용자가 직접 참여할 기능이 없음
+
+게시물별 비밀번호 수정/삭제는 Mission 8에서도 유지합니다.
+
+### 3. 최소 구현 범위
+
+| 영역 | 범위 |
+| --- | --- |
+| 인증 | signup / login / logout / me |
+| 댓글 | 조회(비로그인 가능) / 작성(로그인 필요) / 삭제(본인 또는 ADMIN) |
+| UX | Loading / Error / Empty + 로그인 유도 |
+| UI 언어 | English-first (KO/EN 토글 제거) |
+
+### 4. Session을 선택한 이유
+
+JWT가 아니라 **Session-based Authentication**을 사용합니다.
+
+- React + Express 단일 웹 서비스 구조에 적합
+- 서버에서 로그인 상태를 즉시 관리·종료하기 쉬움
+- 권한 변경을 서버에서 바로 반영 가능
+- 현재 규모에서 stateless JWT가 필수는 아님
+- Authentication / Authorization 학습에 적합
+
+운영에서는 Express MemoryStore 대신 **PostgreSQL Session Store** (`connect-pg-simple`)를 사용합니다.
+
+### 5. 사용자 흐름 (요약)
+
+```text
+Editorial 상세 → 댓글 읽기(비로그인 가능)
+       ↓
+댓글 작성 시도
+  ├─ 비로그인 → Login → 원래 상세로 복귀 → 작성
+  └─ 로그인 → POST 댓글 → 목록 반영
+       ↓
+본인(또는 ADMIN)만 삭제 가능
+```
+
+### 6. 댓글 권한 정책
+
+| 동작 | 비로그인 | USER | ADMIN |
+| --- | --- | --- | --- |
+| Editorial / 댓글 조회 | 가능 | 가능 | 가능 |
+| 댓글 작성 | 불가 (401) | 가능 | 가능 |
+| 본인 댓글 삭제 | 불가 (401) | 가능 | 가능 |
+| 타인 댓글 삭제 | 불가 | 불가 (403) | 가능 |
+
+### 7. English-first 방향
+
+- 기본 UI 언어는 English
+- Header의 KO / EN 언어 전환 버튼은 제거됨
+- DB의 `titleKo`, `contentKo` 등 다국어 필드는 Mission 8에서 삭제하지 않음
+- 전체 i18n / DB 정리는 추후 리팩터링 대상
+
+### 8. 주요 API (초기 구현)
+
+| Method | Endpoint | 인증 | 상태 |
+| --- | --- | --- | --- |
+| `POST` | `/api/auth/signup` | 불필요 | 초기 구현 · 검증 필요 |
+| `POST` | `/api/auth/login` | 불필요 | 초기 구현 · 검증 필요 |
+| `POST` | `/api/auth/logout` | 세션 | 초기 구현 · 검증 필요 |
+| `GET` | `/api/auth/me` | 세션 확인 | 초기 구현 · 검증 필요 |
+| `GET` | `/api/posts/:postId/comments` | 불필요 | 초기 구현 · 검증 필요 |
+| `POST` | `/api/posts/:postId/comments` | 필요 | 초기 구현 · 검증 필요 |
+| `DELETE` | `/api/comments/:commentId` | 본인 또는 ADMIN | 초기 구현 · 검증 필요 |
+
+### 9. DB 모델 변경
+
+Prisma에 다음 모델이 추가되어 있습니다. (migration 파일 존재 · **DB 적용/검증 필요**)
+
+- `User` — email, passwordHash, displayName, role (`USER` / `ADMIN`)
+- `Comment` — content, userId, postId
+- `Post.comments` 관계
+
+Session 테이블은 Prisma migration이 아니라 `connect-pg-simple`이 DB에 생성합니다 (`createTableIfMissing: true`).
+
+### 10. 보안 및 환경변수
+
+Backend `.env` 예시 (`backend/.env.example`):
+
+```env
+DATABASE_URL="..."
+DIRECT_URL="..."
+PORT=3000
+CORS_ORIGIN="http://localhost:5173,https://koaus-validation-mvp.vercel.app"
+SESSION_SECRET="replace-with-a-long-random-secret"
+NODE_ENV="development"
+```
+
+- 비밀번호는 bcrypt hash만 저장
+- Session cookie: HttpOnly, production에서 Secure + SameSite=None
+- CORS `credentials: true` + Origin 제한
+- 권한은 클라이언트 입력이 아니라 `session.userId` / DB role 기준
+
+### 11. 검증 항목
+
+아직 실행 검증은 완료하지 않았습니다. 검증이 필요한 항목:
+
+- [ ] migration 적용 후 User / Comment 테이블 존재
+- [ ] signup → session cookie → `/api/auth/me`
+- [ ] login / logout
+- [ ] 비로그인 댓글 작성 시 401
+- [ ] 로그인 후 댓글 작성 / 본인 삭제
+- [ ] 타인 댓글 삭제 시 403, ADMIN 삭제 가능
+- [ ] Frontend 로그인 ↔ Editorial 댓글 UX
+- [ ] Loading / Error / Empty 상태
+- [ ] cross-origin cookie (local / Vercel)
+
+### 12. 향후 확장 가능성
+
+- 사용자 프로필 / Saved Articles
+- 댓글 수정·대댓글·moderation
+- Editorial 작성자를 User와 통합
+- 관리자 CMS
+- 게시물별 비밀번호 → 사용자 권한 기반 전환
+
+### 13. Out of Scope (Mission 8)
+
+- 댓글 수정 / 대댓글 / 알림 / 좋아요
+- 소셜 로그인 / 비밀번호 찾기
+- 사용자 프로필 / 팔로우
+- 결제 / 자체 쇼핑몰
+- 전체 CMS·Product DB 재설계
+- 기존 다국어 DB 필드 전체 삭제
+
+### 현재 구현 상태 (요약)
+
+| 구분 | 상태 |
+| --- | --- |
+| Backend Session / Auth / Comment API 코드 | 초기 구현 · 검증 필요 |
+| Prisma User / Comment 모델 + migration 파일 | 초기 구현 · DB 적용 검증 필요 |
+| `express-session` / `connect-pg-simple` | `package.json`에 선언됨 · **npm install / lockfile 동기화 검증 필요** |
+| Frontend Auth UI / AuthProvider | 미구현 |
+| Frontend Comment UI | 미구현 |
+| English-first (Header 토글 제거, locale `en` 고정) | 초기 적용 · `LanguageToggle.jsx` 파일·ko translations 잔존 |
+| 동작/배포 검증 | 미실시 |
 
 ---
 
@@ -143,6 +305,8 @@ Product Detail
 - bcryptjs
 - dotenv
 - cors
+- express-session *(Mission 8 초기 구현)*
+- connect-pg-simple *(Mission 8 초기 구현 · PostgreSQL Session Store)*
 
 ## Infrastructure
 
@@ -156,17 +320,19 @@ Product Detail
 ```text
 Browser
   │
-  │ HTTP Request
+  │ HTTP Request (+ Session Cookie for Auth)
   ▼
 React / Vite Frontend (Vercel)
   │
-  │ fetch()
+  │ fetch()  · Mission 8에서는 credentials: 'include' 예정
   ▼
 Express REST API (Vercel)
   │
-  │ Prisma
-  ▼
-Supabase PostgreSQL
+  ├─ Prisma ──────────────► User / Post / Comment / Product
+  └─ express-session ─────► PostgreSQL Session Store
+           │
+           ▼
+    Supabase PostgreSQL
 ```
 
 예를 들어 Editorial 목록을 불러올 때의 흐름은 다음과 같습니다.
@@ -251,6 +417,39 @@ Marketplace 상품 데이터를 저장합니다.
 - Product Highlights
 - Creator Fit
 - Content Ideas
+
+---
+
+## User *(Mission 8 · 초기 구현 · 검증 필요)*
+
+회원 계정 정보를 저장합니다.
+
+| Field          | Description        |
+| -------------- | ------------------ |
+| `id`           | User ID            |
+| `email`        | 이메일 (unique)      |
+| `passwordHash` | 비밀번호 Hash         |
+| `displayName`  | 표시 이름            |
+| `role`         | `USER` / `ADMIN` |
+| `createdAt`    | 생성일               |
+| `updatedAt`    | 수정일               |
+
+---
+
+## Comment *(Mission 8 · 초기 구현 · 검증 필요)*
+
+Editorial 게시물 댓글을 저장합니다.
+
+| Field       | Description |
+| ----------- | ----------- |
+| `id`        | Comment ID  |
+| `content`   | 댓글 본문      |
+| `userId`    | 작성자 User ID |
+| `postId`    | 대상 Post ID |
+| `createdAt` | 생성일        |
+| `updatedAt` | 수정일        |
+
+관계: `User 1 ─── N Comment N ─── 1 Post`
 
 ---
 
@@ -531,7 +730,34 @@ true / false
 ```
 
 > 이 기능은 게시물 수정/삭제 보호를 위한 간단한 구현입니다.
-> JWT 기반 사용자 인증 시스템은 현재 구현 범위에 포함하지 않았습니다.
+> Mission 8에서 Session 기반 회원 인증을 추가하지만,
+> 게시물별 비밀번호 방식은 Mission 8 범위에서도 유지합니다.
+
+---
+
+# Auth & Comments API *(Mission 8 · 초기 구현 · 검증 필요)*
+
+아래 API는 백엔드 라우트 코드가 존재합니다.
+프론트엔드 연동 및 실행 검증은 아직 완료되지 않았습니다.
+
+### Auth
+
+```http
+POST /api/auth/signup
+POST /api/auth/login
+POST /api/auth/logout
+GET  /api/auth/me
+```
+
+### Comments
+
+```http
+GET    /api/posts/:postId/comments
+POST   /api/posts/:postId/comments
+DELETE /api/comments/:commentId
+```
+
+요청/응답·상태 코드·권한 정책의 상세는 [docs/mission8.md](./docs/mission8.md)를 참고하세요.
 
 ---
 
@@ -568,10 +794,17 @@ import.meta.env.VITE_API_URL
 ```env
 DATABASE_URL="YOUR_POOLED_DATABASE_URL"
 DIRECT_URL="YOUR_DIRECT_DATABASE_URL"
+PORT=3000
+CORS_ORIGIN="http://localhost:5173,https://koaus-validation-mvp.vercel.app"
+SESSION_SECRET="replace-with-a-long-random-secret"
+NODE_ENV="development"
 ```
 
 - `DATABASE_URL` — 애플리케이션 런타임에서 사용하는 Supabase pooled connection
 - `DIRECT_URL` — Prisma migration 등 CLI 작업에 사용하는 direct/session connection
+- `CORS_ORIGIN` — credential 요청을 허용할 Origin 목록 (쉼표 구분) *(Mission 8)*
+- `SESSION_SECRET` — express-session 비밀키 *(Mission 8 · production 필수)*
+- `NODE_ENV` — `production`일 때 Secure cookie 등 보안 옵션 활성화
 
 실제 `.env` 파일은 Git에 Commit하지 않습니다.
 
@@ -605,6 +838,8 @@ koaus-validation-mvp/
 ├── backend/
 │   ├── db/
 │   │   └── prisma.js
+│   ├── middleware/          # requireAuth (Mission 8)
+│   ├── routes/              # auth / comment (Mission 8)
 │   ├── prisma/
 │   │   ├── migrations/
 │   │   ├── schema.prisma
@@ -615,6 +850,9 @@ koaus-validation-mvp/
 │
 ├── .env.example
 ├── package.json
+├── docs/
+│   ├── mission6.md
+│   └── mission8.md
 └── README.md
 ```
 
@@ -622,18 +860,20 @@ koaus-validation-mvp/
 
 # Routes
 
-| Route                     | Description    |
-| ------------------------- | -------------- |
-| `/`                       | Landing Page   |
-| `/editorial`              | Editorial 목록   |
-| `/editorial/write`        | Editorial 작성   |
-| `/editorial/:postId`      | Editorial 상세   |
-| `/editorial/:postId/edit` | Editorial 수정   |
-| `/marketplace`            | Marketplace    |
-| `/products/:productId`    | Product Detail |
-| `/creator-access`         | Creator Access |
-| `/brands`                 | Brand Page     |
-| `*`                       | Not Found      |
+| Route                     | Description                         |
+| ------------------------- | ----------------------------------- |
+| `/`                       | Landing Page                        |
+| `/editorial`              | Editorial 목록                        |
+| `/editorial/write`        | Editorial 작성                        |
+| `/editorial/:postId`      | Editorial 상세                        |
+| `/editorial/:postId/edit` | Editorial 수정                        |
+| `/marketplace`            | Marketplace                         |
+| `/products/:productId`    | Product Detail                      |
+| `/creator-access`         | Creator Access                      |
+| `/brands`                 | Brand Page                          |
+| `/login`                  | Login *(Mission 8 · 구현 예정)*          |
+| `/signup`                 | Signup *(Mission 8 · 구현 예정)*         |
+| `*`                       | Not Found                           |
 
 ---
 
@@ -758,10 +998,11 @@ project root → npm run dev
 
 ### 1. JWT 인증
 
-❌ 미구현
+❌ 미구현 (의도적)
 
-게시물 수정/삭제는 게시물별 비밀번호와
-bcrypt Hash 검증 방식으로 보호합니다.
+Mission 7 심화 항목의 JWT 대신,
+Mission 8에서는 **Session 기반 인증**을 선택했습니다.
+게시물 수정/삭제는 기존처럼 게시물별 비밀번호 + bcrypt Hash 방식을 유지합니다.
 
 ### 2. 입력값 검증 및 에러 처리
 
