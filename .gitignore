@@ -25,3 +25,11 @@ dist-ssr
 
 # Local visual-parity comparison artifacts
 .parity
+
+# Vercel local files
+.vercel/
+
+# Environment variables
+.env
+.env.*
+!.env.example
