@@ -42,6 +42,7 @@ app.use(
     name: 'koaus.sid',
     store: new PgSession({
       conString: process.env.DATABASE_URL,
+      schemaName: 'private',
       createTableIfMissing: true,
     }),
     secret: sessionSecret,
