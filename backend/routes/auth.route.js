@@ -3,6 +3,13 @@ import bcrypt from 'bcryptjs'
 import prisma from '../db/prisma.js'
 
 const router = Router()
+const isProduction = process.env.NODE_ENV === 'production'
+const sessionCookieOptions = {
+  path: '/',
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax',
+}
 
 function sanitizeUser(user) {
   return {
@@ -64,6 +71,12 @@ router.post('/signup', async (req, res) => {
       user: sanitizeUser(user),
     })
   } catch (error) {
+    if (error?.code === 'P2002') {
+      return res.status(409).json({
+        message: 'An account with this email already exists',
+      })
+    }
+
     console.error('POST /api/auth/signup failed:', error)
     res.status(500).json({
       message: 'Failed to create account',
@@ -118,9 +131,12 @@ router.post('/login', async (req, res) => {
 
 router.post('/logout', (req, res, next) => {
   req.session.destroy((error) => {
-    if (error) return next(error)
+    if (error) {
+      console.error('POST /api/auth/logout failed:', error)
+      return next(error)
+    }
 
-    res.clearCookie('koaus.sid')
+    res.clearCookie('koaus.sid', sessionCookieOptions)
     res.status(204).end()
   })
 })
@@ -138,9 +154,18 @@ router.get('/me', async (req, res) => {
     })
 
     if (!user) {
-      req.session.destroy(() => {})
-      return res.status(200).json({
-        user: null,
+      return req.session.destroy((error) => {
+        if (error) {
+          console.error('GET /api/auth/me session cleanup failed:', error)
+          return res.status(500).json({
+            message: 'Failed to load authentication state',
+          })
+        }
+
+        res.clearCookie('koaus.sid', sessionCookieOptions)
+        return res.status(200).json({
+          user: null,
+        })
       })
     }
 

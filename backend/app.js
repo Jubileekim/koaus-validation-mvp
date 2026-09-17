@@ -14,16 +14,25 @@ const app = express()
 const PORT = process.env.PORT || 3000
 const isProduction = process.env.NODE_ENV === 'production'
 const PgSession = connectPgSimple(session)
+const sessionSecret = process.env.SESSION_SECRET
+const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
 
-if (isProduction && !process.env.SESSION_SECRET) {
-  throw new Error('SESSION_SECRET is required in production')
+if (!sessionSecret) {
+  throw new Error('SESSION_SECRET is required')
+}
+
+if (corsOrigins.length === 0) {
+  throw new Error('CORS_ORIGIN must include at least one origin')
 }
 
 app.set('trust proxy', 1)
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN?.split(',') ?? 'http://localhost:5173',
+    origin: corsOrigins,
     credentials: true,
   }),
 )
@@ -35,7 +44,7 @@ app.use(
       conString: process.env.DATABASE_URL,
       createTableIfMissing: true,
     }),
-    secret: process.env.SESSION_SECRET || 'koaus-local-development-secret',
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
