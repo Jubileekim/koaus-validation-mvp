@@ -11,6 +11,8 @@ import EditorialEditPage from './pages/EditorialEditPage.jsx'
 
 import CreatorAccessPage from './pages/CreatorAccessPage.jsx'
 import BrandsPage from './pages/BrandsPage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
+import SignupPage from './pages/SignupPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
 
 import RootLayout from './components/layout/RootLayout.jsx'
@@ -62,6 +64,16 @@ export default function App() {
         <Route
           path="/brands"
           element={<BrandsPage />}
+        />
+
+        <Route
+          path="/login"
+          element={<LoginPage />}
+        />
+
+        <Route
+          path="/signup"
+          element={<SignupPage />}
         />
 
         <Route
