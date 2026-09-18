@@ -1,8 +1,13 @@
 .auth-page {
   min-height: calc(100vh - 160px);
   padding: 48px 0 96px;
-  background: #f7f3ec;
-  color: #111;
+  color: var(--ink);
+  background: linear-gradient(
+    128deg,
+    #fffaf3 0%,
+    #fff1df 56%,
+    #ffdfbd 100%
+  );
 }
 
 .auth-shell {
@@ -11,21 +16,25 @@
 }
 
 .auth-card {
-  padding: 36px 32px 40px;
-  background: #fffdf8;
-  border: 1px solid #c8c2b7;
+  padding: 40px 36px 44px;
+  border: 1px solid rgba(55, 37, 25, 0.12);
+  border-radius: 28px;
+  background: var(--cream);
+  box-shadow: 0 18px 48px rgba(104, 50, 20, 0.1);
 }
 
 .auth-eyebrow {
   margin: 0 0 14px;
+  color: var(--brand-red-500);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
 .auth-card h1 {
   margin: 0 0 12px;
+  color: var(--ink);
   font-size: clamp(2rem, 4vw, 2.8rem);
   font-weight: 500;
   line-height: 1;
@@ -34,7 +43,7 @@
 
 .auth-lead {
   margin: 0 0 28px;
-  color: #625f58;
+  color: var(--muted);
   font-size: 1rem;
   line-height: 1.6;
 }
@@ -50,6 +59,7 @@
 }
 
 .auth-form label > span {
+  color: var(--ink);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -59,20 +69,22 @@
 .auth-form input {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid #c8c2b7;
-  border-radius: 0;
-  background: #fff;
-  color: #111;
+  border: 1px solid rgba(55, 37, 25, 0.18);
+  border-radius: 16px;
+  background: var(--paper);
+  color: var(--ink);
   font: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .auth-form input:focus {
-  outline: 2px solid #111;
-  outline-offset: 1px;
+  border-color: var(--brand-orange-500);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.22);
 }
 
 .auth-form em {
-  color: #b42318;
+  color: var(--brand-red-700);
   font-size: 0.88rem;
   font-style: normal;
 }
@@ -80,9 +92,10 @@
 .auth-error {
   margin: 0;
   padding: 12px 14px;
-  border: 1px solid #f0b4ae;
-  background: #fff1f0;
-  color: #9b1c1c;
+  border: 1px solid rgba(185, 47, 32, 0.28);
+  border-radius: 16px;
+  background: var(--brand-red-100);
+  color: var(--brand-red-700);
   font-size: 0.92rem;
   line-height: 1.45;
 }
@@ -96,31 +109,75 @@
 .auth-actions .button {
   width: 100%;
   justify-content: center;
+  border-color: transparent;
+  color: #fff;
+  background: linear-gradient(
+    90deg,
+    var(--brand-red-500),
+    var(--brand-orange-500)
+  );
+  box-shadow: none;
+}
+
+.auth-actions .button:hover:not(:disabled) {
+  border-color: transparent;
+  background: linear-gradient(
+    90deg,
+    var(--brand-red-600),
+    var(--brand-orange-600)
+  );
+  box-shadow: 0 10px 22px rgba(185, 47, 32, 0.18);
 }
 
 .auth-actions .button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
 .auth-switch {
   margin: 0;
-  color: #625f58;
+  color: var(--muted);
   font-size: 0.95rem;
   text-align: center;
 }
 
 .auth-switch a {
-  color: #111;
-  font-weight: 650;
+  color: var(--brand-red-600);
+  font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
+.auth-switch a:hover {
+  color: var(--brand-orange-600);
+}
+
 .auth-loading {
   margin: 0;
-  color: #625f58;
+  color: var(--muted);
+}
+
+.button--login {
+  border-color: transparent;
+  color: #fff;
+  background: linear-gradient(
+    90deg,
+    var(--brand-red-500),
+    var(--brand-orange-500)
+  );
+  box-shadow: none;
+}
+
+.button--login:hover {
+  border-color: transparent;
+  background: linear-gradient(
+    90deg,
+    var(--brand-red-600),
+    var(--brand-orange-600)
+  );
+  box-shadow: 0 8px 18px rgba(185, 47, 32, 0.16);
 }
 
 .header-auth {
@@ -134,6 +191,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--ink);
   font-size: 0.9rem;
   font-weight: 700;
 }
@@ -154,7 +212,7 @@
   border: 0;
   padding: 0;
   background: transparent;
-  color: inherit;
+  color: var(--ink);
   font: inherit;
   font-size: 0.9rem;
   font-weight: 700;
@@ -162,6 +220,7 @@
 }
 
 .header-auth__logout:hover:not(:disabled) {
+  color: var(--brand-red-600);
   text-decoration: underline;
   text-underline-offset: 3px;
 }
@@ -174,7 +233,7 @@
 .header-auth__error {
   margin: 0;
   max-width: 12rem;
-  color: #8f2a20;
+  color: var(--brand-red-700);
   font-size: 0.78rem;
   font-weight: 650;
   line-height: 1.3;
@@ -198,6 +257,11 @@
   max-width: none;
 }
 
+.mobile-menu .button--login {
+  width: fit-content;
+  margin-top: 4px;
+}
+
 @media (max-width: 900px) {
   .header-auth--desktop {
     display: none;
@@ -215,5 +279,6 @@
 
   .auth-card {
     padding: 28px 20px 32px;
+    border-radius: 22px;
   }
 }

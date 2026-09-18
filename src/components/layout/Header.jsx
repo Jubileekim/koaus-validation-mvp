@@ -12,15 +12,9 @@ function HeaderAuthControls({ variant = 'desktop' }) {
   const [loggingOut, setLoggingOut] = useState(false)
   const [logoutError, setLogoutError] = useState('')
 
-  if (isLoading) {
+  if (isLoading || !isAuthenticated || !user) {
     return null
   }
-
-  const returnFrom = getSafeReturnTo(
-    `${location.pathname}${location.search}`,
-  )
-  const authLinkState =
-    returnFrom !== '/' ? { from: returnFrom } : undefined
 
   async function handleLogout() {
     if (loggingOut) {
@@ -54,55 +48,56 @@ function HeaderAuthControls({ variant = 'desktop' }) {
     .filter(Boolean)
     .join(' ')
 
-  if (isAuthenticated && user) {
-    return (
-      <div className={className}>
-        <span className="header-auth__name">{user.displayName}</span>
-        <button
-          className="header-auth__logout"
-          type="button"
-          onClick={handleLogout}
-          disabled={loggingOut}
-        >
-          {loggingOut ? 'Logging out…' : 'Log out'}
-        </button>
-        {logoutError ? (
-          <p className="header-auth__error" role="alert">
-            {logoutError}
-          </p>
-        ) : null}
-      </div>
-    )
-  }
-
   return (
     <div className={className}>
-      <Link
-        className="header-auth__link"
-        to="/login"
-        state={authLinkState}
+      <span className="header-auth__name">{user.displayName}</span>
+      <button
+        className="header-auth__logout"
+        type="button"
+        onClick={handleLogout}
+        disabled={loggingOut}
       >
-        Log in
-      </Link>
-      <Link
-        className="header-auth__link"
-        to="/signup"
-        state={authLinkState}
-      >
-        Sign up
-      </Link>
+        {loggingOut ? 'Logging out…' : 'Log out'}
+      </button>
+      {logoutError ? (
+        <p className="header-auth__error" role="alert">
+          {logoutError}
+        </p>
+      ) : null}
     </div>
+  )
+}
+
+function LoginCta({ className = '', state }) {
+  return (
+    <Link
+      className={['button', 'button--login', className]
+        .filter(Boolean)
+        .join(' ')}
+      to="/login"
+      state={state}
+    >
+      Log in
+      <span aria-hidden="true">→</span>
+    </Link>
   )
 }
 
 export default function Header() {
   const { t } = useTranslation()
   const location = useLocation()
+  const { isAuthenticated, isLoading } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     setMenuOpen(false)
   }, [location.pathname])
+
+  const returnFrom = getSafeReturnTo(
+    `${location.pathname}${location.search}`,
+  )
+  const authLinkState =
+    returnFrom !== '/' ? { from: returnFrom } : undefined
 
   return (
     <header className="site-header">
@@ -137,14 +132,25 @@ export default function Header() {
         </nav>
 
         <div className="header-actions">
-          <HeaderAuthControls variant="desktop" />
+          {!isLoading && isAuthenticated ? (
+            <>
+              <HeaderAuthControls variant="desktop" />
 
-          <Link
-            className="button button--dark"
-            to="/editorial/write"
-          >
-            {t('nav.write')}
-          </Link>
+              <Link
+                className="button button--dark"
+                to="/editorial/write"
+              >
+                Write
+              </Link>
+            </>
+          ) : null}
+
+          {!isLoading && !isAuthenticated ? (
+            <LoginCta
+              className="header-actions__login"
+              state={authLinkState}
+            />
+          ) : null}
 
           <button
             className="menu-toggle"
@@ -183,9 +189,13 @@ export default function Header() {
           {t('nav.brands')}
         </Link>
 
-        <Link to="/editorial/write">
-          {t('nav.write')}
-        </Link>
+        {!isLoading && isAuthenticated ? (
+          <Link to="/editorial/write">Write</Link>
+        ) : null}
+
+        {!isLoading && !isAuthenticated ? (
+          <LoginCta state={authLinkState} />
+        ) : null}
 
         <HeaderAuthControls variant="mobile" />
       </nav>
