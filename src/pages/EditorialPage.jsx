@@ -4,6 +4,7 @@ import {
   deletePost,
   getPosts,
 } from '../services/postApi.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
 import { useTranslation } from '../contexts/LocaleContext.jsx'
 import '../styles/editorial.css'
 
@@ -22,13 +23,18 @@ function formatDate(dateString, locale) {
 
 export default function EditorialPage() {
   const { locale } = useTranslation()
+  const { user, isAuthenticated } = useAuth()
+  const isAdmin = user?.role === 'ADMIN'
+  const writeHref = isAuthenticated ? '/editorial/write' : '/login'
+  const writeState = isAuthenticated
+    ? undefined
+    : { from: '/editorial/write' }
 
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
 
   const [deleteTarget, setDeleteTarget] = useState(null)
-  const [deletePassword, setDeletePassword] = useState('')
   const [deleteError, setDeleteError] = useState('')
   const [deleting, setDeleting] = useState(false)
 
@@ -54,17 +60,14 @@ export default function EditorialPage() {
           read: '읽기 →',
           readStory: '이야기 읽기 ↗',
           by: '글',
-          delete: '삭제',
-          deleteTitle: '글을 삭제할까요?',
+          delete: 'Delete',
+          deleteTitle: 'Delete story?',
           deleteDescription:
-            '이 글을 발행할 때 설정한 비밀번호를 입력하세요.',
-          password: '비밀번호',
-          passwordPlaceholder: '글 비밀번호 입력',
-          passwordRequired: '비밀번호를 입력해 주세요.',
-          cancel: '취소',
-          deleteStory: '글 삭제',
-          deleting: '삭제 중...',
-          close: '닫기',
+            'This permanently removes the story. Only admins can delete.',
+          cancel: 'Cancel',
+          deleteStory: 'Delete',
+          deleting: 'Deleting...',
+          close: 'Close',
         }
       : {
           eyebrow: 'KOAUS EDITORIAL',
@@ -89,12 +92,9 @@ export default function EditorialPage() {
           delete: 'Delete',
           deleteTitle: 'Delete story?',
           deleteDescription:
-            'Enter the password you used when publishing this story.',
-          password: 'Password',
-          passwordPlaceholder: 'Enter story password',
-          passwordRequired: 'Password is required.',
+            'This permanently removes the story. Only admins can delete.',
           cancel: 'Cancel',
-          deleteStory: 'Delete story',
+          deleteStory: 'Delete',
           deleting: 'Deleting...',
           close: 'Close',
         }
@@ -136,8 +136,9 @@ export default function EditorialPage() {
   }, [])
 
   const openDeleteModal = (post) => {
+    if (!isAdmin) return
+
     setDeleteTarget(post)
-    setDeletePassword('')
     setDeleteError('')
   }
 
@@ -145,28 +146,19 @@ export default function EditorialPage() {
     if (deleting) return
 
     setDeleteTarget(null)
-    setDeletePassword('')
     setDeleteError('')
   }
 
   const handleDelete = async (event) => {
     event.preventDefault()
 
-    if (!deleteTarget) return
-
-    if (!deletePassword) {
-      setDeleteError(copy.passwordRequired)
-      return
-    }
+    if (!deleteTarget || !isAdmin) return
 
     try {
       setDeleting(true)
       setDeleteError('')
 
-      await deletePost(
-        deleteTarget.id,
-        deletePassword,
-      )
+      await deletePost(deleteTarget.id)
 
       setPosts((currentPosts) =>
         currentPosts.filter(
@@ -176,7 +168,6 @@ export default function EditorialPage() {
       )
 
       setDeleteTarget(null)
-      setDeletePassword('')
     } catch (error) {
       console.error(
         'Failed to delete post:',
@@ -218,7 +209,8 @@ export default function EditorialPage() {
           <div className="editorial-hero__actions">
             <Link
               className="editorial-write-button"
-              to="/editorial/write"
+              to={writeHref}
+              state={writeState}
             >
               <span>{copy.write}</span>
               <strong>＋</strong>
@@ -276,7 +268,8 @@ export default function EditorialPage() {
 
             <Link
               className="editorial-write-button editorial-write-button--empty"
-              to="/editorial/write"
+              to={writeHref}
+              state={writeState}
             >
               <span>{copy.firstStory}</span>
               <strong>＋</strong>
@@ -295,15 +288,17 @@ export default function EditorialPage() {
                 aria-label={getTitle(featuredPost)}
               />
 
-              <button
-                className="editorial-delete-button"
-                type="button"
-                onClick={() =>
-                  openDeleteModal(featuredPost)
-                }
-              >
-                {copy.delete}
-              </button>
+              {isAdmin ? (
+                <button
+                  className="editorial-delete-button"
+                  type="button"
+                  onClick={() =>
+                    openDeleteModal(featuredPost)
+                  }
+                >
+                  {copy.delete}
+                </button>
+              ) : null}
 
               {featuredPost.imageUrl ? (
                 <div className="editorial-featured__image">
@@ -372,15 +367,17 @@ export default function EditorialPage() {
                         aria-label={getTitle(post)}
                       />
 
-                      <button
-                        className="editorial-delete-button"
-                        type="button"
-                        onClick={() =>
-                          openDeleteModal(post)
-                        }
-                      >
-                        {copy.delete}
-                      </button>
+                      {isAdmin ? (
+                        <button
+                          className="editorial-delete-button"
+                          type="button"
+                          onClick={() =>
+                            openDeleteModal(post)
+                          }
+                        >
+                          {copy.delete}
+                        </button>
+                      ) : null}
 
                       {post.imageUrl ? (
                         <div className="editorial-card__image">
@@ -444,7 +441,7 @@ export default function EditorialPage() {
         ) : null}
       </section>
 
-      {deleteTarget ? (
+      {isAdmin && deleteTarget ? (
         <div
           className="editorial-modal-backdrop"
           onMouseDown={(event) => {
@@ -487,27 +484,6 @@ export default function EditorialPage() {
             </p>
 
             <form onSubmit={handleDelete}>
-              <label htmlFor="delete-password">
-                {copy.password}
-              </label>
-
-              <input
-                id="delete-password"
-                type="password"
-                autoFocus
-                value={deletePassword}
-                onChange={(event) => {
-                  setDeletePassword(
-                    event.target.value,
-                  )
-
-                  setDeleteError('')
-                }}
-                placeholder={
-                  copy.passwordPlaceholder
-                }
-              />
-
               {deleteError ? (
                 <p
                   className="editorial-delete-modal__error"

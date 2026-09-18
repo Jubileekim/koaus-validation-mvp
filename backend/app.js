@@ -1,7 +1,6 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import bcrypt from 'bcryptjs'
 import session from 'express-session'
 import connectPgSimple from 'connect-pg-simple'
 import prisma from './db/prisma.js'
@@ -71,6 +70,29 @@ function removePasswordHash(post) {
   return safePost
 }
 
+function canEditPost(user, post) {
+  if (!user || !post) return false
+  if (user.role === 'ADMIN') return true
+  if (post.authorUserId && post.authorUserId === user.id) {
+    return true
+  }
+  return false
+}
+
+async function getSessionUser(req) {
+  if (!req.session?.userId) {
+    return null
+  }
+
+  return prisma.user.findUnique({
+    where: { id: req.session.userId },
+    select: {
+      id: true,
+      role: true,
+    },
+  })
+}
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     message: 'KOAUS API is running',
@@ -138,6 +160,14 @@ app.get('/api/posts/:id', async (req, res) => {
 
 app.post('/api/posts', async (req, res) => {
   try {
+    const currentUser = await getSessionUser(req)
+
+    if (!currentUser) {
+      return res.status(401).json({
+        message: 'Authentication required',
+      })
+    }
+
     const {
       title,
       titleKo,
@@ -147,7 +177,6 @@ app.post('/api/posts', async (req, res) => {
       imageUrl,
       videoUrl,
       editorId,
-      password,
     } = req.body
 
     if (!title?.trim()) {
@@ -174,12 +203,6 @@ app.post('/api/posts', async (req, res) => {
       })
     }
 
-    if (!password || password.length < 6) {
-      return res.status(400).json({
-        message: 'Password must be at least 6 characters',
-      })
-    }
-
     const editor = await prisma.editor.findUnique({
       where: { id: editorId },
     })
@@ -189,8 +212,6 @@ app.post('/api/posts', async (req, res) => {
         message: 'Editor not found',
       })
     }
-
-    const passwordHash = await bcrypt.hash(password, 10)
 
     const post = await prisma.post.create({
       data: {
@@ -202,7 +223,7 @@ app.post('/api/posts', async (req, res) => {
         imageUrl: imageUrl || null,
         videoUrl: videoUrl || null,
         editorId,
-        passwordHash,
+        authorUserId: currentUser.id,
       },
       include: {
         editor: true,
@@ -220,6 +241,14 @@ app.post('/api/posts', async (req, res) => {
 
 app.patch('/api/posts/:id', async (req, res) => {
   try {
+    const currentUser = await getSessionUser(req)
+
+    if (!currentUser) {
+      return res.status(401).json({
+        message: 'Authentication required',
+      })
+    }
+
     const { id } = req.params
     const {
       title,
@@ -229,17 +258,14 @@ app.patch('/api/posts/:id', async (req, res) => {
       type,
       imageUrl,
       videoUrl,
-      password,
     } = req.body
-
-    if (!password) {
-      return res.status(400).json({
-        message: 'Password is required',
-      })
-    }
 
     const existingPost = await prisma.post.findUnique({
       where: { id },
+      select: {
+        id: true,
+        authorUserId: true,
+      },
     })
 
     if (!existingPost) {
@@ -248,20 +274,9 @@ app.patch('/api/posts/:id', async (req, res) => {
       })
     }
 
-    if (!existingPost.passwordHash) {
+    if (!canEditPost(currentUser, existingPost)) {
       return res.status(403).json({
-        message: 'This post cannot be edited because it has no edit password',
-      })
-    }
-
-    const passwordMatches = await bcrypt.compare(
-      password,
-      existingPost.passwordHash,
-    )
-
-    if (!passwordMatches) {
-      return res.status(401).json({
-        message: 'Incorrect password',
+        message: 'You do not have permission to edit this post',
       })
     }
 
@@ -311,39 +326,30 @@ app.patch('/api/posts/:id', async (req, res) => {
 
 app.delete('/api/posts/:id', async (req, res) => {
   try {
-    const { id } = req.params
-    const password = req.get('x-post-password')
+    const currentUser = await getSessionUser(req)
 
-    if (!password) {
-      return res.status(400).json({
-        message: 'Password is required',
+    if (!currentUser) {
+      return res.status(401).json({
+        message: 'Authentication required',
       })
     }
 
+    if (currentUser.role !== 'ADMIN') {
+      return res.status(403).json({
+        message: 'Only admins can delete posts',
+      })
+    }
+
+    const { id } = req.params
+
     const post = await prisma.post.findUnique({
       where: { id },
+      select: { id: true },
     })
 
     if (!post) {
       return res.status(404).json({
         message: 'Post not found',
-      })
-    }
-
-    if (!post.passwordHash) {
-      return res.status(403).json({
-        message: 'This post was created before password protection was enabled',
-      })
-    }
-
-    const passwordMatches = await bcrypt.compare(
-      password,
-      post.passwordHash,
-    )
-
-    if (!passwordMatches) {
-      return res.status(401).json({
-        message: 'Incorrect password',
       })
     }
 

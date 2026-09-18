@@ -36,6 +36,8 @@ model Post {
   videoUrl     String?
   editorId     String
   editor       Editor   @relation(fields: [editorId], references: [id], onDelete: Cascade)
+  authorUserId String?
+  authorUser   User?    @relation(fields: [authorUserId], references: [id], onDelete: SetNull)
   passwordHash String?
   comments     Comment[]
   createdAt    DateTime @default(now())
@@ -43,6 +45,7 @@ model Post {
 
   @@index([createdAt])
   @@index([editorId])
+  @@index([authorUserId])
 }
 
 model User {
@@ -52,6 +55,7 @@ model User {
   displayName  String
   role         UserRole  @default(USER)
   comments     Comment[]
+  posts        Post[]
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 }
