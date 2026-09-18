@@ -1,34 +1,43 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { createPost } from '../services/postApi.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
 import '../styles/editorial-write.css'
 
 const EDITOR_ID = 'editor-koaus-01'
 
 export default function EditorialWritePage() {
   const navigate = useNavigate()
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
 
   const [type, setType] = useState('ARTICLE')
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
-  const [password, setPassword] = useState('')
 
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
 
+  useEffect(() => {
+    if (authLoading) {
+      return
+    }
+
+    if (!isAuthenticated) {
+      navigate('/login', {
+        replace: true,
+        state: { from: '/editorial/write' },
+      })
+    }
+  }, [authLoading, isAuthenticated, navigate])
+
   const titleValid = title.trim().length > 0
   const contentValid = content.trim().length > 0
-  const passwordValid = password.length >= 6
-
-  const isValid =
-    titleValid &&
-    contentValid &&
-    passwordValid
+  const isValid = titleValid && contentValid
 
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    if (!isValid || submitting) {
+    if (!isAuthenticated || !isValid || submitting) {
       return
     }
 
@@ -41,7 +50,6 @@ export default function EditorialWritePage() {
         content: content.trim(),
         type,
         editorId: EDITOR_ID,
-        password,
       })
 
       navigate(`/editorial/${createdPost.id}`)
@@ -54,6 +62,16 @@ export default function EditorialWritePage() {
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (authLoading || !isAuthenticated) {
+    return (
+      <main className="ew-page">
+        <div className="shell ew-shell">
+          Checking session...
+        </div>
+      </main>
+    )
   }
 
   return (
@@ -160,44 +178,6 @@ export default function EditorialWritePage() {
             </div>
           </div>
 
-          <div className="ew-field">
-            <div className="ew-field__label">
-              <span>04</span>
-              <label htmlFor="post-password">
-                Password
-              </label>
-            </div>
-
-            <div className="ew-field__control">
-              <input
-                id="post-password"
-                type="password"
-                value={password}
-                autoComplete="new-password"
-                onChange={(event) =>
-                  setPassword(event.target.value)
-                }
-                placeholder="At least 6 characters"
-              />
-
-              <p className="ew-help">
-                This password is required later
-                to edit or delete this story.
-              </p>
-
-              {password.length > 0 &&
-              !passwordValid ? (
-                <p
-                  className="ew-error"
-                  role="alert"
-                >
-                  Password must be at least
-                  6 characters.
-                </p>
-              ) : null}
-            </div>
-          </div>
-
           {submitError ? (
             <p
               className="ew-submit-error"
@@ -227,16 +207,6 @@ export default function EditorialWritePage() {
                 }
               >
                 Story
-              </span>
-
-              <span
-                className={
-                  passwordValid
-                    ? 'is-complete'
-                    : ''
-                }
-              >
-                Password
               </span>
             </div>
 

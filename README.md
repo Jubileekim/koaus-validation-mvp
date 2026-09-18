@@ -5,10 +5,12 @@
 
 - **Sprint Mission 6** — React 기반 Frontend MVP
 - **Sprint Mission 7** — Express + Prisma + PostgreSQL 기반 Full-stack MVP
+- **Sprint Mission 8** — Session 인증 + Editorial Comments + Editorial Authorization (**구현 · 검증 완료**)
 
-Mission 6의 기존 프로젝트 문서는 아래에서 확인할 수 있습니다.
+Mission 6 / Mission 8 상세 문서는 아래에서 확인할 수 있습니다.
 
-→ [Mission 6 README](./docs/mission6.md)
+→ [Mission 6 README](./docs/mission6.md)  
+→ [Mission 8 Spec](./docs/mission8.md)
 
 # KOAUS — Editorial Commerce MVP
 
@@ -21,6 +23,10 @@ Editorial Commerce MVP입니다.
 React 프론트엔드 MVP를 기반으로,
 Sprint Mission 7에서 Express API, PostgreSQL 데이터베이스,
 Prisma ORM을 추가하여 실제 클라이언트-서버 구조로 확장했습니다.
+
+Sprint Mission 8에서는 Session 기반 유저 인증, Editorial 댓글,
+그리고 Editorial Write / Edit / Delete Authorization을
+**구현하고 로컬에서 검증 완료**했습니다.
 
 ---
 
@@ -44,6 +50,147 @@ Prisma ORM을 추가하여 실제 클라이언트-서버 구조로 확장했습�
 - KO / EN Editorial 콘텐츠
 - Article / Reel 콘텐츠 타입
 - Editorial 콘텐츠 내 Marketplace 상품 연결
+
+---
+
+## Sprint Mission 8
+
+Mission 8에서는 고도화 기능으로
+**Session Authentication + Editorial Comments + Editorial Authorization** 을 선택했습니다.
+
+상세 설계·API·검증 체크리스트는 [docs/mission8.md](./docs/mission8.md)를 참고하세요.
+
+### 1. 선택한 고도화 기능
+
+- 회원가입 / 로그인 / 로그아웃 / session 복구
+- Editorial 댓글 조회 / 작성 / 삭제
+- Editorial Write / Edit / Delete Authorization
+- Loading / Error / Empty + returnTo UX
+- English-first Auth UI (KOAUS warm red→orange)
+
+### 2. 기존 MVP 한계 (Mission 7)
+
+- 사용자를 식별할 수 없음
+- 로그인 상태를 유지할 수 없음
+- 사용자별 권한 제어가 어려움
+- Editorial을 읽은 사용자가 직접 참여할 기능이 없음
+- 게시물 수정/삭제가 게시물별 password에만 의존 (사용자 인증이 아님)
+
+### 3. 최종 권한 정책
+
+```text
+READ  = PUBLIC
+WRITE = AUTHENTICATED USER
+EDIT  = OWNER OR ADMIN
+DELETE = ADMIN ONLY
+```
+
+| 동작 | Public | USER | ADMIN |
+| --- | --- | --- | --- |
+| Editorial / Product / Comment GET | ✅ | ✅ | ✅ |
+| Post WRITE | ❌ 401 | ✅ | ✅ |
+| Post EDIT (본인) | ❌ | ✅ | ✅ |
+| Post EDIT (타인 / legacy `authorUserId=null`) | ❌ | ❌ 403 | ✅ |
+| Post DELETE | ❌ 401 | ❌ 403 | ✅ |
+| Comment POST | ❌ 401 | ✅ | ✅ |
+| Comment DELETE (본인) | ❌ | ✅ | ✅ |
+| Comment DELETE (타인) | ❌ | ❌ 403 | ✅ |
+
+### 4. Session을 선택한 이유
+
+JWT가 아니라 **Session-based Authentication**을 사용합니다.
+
+- React + Express 단일 웹 서비스 구조에 적합
+- 서버에서 로그인 상태를 즉시 관리·종료하기 쉬움
+- 권한 변경을 서버에서 바로 반영 가능
+- 현재 규모에서 stateless JWT가 필수는 아님
+
+```text
+Browser
+→ HttpOnly Session Cookie (`koaus.sid`)
+→ Express
+→ PostgreSQL Session Store (`private.session`)
+→ session.userId
+→ User
+```
+
+### 5. Post ownership
+
+- `Post.authorUserId` (nullable) — migration `20260918120000_add_post_author_user` 적용 완료
+- 신규 글: `authorUserId = req.session.userId` (body 값 미신뢰)
+- legacy 글: `authorUserId = null` → ADMIN만 Edit
+- Mission 7 Post password Write/Edit/Delete는 **더 이상 사용하지 않음**
+- DB `passwordHash` 컬럼은 legacy 호환을 위해 남겨 두었으며, 새 flow에서는 사용하지 않음
+
+### 6. Frontend UX (요약)
+
+- 비로그인 Header: red→orange gradient `Log in →`
+- 로그인 Header: `Write · displayName · Log out`
+- `/editorial/write` 보호 + returnTo
+- Edit UI: owner 또는 ADMIN
+- Delete UI: ADMIN only
+- Login/Signup: KOAUS warm cream/peach + red/orange
+
+### 7. English-first
+
+- 기본 UI 언어는 English · KO/EN 토글 제거
+- DB `titleKo` / `contentKo` 등은 Mission 8에서 삭제하지 않음
+
+### 8. 주요 API (구현 · 검증 완료)
+
+| Method | Endpoint | 인증 | 상태 |
+| --- | --- | --- | --- |
+| `POST` | `/api/auth/signup` | 불필요 | 구현 · 검증 완료 |
+| `POST` | `/api/auth/login` | 불필요 | 구현 · 검증 완료 |
+| `POST` | `/api/auth/logout` | 세션 | 구현 · 검증 완료 |
+| `GET` | `/api/auth/me` | 세션 확인 | 구현 · 검증 완료 |
+| `POST` | `/api/posts` | 로그인 필요 | 구현 · 검증 완료 |
+| `PATCH` | `/api/posts/:id` | owner 또는 ADMIN | 구현 · 검증 완료 |
+| `DELETE` | `/api/posts/:id` | ADMIN only | 구현 · 검증 완료 |
+| `GET` | `/api/posts/:postId/comments` | 불필요 | 구현 · 검증 완료 |
+| `POST` | `/api/posts/:postId/comments` | 필요 | 구현 · 검증 완료 |
+| `DELETE` | `/api/comments/:commentId` | 본인 또는 ADMIN | 구현 · 검증 완료 |
+
+### 9. DB 모델 변경
+
+- `User` / `Comment`
+- `Post.authorUserId` → `User`
+- `User` / `Comment` RLS enabled (policy 없음)
+- Session: `private.session` (`connect-pg-simple`)
+
+### 10. 보안
+
+- User password bcrypt hashing · API에 `passwordHash` 미노출
+- HttpOnly session cookie · `SESSION_SECRET` 필수
+- credentialed CORS + explicit origins
+- auth token을 localStorage/sessionStorage에 저장하지 않음
+
+### 11. 검증 결과 (요약)
+
+상세는 [docs/mission8.md](./docs/mission8.md).
+
+- [x] Auth / Session / Comments
+- [x] Post ownership Write / Edit / Delete authorization
+- [x] USER A own edit · USER B 403 · ADMIN edit/delete · legacy ADMIN-only
+- [x] Write returnTo · Header auth CTA · build / lint / prisma validate · migrate deploy
+- [ ] Production Vercel cross-origin cookie / CORS
+
+### 12. Out of Scope (Mission 8)
+
+- Like / Reply / Notifications / Comment editing
+- Profile / Follow / Social Login / Password reset
+- Admin dashboard / Full CMS / Payment
+- `passwordHash` 컬럼 drop · Editor 모델 전체 재설계
+
+### 현재 구현 상태 (요약)
+
+| 구분 | 상태 |
+| --- | --- |
+| Session Auth + Comments | 구현 · 검증 완료 |
+| Post ownership Authorization | 구현 · 검증 완료 |
+| Frontend Auth / Write / Edit / Delete UI | 구현 · 검증 완료 |
+| English-first + KOAUS warm Auth UI | 적용 · 검증 완료 |
+| Production Vercel cookie 검증 | 미실시 |
 
 ---
 
@@ -143,6 +290,8 @@ Product Detail
 - bcryptjs
 - dotenv
 - cors
+- express-session *(Mission 8 · 구현 · 검증 완료)*
+- connect-pg-simple *(Mission 8 · PostgreSQL Session Store · 검증 완료)*
 
 ## Infrastructure
 
@@ -156,17 +305,19 @@ Product Detail
 ```text
 Browser
   │
-  │ HTTP Request
+  │ HTTP Request (+ Session Cookie for Auth)
   ▼
 React / Vite Frontend (Vercel)
   │
-  │ fetch()
+  │ fetch()  · credentials: 'include' (Session Cookie)
   ▼
 Express REST API (Vercel)
   │
-  │ Prisma
-  ▼
-Supabase PostgreSQL
+  ├─ Prisma ──────────────► User / Post / Comment / Product
+  └─ express-session ─────► PostgreSQL Session Store
+           │
+           ▼
+    Supabase PostgreSQL
 ```
 
 예를 들어 Editorial 목록을 불러올 때의 흐름은 다음과 같습니다.
@@ -215,20 +366,21 @@ Editorial 게시물을 저장합니다.
 
 주요 필드:
 
-| Field          | Description      |
-| -------------- | ---------------- |
-| `id`           | 게시물 ID           |
-| `title`        | 영어 제목            |
-| `titleKo`      | 한국어 제목           |
-| `content`      | 영어 본문            |
-| `contentKo`    | 한국어 본문           |
-| `type`         | ARTICLE / REEL   |
-| `imageUrl`     | 대표 이미지           |
-| `videoUrl`     | 영상 URL           |
-| `editorId`     | 작성자 ID           |
-| `passwordHash` | 수정/삭제용 비밀번호 Hash |
-| `createdAt`    | 생성일              |
-| `updatedAt`    | 수정일              |
+| Field           | Description                          |
+| --------------- | ------------------------------------ |
+| `id`            | 게시물 ID                             |
+| `title`         | 영어 제목                             |
+| `titleKo`       | 한국어 제목                            |
+| `content`       | 영어 본문                             |
+| `contentKo`     | 한국어 본문                            |
+| `type`          | ARTICLE / REEL                       |
+| `imageUrl`      | 대표 이미지                            |
+| `videoUrl`      | 영상 URL                             |
+| `editorId`      | Editor 관계 ID (Mission 7 유지)       |
+| `authorUserId`  | Session User ownership *(Mission 8, nullable)* |
+| `passwordHash`  | legacy 컬럼 · 새 Write/Edit/Delete에서 미사용 |
+| `createdAt`     | 생성일                               |
+| `updatedAt`     | 수정일                               |
 
 ---
 
@@ -251,6 +403,39 @@ Marketplace 상품 데이터를 저장합니다.
 - Product Highlights
 - Creator Fit
 - Content Ideas
+
+---
+
+## User *(Mission 8 · 구현 · 검증 완료)*
+
+회원 계정 정보를 저장합니다.
+
+| Field          | Description        |
+| -------------- | ------------------ |
+| `id`           | User ID            |
+| `email`        | 이메일 (unique)      |
+| `passwordHash` | 비밀번호 Hash         |
+| `displayName`  | 표시 이름            |
+| `role`         | `USER` / `ADMIN` |
+| `createdAt`    | 생성일               |
+| `updatedAt`    | 수정일               |
+
+---
+
+## Comment *(Mission 8 · 구현 · 검증 완료)*
+
+Editorial 게시물 댓글을 저장합니다.
+
+| Field       | Description |
+| ----------- | ----------- |
+| `id`        | Comment ID  |
+| `content`   | 댓글 본문      |
+| `userId`    | 작성자 User ID |
+| `postId`    | 대상 Post ID |
+| `createdAt` | 생성일        |
+| `updatedAt` | 수정일        |
+
+관계: `User 1 ─── N Comment N ─── 1 Post`
 
 ---
 
@@ -325,13 +510,16 @@ GET /api/posts/editorial-seoul-stationery-shop
 
 ### POST /api/posts
 
-새 Editorial 게시물을 생성합니다.
+새 Editorial 게시물을 생성합니다. **로그인 세션 필수.**
+
+`authorUserId`는 request body가 아니라 `req.session.userId`로 설정됩니다.
 
 ### Request
 
 ```http
 POST /api/posts
 Content-Type: application/json
+Cookie: koaus.sid=...
 ```
 
 ```json
@@ -342,29 +530,20 @@ Content-Type: application/json
   "contentKo": "이야기 본문",
   "type": "ARTICLE",
   "imageUrl": "/assets/editorial/example.jpg",
-  "editorId": "editor-koaus-01",
-  "password": "sample123"
+  "editorId": "editor-koaus-01"
 }
 ```
 
 ### Validation
 
-- `title` 필수
-- `content` 필수
-- `editorId` 필수
+- Session 없으면 `401`
+- `title` / `content` / `editorId` 필수
 - `type`은 `ARTICLE` 또는 `REEL`
-- 비밀번호는 최소 6자
 
 정상 생성:
 
 ```text
 201 Created
-```
-
-잘못된 요청:
-
-```text
-400 Bad Request
 ```
 
 ---
@@ -373,61 +552,44 @@ Content-Type: application/json
 
 기존 게시물을 수정합니다.
 
-수정 시 해당 게시물의 비밀번호가 필요합니다.
+- owner (`authorUserId === session.userId`) 또는 ADMIN
+- legacy (`authorUserId === null`) → ADMIN만
+- 타인 USER → `403`
+- Post password는 사용하지 않음
 
 ### Request
 
 ```http
 PATCH /api/posts/:id
 Content-Type: application/json
+Cookie: koaus.sid=...
 ```
 
 ```json
 {
   "title": "Updated Story",
-  "content": "Updated content",
-  "password": "sample123"
+  "content": "Updated content"
 }
-```
-
-비밀번호가 잘못된 경우:
-
-```text
-403 Forbidden
-```
-
-게시물이 없는 경우:
-
-```text
-404 Not Found
 ```
 
 ---
 
 ### DELETE /api/posts/:id
 
-게시물을 삭제합니다.
-
-비밀번호는 요청 Header를 통해 전달합니다.
+게시물을 삭제합니다. **ADMIN only.**  
+일반 USER는 자신의 글도 DELETE할 수 없습니다. Post password는 사용하지 않습니다.
 
 ### Request
 
 ```http
 DELETE /api/posts/:id
-x-post-password: sample123
+Cookie: koaus.sid=...
 ```
 
-비밀번호가 잘못된 경우:
-
-```text
-403 Forbidden
-```
-
-게시물이 없는 경우:
-
-```text
-404 Not Found
-```
+- 비로그인 → `401`
+- USER → `403`
+- ADMIN → `200`
+- 없는 게시물 → `404`
 
 ---
 
@@ -492,9 +654,12 @@ HTTP Status Code와 JSON 메시지를 함께 반환합니다.
 | ------ | ---------- |
 | `200`  | 요청 성공      |
 | `201`  | 데이터 생성 성공  |
+| `204`  | 성공 (본문 없음) |
 | `400`  | 입력값 오류     |
-| `403`  | 비밀번호 검증 실패 |
+| `401`  | 인증 필요      |
+| `403`  | 권한 없음      |
 | `404`  | 데이터 없음     |
+| `409`  | 충돌 (예: 중복 email) |
 | `500`  | 서버 오류      |
 
 프론트엔드에서도 API 실패 시
@@ -502,36 +667,54 @@ Loading / Error / Empty State를 구분하여 표시합니다.
 
 ---
 
-# Post Edit / Delete Protection
+# Post Authorization *(Mission 8)*
 
-Editorial 게시물 작성 시 사용자가 비밀번호를 입력합니다.
+Mission 7에서는 게시물별 password + bcrypt로 Edit/Delete를 보호했습니다.
 
-비밀번호 원문은 데이터베이스에 저장하지 않고
-`bcryptjs`를 사용하여 Hash 값만 저장합니다.
-
-```text
-User Password
-      ↓
-bcrypt.hash()
-      ↓
-passwordHash
-      ↓
-PostgreSQL
-```
-
-수정 또는 삭제 요청 시에는
-입력된 비밀번호와 저장된 Hash를 비교합니다.
+Mission 8에서는 이를 **Session User ownership + role** 기반으로 교체했습니다.
 
 ```text
-password
-   ↓
-bcrypt.compare()
-   ↓
-true / false
+WRITE  = authenticated session user
+EDIT   = authorUserId match OR ADMIN
+DELETE = ADMIN only
 ```
 
-> 이 기능은 게시물 수정/삭제 보호를 위한 간단한 구현입니다.
-> JWT 기반 사용자 인증 시스템은 현재 구현 범위에 포함하지 않았습니다.
+- 신규 Post: `authorUserId = session.userId`
+- legacy Post: `authorUserId = null` → ADMIN만 Edit
+- DB `passwordHash` 컬럼은 남아 있으나 새 Write/Edit/Delete flow에서는 사용하지 않음
+
+---
+
+# Auth & Comments API *(Mission 8 · 구현 · 검증 완료)*
+
+Session cookie, Comment API, Post authorization은 로컬에서 검증되었습니다.
+
+### Auth
+
+```http
+POST /api/auth/signup
+POST /api/auth/login
+POST /api/auth/logout
+GET  /api/auth/me
+```
+
+### Comments
+
+```http
+GET    /api/posts/:postId/comments
+POST   /api/posts/:postId/comments
+DELETE /api/comments/:commentId
+```
+
+### Editorial Authorization
+
+```http
+POST   /api/posts              # authenticated
+PATCH  /api/posts/:id          # owner or ADMIN
+DELETE /api/posts/:id          # ADMIN only
+```
+
+요청/응답·상태 코드·권한 정책·검증 체크리스트는 [docs/mission8.md](./docs/mission8.md)를 참고하세요.
 
 ---
 
@@ -568,10 +751,17 @@ import.meta.env.VITE_API_URL
 ```env
 DATABASE_URL="YOUR_POOLED_DATABASE_URL"
 DIRECT_URL="YOUR_DIRECT_DATABASE_URL"
+PORT=3000
+CORS_ORIGIN="http://localhost:5173,https://koaus-validation-mvp.vercel.app"
+SESSION_SECRET="replace-with-a-long-random-secret"
+NODE_ENV="development"
 ```
 
 - `DATABASE_URL` — 애플리케이션 런타임에서 사용하는 Supabase pooled connection
 - `DIRECT_URL` — Prisma migration 등 CLI 작업에 사용하는 direct/session connection
+- `CORS_ORIGIN` — credential 요청을 허용할 Origin 목록 (쉼표 구분) *(Mission 8)*
+- `SESSION_SECRET` — express-session 비밀키 *(Mission 8 · production 필수)*
+- `NODE_ENV` — `production`일 때 Secure cookie 등 보안 옵션 활성화
 
 실제 `.env` 파일은 Git에 Commit하지 않습니다.
 
@@ -605,6 +795,8 @@ koaus-validation-mvp/
 ├── backend/
 │   ├── db/
 │   │   └── prisma.js
+│   ├── middleware/          # requireAuth (Mission 8)
+│   ├── routes/              # auth / comment (Mission 8)
 │   ├── prisma/
 │   │   ├── migrations/
 │   │   ├── schema.prisma
@@ -615,6 +807,9 @@ koaus-validation-mvp/
 │
 ├── .env.example
 ├── package.json
+├── docs/
+│   ├── mission6.md
+│   └── mission8.md
 └── README.md
 ```
 
@@ -622,18 +817,20 @@ koaus-validation-mvp/
 
 # Routes
 
-| Route                     | Description    |
-| ------------------------- | -------------- |
-| `/`                       | Landing Page   |
-| `/editorial`              | Editorial 목록   |
-| `/editorial/write`        | Editorial 작성   |
-| `/editorial/:postId`      | Editorial 상세   |
-| `/editorial/:postId/edit` | Editorial 수정   |
-| `/marketplace`            | Marketplace    |
-| `/products/:productId`    | Product Detail |
-| `/creator-access`         | Creator Access |
-| `/brands`                 | Brand Page     |
-| `*`                       | Not Found      |
+| Route                     | Description                         |
+| ------------------------- | ----------------------------------- |
+| `/`                       | Landing Page                        |
+| `/editorial`              | Editorial 목록                        |
+| `/editorial/write`        | Editorial 작성                        |
+| `/editorial/:postId`      | Editorial 상세                        |
+| `/editorial/:postId/edit` | Editorial 수정                        |
+| `/marketplace`            | Marketplace                         |
+| `/products/:productId`    | Product Detail                      |
+| `/creator-access`         | Creator Access                      |
+| `/brands`                 | Brand Page                          |
+| `/login`                  | Login *(Mission 8)*                   |
+| `/signup`                 | Signup *(Mission 8)*                  |
+| `*`                       | Not Found                           |
 
 ---
 
@@ -653,6 +850,9 @@ Frontend:
 ```text
 http://localhost:5173
 ```
+
+> Development note: open the local frontend at `http://localhost:5173`.
+> `http://127.0.0.1:5173` is blocked unless that origin is added to `CORS_ORIGIN`.
 
 ---
 
@@ -758,10 +958,11 @@ project root → npm run dev
 
 ### 1. JWT 인증
 
-❌ 미구현
+❌ 미구현 (의도적)
 
-게시물 수정/삭제는 게시물별 비밀번호와
-bcrypt Hash 검증 방식으로 보호합니다.
+Mission 7 심화 항목의 JWT 대신,
+Mission 8에서는 **Session 기반 인증**을 선택했습니다.
+Editorial Write / Edit / Delete는 Session ownership + role로 보호합니다.
 
 ### 2. 입력값 검증 및 에러 처리
 

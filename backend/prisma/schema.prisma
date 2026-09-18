@@ -11,6 +11,11 @@ enum PostType {
   REEL
 }
 
+enum UserRole {
+  USER
+  ADMIN
+}
+
 model Editor {
   id        String   @id @default(cuid())
   name      String
@@ -22,28 +27,51 @@ model Editor {
 
 model Post {
   id           String   @id @default(cuid())
-
   title        String
   titleKo      String?
-
   content      String
   contentKo    String?
-
   type         PostType @default(ARTICLE)
-
   imageUrl     String?
   videoUrl     String?
-
   editorId     String
   editor       Editor   @relation(fields: [editorId], references: [id], onDelete: Cascade)
-
+  authorUserId String?
+  authorUser   User?    @relation(fields: [authorUserId], references: [id], onDelete: SetNull)
   passwordHash String?
-
+  comments     Comment[]
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   @@index([createdAt])
   @@index([editorId])
+  @@index([authorUserId])
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  displayName  String
+  role         UserRole  @default(USER)
+  comments     Comment[]
+  posts        Post[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  userId    String
+  postId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId, createdAt])
+  @@index([userId])
 }
 
 model Product {
@@ -52,34 +80,27 @@ model Product {
   nameKo   String?
   brand    String?
   category String?
-
   country     String?
   brandOrigin String?
   sourceUrl   String?
-
   description     String?
   descriptionI18n Json?
   tagline         Json?
-
   retailPrice   Float?
   price         Float?
   creatorPrice  Float?
   creatorMargin Int?
   moq           Int?
-
   shipsTo         String?
   sampleAvailable Boolean @default(false)
   isNew           Boolean @default(false)
-
   images      Json?
   imageUrl    String?
   externalUrl String?
-
   collaborationTypes Json?
   highlights         Json?
   creatorFit         Json?
   contentIdeas       Json?
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

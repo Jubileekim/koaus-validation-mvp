@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
+import CommentSection from '../components/editorial/CommentSection.jsx'
 import { getPostById } from '../services/postApi.js'
 import { getProductById } from '../services/productApi.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
 import { useTranslation } from '../contexts/LocaleContext.jsx'
+import { canEditPost } from '../utils/postAuth.js'
 import '../styles/editorial.css'
 
 function ShopProductBlock({ productId, locale }) {
@@ -159,16 +162,19 @@ function ArticleBody({ content, locale }) {
 export default function EditorialDetailPage() {
   const { postId } = useParams()
   const { locale } = useTranslation()
+  const { user } = useAuth()
 
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState(false)
 
+  const canEdit = canEditPost(user, post)
+
   const copy =
     locale === 'ko'
       ? {
           back: '← 에디토리얼로 돌아가기',
-          edit: '글 수정',
+          edit: 'Edit',
           loading: '이야기를 불러오는 중...',
           error: '이야기를 불러올 수 없습니다.',
           retry: '다시 시도',
@@ -179,7 +185,7 @@ export default function EditorialDetailPage() {
         }
       : {
           back: '← Back to Editorial',
-          edit: 'Edit story',
+          edit: 'Edit',
           loading: 'Loading story...',
           error: 'Unable to load story.',
           retry: 'Try again',
@@ -272,12 +278,14 @@ export default function EditorialDetailPage() {
             {copy.back}
           </Link>
 
-          <Link
-            className="editorial-detail__edit"
-            to={`/editorial/${post.id}/edit`}
-          >
-            {copy.edit} →
-          </Link>
+          {canEdit ? (
+            <Link
+              className="editorial-detail__edit"
+              to={`/editorial/${post.id}/edit`}
+            >
+              {copy.edit} →
+            </Link>
+          ) : null}
         </div>
 
         <article>
@@ -321,6 +329,8 @@ export default function EditorialDetailPage() {
             locale={locale}
           />
         </article>
+
+        <CommentSection postId={post.id} />
       </div>
     </main>
   )

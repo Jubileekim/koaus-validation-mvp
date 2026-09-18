@@ -8,12 +8,16 @@ import {
   getPostById,
   updatePost,
 } from '../services/postApi.js'
+import { useAuth } from '../contexts/AuthContext.jsx'
+import { canEditPost } from '../utils/postAuth.js'
 import '../styles/editorial-write.css'
 
 export default function EditorialEditPage() {
   const { postId } = useParams()
   const navigate = useNavigate()
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
 
+  const [post, setPost] = useState(null)
   const [type, setType] = useState('ARTICLE')
   const [title, setTitle] = useState('')
   const [titleKo, setTitleKo] = useState('')
@@ -21,29 +25,44 @@ export default function EditorialEditPage() {
   const [contentKo, setContentKo] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [videoUrl, setVideoUrl] = useState('')
-  const [password, setPassword] = useState('')
 
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
+  const allowed = canEditPost(user, post)
+
   useEffect(() => {
+    if (authLoading) {
+      return
+    }
+
+    if (!isAuthenticated) {
+      navigate('/login', {
+        replace: true,
+        state: { from: `/editorial/${postId}/edit` },
+      })
+      return
+    }
+
     async function loadPost() {
       try {
-        const post = await getPostById(postId)
+        const data = await getPostById(postId)
 
-        if (!post) {
+        if (!data) {
           setError('Story not found.')
+          setPost(null)
           return
         }
 
-        setType(post.type || 'ARTICLE')
-        setTitle(post.title || '')
-        setTitleKo(post.titleKo || '')
-        setContent(post.content || '')
-        setContentKo(post.contentKo || '')
-        setImageUrl(post.imageUrl || '')
-        setVideoUrl(post.videoUrl || '')
+        setPost(data)
+        setType(data.type || 'ARTICLE')
+        setTitle(data.title || '')
+        setTitleKo(data.titleKo || '')
+        setContent(data.content || '')
+        setContentKo(data.contentKo || '')
+        setImageUrl(data.imageUrl || '')
+        setVideoUrl(data.videoUrl || '')
       } catch (loadError) {
         console.error(loadError)
         setError('Failed to load story.')
@@ -53,13 +72,13 @@ export default function EditorialEditPage() {
     }
 
     loadPost()
-  }, [postId])
+  }, [postId, authLoading, isAuthenticated, navigate])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    if (!password) {
-      setError('Password is required.')
+    if (!allowed) {
+      setError('You do not have permission to edit this story.')
       return
     }
 
@@ -75,7 +94,6 @@ export default function EditorialEditPage() {
         contentKo,
         imageUrl,
         videoUrl,
-        password,
       })
 
       navigate(`/editorial/${postId}`)
@@ -90,11 +108,47 @@ export default function EditorialEditPage() {
     }
   }
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <main className="ew-page">
         <div className="shell ew-shell">
           Loading story...
+        </div>
+      </main>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <main className="ew-page">
+        <div className="shell ew-shell">
+          Redirecting to login...
+        </div>
+      </main>
+    )
+  }
+
+  if (!post || !allowed) {
+    return (
+      <main className="ew-page">
+        <div className="shell ew-shell">
+          <div className="ew-topbar">
+            <Link
+              className="ew-back"
+              to={`/editorial/${postId}`}
+            >
+              ← Back to story
+            </Link>
+          </div>
+
+          <header className="ew-header">
+            <p className="ew-eyebrow">EDIT STORY</p>
+            <h1>You cannot edit this story.</h1>
+            <p className="ew-intro">
+              Only the author or an admin can edit this story.
+              Legacy stories without an owner can only be edited by admins.
+            </p>
+          </header>
         </div>
       </main>
     )
@@ -126,8 +180,7 @@ export default function EditorialEditPage() {
           </h1>
 
           <p className="ew-intro">
-            Update the article and enter the
-            password used when it was published.
+            Update your article and publish the latest version.
           </p>
         </header>
 
@@ -162,14 +215,11 @@ export default function EditorialEditPage() {
           <div className="ew-field">
             <div className="ew-field__label">
               <span>02</span>
-              <label htmlFor="edit-title">
-                English title
-              </label>
+              <label>English title</label>
             </div>
 
             <div className="ew-field__control">
               <input
-                id="edit-title"
                 value={title}
                 onChange={(event) =>
                   setTitle(event.target.value)
@@ -256,24 +306,6 @@ export default function EditorialEditPage() {
                 onChange={(event) =>
                   setVideoUrl(event.target.value)
                 }
-              />
-            </div>
-          </div>
-
-          <div className="ew-field">
-            <div className="ew-field__label">
-              <span>08</span>
-              <label>Password</label>
-            </div>
-
-            <div className="ew-field__control">
-              <input
-                type="password"
-                value={password}
-                onChange={(event) =>
-                  setPassword(event.target.value)
-                }
-                placeholder="Story password"
               />
             </div>
           </div>

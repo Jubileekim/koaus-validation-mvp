@@ -1,22 +1,64 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import bcrypt from 'bcryptjs'
+import session from 'express-session'
+import connectPgSimple from 'connect-pg-simple'
 import prisma from './db/prisma.js'
+import authRouter from './routes/auth.route.js'
+import commentRouter from './routes/comment.route.js'
 
 dotenv.config()
 
 const app = express()
 const PORT = process.env.PORT || 3000
+const isProduction = process.env.NODE_ENV === 'production'
+const PgSession = connectPgSimple(session)
+const sessionSecret = process.env.SESSION_SECRET
+const corsOrigins = (process.env.CORS_ORIGIN ?? 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+
+if (!sessionSecret) {
+  throw new Error('SESSION_SECRET is required')
+}
+
+if (corsOrigins.length === 0) {
+  throw new Error('CORS_ORIGIN must include at least one origin')
+}
+
+app.set('trust proxy', 1)
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN?.split(',') ?? '*',
+    origin: corsOrigins,
+    credentials: true,
   }),
 )
 app.use(express.json({ limit: '1mb' }))
+app.use(
+  session({
+    name: 'koaus.sid',
+    store: new PgSession({
+      conString: process.env.DATABASE_URL,
+      schemaName: 'private',
+      createTableIfMissing: true,
+    }),
+    secret: sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    },
+  }),
+)
 
-// API 응답에서 비밀번호 해시 제거
+app.use('/api/auth', authRouter)
+app.use('/api', commentRouter)
+
 function removePasswordHash(post) {
   if (!post) return post
 
@@ -28,14 +70,35 @@ function removePasswordHash(post) {
   return safePost
 }
 
-// 서버 상태 확인
+function canEditPost(user, post) {
+  if (!user || !post) return false
+  if (user.role === 'ADMIN') return true
+  if (post.authorUserId && post.authorUserId === user.id) {
+    return true
+  }
+  return false
+}
+
+async function getSessionUser(req) {
+  if (!req.session?.userId) {
+    return null
+  }
+
+  return prisma.user.findUnique({
+    where: { id: req.session.userId },
+    select: {
+      id: true,
+      role: true,
+    },
+  })
+}
+
 app.get('/api/health', (req, res) => {
   res.status(200).json({
     message: 'KOAUS API is running',
   })
 })
 
-// 게시글 전체 조회
 app.get('/api/posts', async (req, res) => {
   try {
     const limit = Math.min(
@@ -62,26 +125,19 @@ app.get('/api/posts', async (req, res) => {
       .status(200)
       .json(posts.map(removePasswordHash))
   } catch (error) {
-    console.error(
-      'GET /api/posts failed:',
-      error,
-    )
-
+    console.error('GET /api/posts failed:', error)
     res.status(500).json({
       message: 'Failed to load posts',
     })
   }
 })
 
-// 게시글 1개 상세 조회
 app.get('/api/posts/:id', async (req, res) => {
   try {
     const { id } = req.params
 
     const post = await prisma.post.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
       include: {
         editor: true,
       },
@@ -93,24 +149,25 @@ app.get('/api/posts/:id', async (req, res) => {
       })
     }
 
-    res
-      .status(200)
-      .json(removePasswordHash(post))
+    res.status(200).json(removePasswordHash(post))
   } catch (error) {
-    console.error(
-      'GET /api/posts/:id failed:',
-      error,
-    )
-
+    console.error('GET /api/posts/:id failed:', error)
     res.status(500).json({
       message: 'Failed to load post',
     })
   }
 })
 
-// 게시글 작성
 app.post('/api/posts', async (req, res) => {
   try {
+    const currentUser = await getSessionUser(req)
+
+    if (!currentUser) {
+      return res.status(401).json({
+        message: 'Authentication required',
+      })
+    }
+
     const {
       title,
       titleKo,
@@ -120,7 +177,6 @@ app.post('/api/posts', async (req, res) => {
       imageUrl,
       videoUrl,
       editorId,
-      password,
     } = req.body
 
     if (!title?.trim()) {
@@ -143,24 +199,13 @@ app.post('/api/posts', async (req, res) => {
 
     if (!['ARTICLE', 'REEL'].includes(type)) {
       return res.status(400).json({
-        message:
-          'Type must be ARTICLE or REEL',
+        message: 'Type must be ARTICLE or REEL',
       })
     }
 
-    if (!password || password.length < 6) {
-      return res.status(400).json({
-        message:
-          'Password must be at least 6 characters',
-      })
-    }
-
-    const editor =
-      await prisma.editor.findUnique({
-        where: {
-          id: editorId,
-        },
-      })
+    const editor = await prisma.editor.findUnique({
+      where: { id: editorId },
+    })
 
     if (!editor) {
       return res.status(404).json({
@@ -168,56 +213,43 @@ app.post('/api/posts', async (req, res) => {
       })
     }
 
-    const passwordHash = await bcrypt.hash(
-      password,
-      10,
-    )
-
     const post = await prisma.post.create({
       data: {
-        // 영어
         title: title.trim(),
         content: content.trim(),
-
-        // 한국어
         titleKo: titleKo?.trim() || null,
-        contentKo:
-          contentKo?.trim() || null,
-
+        contentKo: contentKo?.trim() || null,
         type,
-
         imageUrl: imageUrl || null,
         videoUrl: videoUrl || null,
-
         editorId,
-        passwordHash,
+        authorUserId: currentUser.id,
       },
-
       include: {
         editor: true,
       },
     })
 
-    res
-      .status(201)
-      .json(removePasswordHash(post))
+    res.status(201).json(removePasswordHash(post))
   } catch (error) {
-    console.error(
-      'POST /api/posts failed:',
-      error,
-    )
-
+    console.error('POST /api/posts failed:', error)
     res.status(500).json({
       message: 'Failed to create post',
     })
   }
 })
 
-// 게시글 수정
 app.patch('/api/posts/:id', async (req, res) => {
   try {
-    const { id } = req.params
+    const currentUser = await getSessionUser(req)
 
+    if (!currentUser) {
+      return res.status(401).json({
+        message: 'Authentication required',
+      })
+    }
+
+    const { id } = req.params
     const {
       title,
       titleKo,
@@ -226,21 +258,15 @@ app.patch('/api/posts/:id', async (req, res) => {
       type,
       imageUrl,
       videoUrl,
-      password,
     } = req.body
 
-    if (!password) {
-      return res.status(400).json({
-        message: 'Password is required',
-      })
-    }
-
-    const existingPost =
-      await prisma.post.findUnique({
-        where: {
-          id,
-        },
-      })
+    const existingPost = await prisma.post.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        authorUserId: true,
+      },
+    })
 
     if (!existingPost) {
       return res.status(404).json({
@@ -248,140 +274,78 @@ app.patch('/api/posts/:id', async (req, res) => {
       })
     }
 
-    if (!existingPost.passwordHash) {
+    if (!canEditPost(currentUser, existingPost)) {
       return res.status(403).json({
-        message:
-          'This post cannot be edited because it has no edit password',
+        message: 'You do not have permission to edit this post',
       })
     }
 
-    const passwordMatches =
-      await bcrypt.compare(
-        password,
-        existingPost.passwordHash,
-      )
-
-    if (!passwordMatches) {
-      return res.status(403).json({
-        message: 'Incorrect password',
-      })
-    }
-
-    if (
-      type !== undefined &&
-      !['ARTICLE', 'REEL'].includes(type)
-    ) {
+    if (type !== undefined && !['ARTICLE', 'REEL'].includes(type)) {
       return res.status(400).json({
-        message:
-          'Type must be ARTICLE or REEL',
+        message: 'Type must be ARTICLE or REEL',
       })
     }
 
-    if (
-      title !== undefined &&
-      !title.trim()
-    ) {
+    if (title !== undefined && !title.trim()) {
       return res.status(400).json({
-        message:
-          'English title cannot be empty',
+        message: 'English title cannot be empty',
       })
     }
 
-    if (
-      content !== undefined &&
-      !content.trim()
-    ) {
+    if (content !== undefined && !content.trim()) {
       return res.status(400).json({
-        message:
-          'English content cannot be empty',
+        message: 'English content cannot be empty',
       })
     }
 
     const updateData = {}
+    if (title !== undefined) updateData.title = title.trim()
+    if (titleKo !== undefined) updateData.titleKo = titleKo?.trim() || null
+    if (content !== undefined) updateData.content = content.trim()
+    if (contentKo !== undefined) updateData.contentKo = contentKo?.trim() || null
+    if (type !== undefined) updateData.type = type
+    if (imageUrl !== undefined) updateData.imageUrl = imageUrl || null
+    if (videoUrl !== undefined) updateData.videoUrl = videoUrl || null
 
-    if (title !== undefined) {
-      updateData.title = title.trim()
-    }
+    const updatedPost = await prisma.post.update({
+      where: { id },
+      data: updateData,
+      include: {
+        editor: true,
+      },
+    })
 
-    if (titleKo !== undefined) {
-      updateData.titleKo =
-        titleKo?.trim() || null
-    }
-
-    if (content !== undefined) {
-      updateData.content =
-        content.trim()
-    }
-
-    if (contentKo !== undefined) {
-      updateData.contentKo =
-        contentKo?.trim() || null
-    }
-
-    if (type !== undefined) {
-      updateData.type = type
-    }
-
-    if (imageUrl !== undefined) {
-      updateData.imageUrl =
-        imageUrl || null
-    }
-
-    if (videoUrl !== undefined) {
-      updateData.videoUrl =
-        videoUrl || null
-    }
-
-    const updatedPost =
-      await prisma.post.update({
-        where: {
-          id,
-        },
-
-        data: updateData,
-
-        include: {
-          editor: true,
-        },
-      })
-
-    res
-      .status(200)
-      .json(
-        removePasswordHash(updatedPost),
-      )
+    res.status(200).json(removePasswordHash(updatedPost))
   } catch (error) {
-    console.error(
-      'PATCH /api/posts/:id failed:',
-      error,
-    )
-
+    console.error('PATCH /api/posts/:id failed:', error)
     res.status(500).json({
       message: 'Failed to update post',
     })
   }
 })
 
-// 게시글 삭제
 app.delete('/api/posts/:id', async (req, res) => {
   try {
-    const { id } = req.params
+    const currentUser = await getSessionUser(req)
 
-    const password =
-      req.get('x-post-password')
-
-    if (!password) {
-      return res.status(400).json({
-        message: 'Password is required',
+    if (!currentUser) {
+      return res.status(401).json({
+        message: 'Authentication required',
       })
     }
 
-    const post =
-      await prisma.post.findUnique({
-        where: {
-          id,
-        },
+    if (currentUser.role !== 'ADMIN') {
+      return res.status(403).json({
+        message: 'Only admins can delete posts',
       })
+    }
+
+    const { id } = req.params
+
+    const post = await prisma.post.findUnique({
+      where: { id },
+      select: { id: true },
+    })
 
     if (!post) {
       return res.status(404).json({
@@ -389,105 +353,59 @@ app.delete('/api/posts/:id', async (req, res) => {
       })
     }
 
-    if (!post.passwordHash) {
-      return res.status(403).json({
-        message:
-          'This post was created before password protection was enabled',
-      })
-    }
-
-    const passwordMatches =
-      await bcrypt.compare(
-        password,
-        post.passwordHash,
-      )
-
-    if (!passwordMatches) {
-      return res.status(401).json({
-        message: 'Incorrect password',
-      })
-    }
-
     await prisma.post.delete({
-      where: {
-        id,
-      },
+      where: { id },
     })
 
     res.status(200).json({
-      message:
-        'Post deleted successfully',
+      message: 'Post deleted successfully',
     })
   } catch (error) {
-    console.error(
-      'DELETE /api/posts/:id failed:',
-      error,
-    )
-
+    console.error('DELETE /api/posts/:id failed:', error)
     res.status(500).json({
       message: 'Failed to delete post',
     })
   }
 })
 
-// 상품 전체 조회
 app.get('/api/products', async (req, res) => {
   try {
-    const products =
-      await prisma.product.findMany({
-        orderBy: {
-          createdAt: 'desc',
-        },
-      })
+    const products = await prisma.product.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    })
 
     res.status(200).json(products)
   } catch (error) {
-    console.error(
-      'GET /api/products failed:',
-      error,
-    )
-
+    console.error('GET /api/products failed:', error)
     res.status(500).json({
-      message:
-        'Failed to load products',
+      message: 'Failed to load products',
     })
   }
 })
 
-// 상품 1개 상세 조회
-app.get(
-  '/api/products/:id',
-  async (req, res) => {
-    try {
-      const { id } = req.params
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const product = await prisma.product.findUnique({
+      where: { id },
+    })
 
-      const product =
-        await prisma.product.findUnique({
-          where: {
-            id,
-          },
-        })
-
-      if (!product) {
-        return res.status(404).json({
-          message: 'Product not found',
-        })
-      }
-
-      res.status(200).json(product)
-    } catch (error) {
-      console.error(
-        'GET /api/products/:id failed:',
-        error,
-      )
-
-      res.status(500).json({
-        message:
-          'Failed to load product',
+    if (!product) {
+      return res.status(404).json({
+        message: 'Product not found',
       })
     }
-  },
-)
+
+    res.status(200).json(product)
+  } catch (error) {
+    console.error('GET /api/products/:id failed:', error)
+    res.status(500).json({
+      message: 'Failed to load product',
+    })
+  }
+})
 
 app.use((req, res) => {
   res.status(404).json({
@@ -497,14 +415,11 @@ app.use((req, res) => {
 
 app.use((error, req, res, _next) => {
   console.error('Unhandled error:', error)
-
   res.status(500).json({
     message: 'Unexpected server error',
   })
 })
 
 app.listen(PORT, () => {
-  console.log(
-    `KOAUS server running on http://localhost:${PORT}`,
-  )
+  console.log(`KOAUS server running on http://localhost:${PORT}`)
 })
