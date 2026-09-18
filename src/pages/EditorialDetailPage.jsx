@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
+import CommentSection from '../components/editorial/CommentSection.jsx'
 import { getPostById } from '../services/postApi.js'
 import { getProductById } from '../services/productApi.js'
 import { useTranslation } from '../contexts/LocaleContext.jsx'
@@ -321,6 +322,8 @@ export default function EditorialDetailPage() {
             locale={locale}
           />
         </article>
+
+        <CommentSection postId={post.id} />
       </div>
     </main>
   )
