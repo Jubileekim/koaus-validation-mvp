@@ -5,7 +5,7 @@
 
 - **Sprint Mission 6** — React 기반 Frontend MVP
 - **Sprint Mission 7** — Express + Prisma + PostgreSQL 기반 Full-stack MVP
-- **Sprint Mission 8** — Session 기반 회원 인증 + Editorial 댓글 (진행 중)
+- **Sprint Mission 8** — Session 기반 회원 인증 + Editorial 댓글 (**구현 · 검증 완료**)
 
 Mission 6 / Mission 8 상세 문서는 아래에서 확인할 수 있습니다.
 
@@ -25,7 +25,7 @@ Sprint Mission 7에서 Express API, PostgreSQL 데이터베이스,
 Prisma ORM을 추가하여 실제 클라이언트-서버 구조로 확장했습니다.
 
 Sprint Mission 8에서는 Session 기반 유저 인증과
-Editorial 댓글 기능을 추가하는 고도화를 **진행 중**입니다.
+Editorial 댓글 기능을 추가하는 고도화를 **구현하고 로컬에서 검증 완료**했습니다.
 
 ---
 
@@ -56,7 +56,7 @@ Editorial 댓글 기능을 추가하는 고도화를 **진행 중**입니다.
 
 Mission 8에서는 고도화 기능으로 **유저 기능(Session 기반 인증 + Editorial 댓글)** 을 선택했습니다.
 
-상세 설계·구현 상태·검증 시나리오는 [docs/mission8.md](./docs/mission8.md)를 참고하세요.
+상세 설계·API·검증 체크리스트는 [docs/mission8.md](./docs/mission8.md)를 참고하세요.
 
 ### 1. 선택한 고도화 기능
 
@@ -64,7 +64,7 @@ Mission 8에서는 고도화 기능으로 **유저 기능(Session 기반 인증 
 - Session 기반 로그인 상태 유지
 - Editorial 게시물 댓글 조회 / 작성 / 삭제
 - 본인 댓글 삭제 + ADMIN 전체 댓글 삭제
-- Loading / Error / Empty 상태 처리 (설계 및 일부 백엔드 기반)
+- Loading / Error / Empty 상태 처리
 
 ### 2. 기존 MVP 한계 (Mission 7)
 
@@ -81,7 +81,7 @@ Mission 8에서는 고도화 기능으로 **유저 기능(Session 기반 인증 
 | --- | --- |
 | 인증 | signup / login / logout / me |
 | 댓글 | 조회(비로그인 가능) / 작성(로그인 필요) / 삭제(본인 또는 ADMIN) |
-| UX | Loading / Error / Empty + 로그인 유도 |
+| UX | Loading / Error / Empty + 로그인 유도 + returnTo |
 | UI 언어 | English-first (KO/EN 토글 제거) |
 
 ### 4. Session을 선택한 이유
@@ -94,7 +94,14 @@ JWT가 아니라 **Session-based Authentication**을 사용합니다.
 - 현재 규모에서 stateless JWT가 필수는 아님
 - Authentication / Authorization 학습에 적합
 
-운영에서는 Express MemoryStore 대신 **PostgreSQL Session Store** (`connect-pg-simple`)를 사용합니다.
+```text
+Browser
+→ HttpOnly Session Cookie (`koaus.sid`)
+→ Express
+→ PostgreSQL Session Store (`private.session`)
+→ session.userId
+→ User
+```
 
 ### 5. 사용자 흐름 (요약)
 
@@ -124,27 +131,28 @@ Editorial 상세 → 댓글 읽기(비로그인 가능)
 - DB의 `titleKo`, `contentKo` 등 다국어 필드는 Mission 8에서 삭제하지 않음
 - 전체 i18n / DB 정리는 추후 리팩터링 대상
 
-### 8. 주요 API (초기 구현)
+### 8. 주요 API (구현 · 검증 완료)
 
 | Method | Endpoint | 인증 | 상태 |
 | --- | --- | --- | --- |
-| `POST` | `/api/auth/signup` | 불필요 | 초기 구현 · 검증 필요 |
-| `POST` | `/api/auth/login` | 불필요 | 초기 구현 · 검증 필요 |
-| `POST` | `/api/auth/logout` | 세션 | 초기 구현 · 검증 필요 |
-| `GET` | `/api/auth/me` | 세션 확인 | 초기 구현 · 검증 필요 |
-| `GET` | `/api/posts/:postId/comments` | 불필요 | 초기 구현 · 검증 필요 |
-| `POST` | `/api/posts/:postId/comments` | 필요 | 초기 구현 · 검증 필요 |
-| `DELETE` | `/api/comments/:commentId` | 본인 또는 ADMIN | 초기 구현 · 검증 필요 |
+| `POST` | `/api/auth/signup` | 불필요 | 구현 · 검증 완료 |
+| `POST` | `/api/auth/login` | 불필요 | 구현 · 검증 완료 |
+| `POST` | `/api/auth/logout` | 세션 | 구현 · 검증 완료 |
+| `GET` | `/api/auth/me` | 세션 확인 | 구현 · 검증 완료 |
+| `GET` | `/api/posts/:postId/comments` | 불필요 | 구현 · 검증 완료 |
+| `POST` | `/api/posts/:postId/comments` | 필요 | 구현 · 검증 완료 |
+| `DELETE` | `/api/comments/:commentId` | 본인 또는 ADMIN | 구현 · 검증 완료 |
 
 ### 9. DB 모델 변경
 
-Prisma에 다음 모델이 추가되어 있습니다. (migration 파일 존재 · **DB 적용/검증 필요**)
+Supabase PostgreSQL에 적용 완료:
 
 - `User` — email, passwordHash, displayName, role (`USER` / `ADMIN`)
 - `Comment` — content, userId, postId
 - `Post.comments` 관계
+- `User` / `Comment` RLS enabled (policy 없음 · Express/Prisma 서버 연결로 접근)
 
-Session 테이블은 Prisma migration이 아니라 `connect-pg-simple`이 DB에 생성합니다 (`createTableIfMissing: true`).
+Session 테이블은 Prisma migration이 아니라 `connect-pg-simple`이 `private.session`에 생성합니다.
 
 ### 10. 보안 및 환경변수
 
@@ -159,24 +167,23 @@ SESSION_SECRET="replace-with-a-long-random-secret"
 NODE_ENV="development"
 ```
 
-- 비밀번호는 bcrypt hash만 저장
+- 비밀번호는 bcrypt hash만 저장 · API에 `passwordHash` 미노출
 - Session cookie: HttpOnly, production에서 Secure + SameSite=None
 - CORS `credentials: true` + Origin 제한
-- 권한은 클라이언트 입력이 아니라 `session.userId` / DB role 기준
+- Frontend는 `VITE_API_URL`만 사용 (DB/SESSION_SECRET 미노출)
+- auth token을 localStorage/sessionStorage에 저장하지 않음
 
-### 11. 검증 항목
+### 11. 검증 결과 (요약)
 
-아직 실행 검증은 완료하지 않았습니다. 검증이 필요한 항목:
+로컬 Backend API + 브라우저 통합 테스트로 검증했습니다. 상세는 [docs/mission8.md](./docs/mission8.md).
 
-- [ ] migration 적용 후 User / Comment 테이블 존재
-- [ ] signup → session cookie → `/api/auth/me`
-- [ ] login / logout
-- [ ] 비로그인 댓글 작성 시 401
-- [ ] 로그인 후 댓글 작성 / 본인 삭제
-- [ ] 타인 댓글 삭제 시 403, ADMIN 삭제 가능
-- [ ] Frontend 로그인 ↔ Editorial 댓글 UX
-- [ ] Loading / Error / Empty 상태
-- [ ] cross-origin cookie (local / Vercel)
+- [x] migration 적용 · User / Comment / `private` schema
+- [x] signup / login / logout / `/me` / session cookie
+- [x] 비로그인 댓글 작성 401 · 로그인 작성 · 본인 삭제 · 타인 403 · ADMIN 삭제 *(ADMIN은 Backend API 검증)*
+- [x] Frontend Login/Signup · Header · returnTo · CommentSection
+- [x] Loading / Error / Empty · desktop/mobile · production build
+- [ ] Production Vercel cookie/CORS 배포 검증 *(로컬 외 배포 환경은 별도)*
+- 최종 브라우저 E2E에서는 ADMIN role UI를 다시 돌리지 않음 (상세: [docs/mission8.md](./docs/mission8.md))
 
 ### 12. 향후 확장 가능성
 
@@ -199,13 +206,14 @@ NODE_ENV="development"
 
 | 구분 | 상태 |
 | --- | --- |
-| Backend Session / Auth / Comment API 코드 | 초기 구현 · 검증 필요 |
-| Prisma User / Comment 모델 + migration 파일 | 초기 구현 · DB 적용 검증 필요 |
-| `express-session` / `connect-pg-simple` | `package.json`에 선언됨 · **npm install / lockfile 동기화 검증 필요** |
-| Frontend Auth UI / AuthProvider | 미구현 |
-| Frontend Comment UI | 미구현 |
-| English-first (Header 토글 제거, locale `en` 고정) | 초기 적용 · `LanguageToggle.jsx` 파일·ko translations 잔존 |
-| 동작/배포 검증 | 미실시 |
+| Backend Session / Auth / Comment API | 구현 · 검증 완료 |
+| Prisma User / Comment + migration 적용 | 구현 · 검증 완료 |
+| `private.session` Session Store | 구현 · 검증 완료 |
+| Frontend AuthContext / Login / Signup / Header | 구현 · 검증 완료 |
+| Editorial CommentSection | 구현 · 검증 완료 |
+| English-first UI | 적용 · 검증 완료 |
+| 로컬 브라우저 통합 검증 | 검증 완료 |
+| Production 배포 환경 cookie 검증 | 미실시 (로컬 외) |
 
 ---
 
@@ -305,8 +313,8 @@ Product Detail
 - bcryptjs
 - dotenv
 - cors
-- express-session *(Mission 8 초기 구현)*
-- connect-pg-simple *(Mission 8 초기 구현 · PostgreSQL Session Store)*
+- express-session *(Mission 8 · 구현 · 검증 완료)*
+- connect-pg-simple *(Mission 8 · PostgreSQL Session Store · 검증 완료)*
 
 ## Infrastructure
 
@@ -324,7 +332,7 @@ Browser
   ▼
 React / Vite Frontend (Vercel)
   │
-  │ fetch()  · Mission 8에서는 credentials: 'include' 예정
+  │ fetch()  · credentials: 'include' (Session Cookie)
   ▼
 Express REST API (Vercel)
   │
@@ -420,7 +428,7 @@ Marketplace 상품 데이터를 저장합니다.
 
 ---
 
-## User *(Mission 8 · 초기 구현 · 검증 필요)*
+## User *(Mission 8 · 구현 · 검증 완료)*
 
 회원 계정 정보를 저장합니다.
 
@@ -436,7 +444,7 @@ Marketplace 상품 데이터를 저장합니다.
 
 ---
 
-## Comment *(Mission 8 · 초기 구현 · 검증 필요)*
+## Comment *(Mission 8 · 구현 · 검증 완료)*
 
 Editorial 게시물 댓글을 저장합니다.
 
@@ -730,15 +738,14 @@ true / false
 ```
 
 > 이 기능은 게시물 수정/삭제 보호를 위한 간단한 구현입니다.
-> Mission 8에서 Session 기반 회원 인증을 추가하지만,
+> Mission 8에서 Session 기반 회원 인증을 추가했으며,
 > 게시물별 비밀번호 방식은 Mission 8 범위에서도 유지합니다.
 
 ---
 
-# Auth & Comments API *(Mission 8 · 초기 구현 · 검증 필요)*
+# Auth & Comments API *(Mission 8 · 구현 · 검증 완료)*
 
-아래 API는 백엔드 라우트 코드가 존재합니다.
-프론트엔드 연동 및 실행 검증은 아직 완료되지 않았습니다.
+Session cookie와 Comment API는 로컬에서 Backend API 및 브라우저 통합 테스트로 검증되었습니다.
 
 ### Auth
 
@@ -757,7 +764,7 @@ POST   /api/posts/:postId/comments
 DELETE /api/comments/:commentId
 ```
 
-요청/응답·상태 코드·권한 정책의 상세는 [docs/mission8.md](./docs/mission8.md)를 참고하세요.
+요청/응답·상태 코드·권한 정책·검증 체크리스트는 [docs/mission8.md](./docs/mission8.md)를 참고하세요.
 
 ---
 
@@ -871,8 +878,8 @@ koaus-validation-mvp/
 | `/products/:productId`    | Product Detail                      |
 | `/creator-access`         | Creator Access                      |
 | `/brands`                 | Brand Page                          |
-| `/login`                  | Login *(Mission 8 · 구현 예정)*          |
-| `/signup`                 | Signup *(Mission 8 · 구현 예정)*         |
+| `/login`                  | Login *(Mission 8)*                   |
+| `/signup`                 | Signup *(Mission 8)*                  |
 | `*`                       | Not Found                           |
 
 ---
@@ -893,6 +900,9 @@ Frontend:
 ```text
 http://localhost:5173
 ```
+
+> Development note: open the local frontend at `http://localhost:5173`.
+> `http://127.0.0.1:5173` is blocked unless that origin is added to `CORS_ORIGIN`.
 
 ---
 
